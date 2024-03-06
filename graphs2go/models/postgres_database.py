@@ -1,9 +1,12 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from logging import Logger
 
 from psycopg import Connection
 import psycopg
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from logging import Logger
 
 
 @dataclass(frozen=True)
