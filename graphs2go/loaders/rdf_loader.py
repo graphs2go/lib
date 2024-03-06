@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
+from graphs2go.models.rdf_graph_record import RdfGraphRecord
 
 
 class RdfLoader(ABC):

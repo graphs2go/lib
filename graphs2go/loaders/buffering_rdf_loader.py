@@ -1,5 +1,5 @@
 from rdflib import ConjunctiveGraph, Graph
-from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
+from graphs2go.models.rdf_graph_record import RdfGraphRecord
 from graphs2go.loaders.rdf_loader import RdfLoader
 
 

@@ -10,8 +10,8 @@ from pathlib import Path
 
 
 if TYPE_CHECKING:
-    from graphs2go.loaders.rdf_format import RdfFormat
-    from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
+    from graphs2go.models.rdf_format import RdfFormat
+    from graphs2go.models.rdf_graph_record import RdfGraphRecord
 
 
 class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
