@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+poetry run black --check loaders
+poetry run mypy loaders
+poetry run ruff loaders
+poetry run pytest tests
