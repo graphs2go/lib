@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-poetry run black --check loaders
-poetry run mypy loaders
-poetry run ruff loaders
+poetry run black --check graphs2go
+poetry run mypy graphs2go
+poetry run ruff graphs2go
 poetry run pytest tests

@@ -1,6 +1,6 @@
-# loaders
+# shared
 
-Loaders shared by multiple pipelines to e.g., write RDF to files.
+Code shared by multiple pipelines to e.g., write RDF to files.
 
 ## Prerequisites
 
@@ -19,6 +19,6 @@ Loaders shared by multiple pipelines to e.g., write RDF to files.
 
 ## Structure of this project
 
-* `loaders`: Python code
+* `graphs2go`: Python code
 * `script`: scripts following the [Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) normalized script pattern
 * `tests`: unit tests

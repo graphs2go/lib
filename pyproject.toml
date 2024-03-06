@@ -9,7 +9,7 @@ python_version = "3.11"
 warn_unused_configs = true
 
 [tool.poetry]
-name = "loaders"
+name = "graphs2go"
 version = "0.1.0"
 description = ""
 authors = ["Minor Gordon <minorg@server.fake>"]
@@ -27,7 +27,7 @@ pytest = "^8.0.1"
 ruff = "^0.2.2"
 
 [tool.ruff]
-src = ["loaders"]
+src = ["graphs2go"]
 target-version = "py311"
 
 [tool.ruff.lint]
@@ -57,4 +57,4 @@ select = ["ALL"]
 allow-star-arg-any = true
 
 [tool.ruff.lint.isort]
-known-first-party = ["loaders"]
+known-first-party = ["graphs2go"]
