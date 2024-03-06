@@ -1,6 +1,6 @@
 from rdflib import ConjunctiveGraph, Graph
-from loaders.rdf_graph_record import RdfGraphRecord
-from loaders.rdf_loader import RdfLoader
+from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
+from graphs2go.loaders.rdf_loader import RdfLoader
 
 
 class BufferingRdfLoader(RdfLoader):

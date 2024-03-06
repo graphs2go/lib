@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from rdflib import Graph
 
-from loaders.record import Record
+from graphs2go.loaders.record import Record
 
 
 @dataclass(frozen=True)

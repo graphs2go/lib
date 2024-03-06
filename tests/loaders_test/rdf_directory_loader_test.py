@@ -2,10 +2,10 @@ from pathlib import Path
 import pytest
 
 from rdflib import ConjunctiveGraph, Graph
-from loaders.rdf_directory_loader import RdfDirectoryLoader
-from loaders.rdf_format import RdfFormat
+from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
+from graphs2go.loaders.rdf_format import RdfFormat
 
-from loaders.rdf_graph_record import RdfGraphRecord
+from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
 
 
 @pytest.mark.parametrize(

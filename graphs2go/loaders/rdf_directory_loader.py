@@ -1,17 +1,17 @@
 from __future__ import annotations
 from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph, Graph
-from loaders.buffering_rdf_loader import BufferingRdfLoader
+from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
 
-from loaders.directory_loader import DirectoryLoader
+from graphs2go.loaders.directory_loader import DirectoryLoader
 from typing import IO, TYPE_CHECKING
-from loaders.rdf_loader import RdfLoader
+from graphs2go.loaders.rdf_loader import RdfLoader
 from pathlib import Path
 
 
 if TYPE_CHECKING:
-    from loaders.rdf_format import RdfFormat
-    from loaders.rdf_graph_record import RdfGraphRecord
+    from graphs2go.loaders.rdf_format import RdfFormat
+    from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
 
 
 class RdfDirectoryLoader(DirectoryLoader, RdfLoader):

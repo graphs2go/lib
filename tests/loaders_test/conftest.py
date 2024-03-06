@@ -1,7 +1,7 @@
 import pytest
 from rdflib import RDF, RDFS, SDO, Graph, Literal, URIRef
 
-from loaders.rdf_graph_record import RdfGraphRecord
+from graphs2go.loaders.rdf_graph_record import RdfGraphRecord
 
 
 @pytest.fixture(scope="session")
