@@ -2,7 +2,7 @@ from __future__ import annotations
 from dagster import ConfigurableResource, EnvVar
 
 
-class PostgresConfig(ConfigurableResource):
+class PostgresConfig(ConfigurableResource):  # type: ignore
     conninfo: str
     truncate: bool
 
