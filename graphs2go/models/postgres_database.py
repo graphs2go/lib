@@ -1,9 +1,10 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
-from psycopg import Connection
-import psycopg
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
+
+import psycopg
+from psycopg import Connection
 
 if TYPE_CHECKING:
     from logging import Logger

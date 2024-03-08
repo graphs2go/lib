@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from graphs2go.models.postgres_schema import PostgresSchema
 
+from graphs2go.models.postgres_schema import PostgresSchema
 from graphs2go.models.postgres_table import PostgresTable
 
 

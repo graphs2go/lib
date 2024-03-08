@@ -1,9 +1,8 @@
+import os
 from collections.abc import Callable
 from logging import Logger
-import os
 from pathlib import Path
 from typing import TypeVar
-
 
 ReleaseT = TypeVar("ReleaseT")
 

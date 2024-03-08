@@ -1,12 +1,14 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from graphs2go.models.postgres_database import PostgresDatabase
     from logging import Logger
+
     from psycopg import Connection
+
+    from graphs2go.models.postgres_database import PostgresDatabase
 
 
 @dataclass(frozen=True)

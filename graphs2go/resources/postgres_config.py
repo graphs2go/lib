@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dagster import ConfigurableResource, EnvVar
 
 
