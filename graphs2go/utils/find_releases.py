@@ -20,6 +20,12 @@ def find_releases(
     release_factory is called with a candidate directory path. It should return a release object or throw ValueError.
     """
 
+    release_directory_path = release_directory_path.absolute()
+    if not release_directory_path.is_dir():
+        raise ValueError(
+            "release directory {release_directory_path} is not a directory"
+        )
+
     releases: list[ReleaseT] = []
 
     try:
