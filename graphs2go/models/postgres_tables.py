@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+import dataclasses
 from dataclasses import dataclass
 
 from graphs2go.models.postgres_schema import PostgresSchema
@@ -6,7 +6,7 @@ from graphs2go.models.postgres_table import PostgresTable
 
 
 @dataclass(frozen=True)
-class PostgresTables(ABC):
+class PostgresTables:
     def _post_init(self) -> None:
         database_names: set[str] = set()
         schema_names: set[str] = set()
@@ -25,6 +25,10 @@ class PostgresTables(ABC):
         return self._tables[0].schema
 
     @property
-    @abstractmethod
     def _tables(self) -> tuple[PostgresTable, ...]:
-        raise NotImplementedError
+        result: list[PostgresTable] = []
+        for field in dataclasses.fields(self):
+            value = getattr(self, field.name)
+            assert isinstance(value, PostgresTable)
+            result.append(value)
+        return tuple(result)
