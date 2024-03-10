@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from logging import Logger
-
-    from psycopg import Connection
 
     from graphs2go.models.postgres_database import PostgresDatabase
 
@@ -16,8 +15,9 @@ class PostgresSchema:
     database: PostgresDatabase
     name: str
 
-    def connect(self) -> Connection:
-        return self.database.connect(options=f"-c search_path={self.name}")
+    @property
+    def conninfo(self) -> str:
+        return self.database.conninfo + f"?options=-csearch_path%3D{self.name}"
 
     @classmethod
     def create(

@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-import psycopg
-from psycopg import Connection
+from graphs2go.resources.postgres_connection_pool import PostgresConnectionPool
+
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -12,16 +12,13 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class PostgresDatabase:
-    conninfo: str
     name: str
 
-    def connect(self, options: str | None = None) -> Connection:
-        return psycopg.connect(self.conninfo, dbname=self.name, options=options)
-
     @classmethod
-    def create(cls, *, conninfo: str, logger: Logger, name: str) -> PostgresDatabase:
-        with psycopg.connect(conninfo) as conn:
-            conn.autocommit = True
+    def create(
+        cls, *, connection_pool: PostgresConnectionPool, logger: Logger, name: str
+    ) -> PostgresDatabase:
+        with connection_pool.connect(self) as conn:
             with conn.cursor() as cur:
                 try:
                     cur.execute(f"CREATE DATABASE {name};")  # type: ignore
