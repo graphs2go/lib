@@ -48,7 +48,7 @@ class PostgresConnectionPool(ConfigurableResource):
             if schema_name is not None:
                 connection_pool_kwds["options"] = f"-c search_path={schema_name}"
             connection_pool = ConnectionPool(
-                conninfo=self.conninfo, **connection_pool_kwds  # type: ignore
+                conninfo=self.conninfo, kwargs=connection_pool_kwds
             )
             self.__connection_pools[database_name][schema_name] = connection_pool
 
@@ -61,6 +61,6 @@ class PostgresConnectionPool(ConfigurableResource):
         finally:
             connection_pool.putconn(conn)
             t1 = monotonic()
-            connection_pool._stats[self._USAGE_MS] += int(  # noqa: SLF001
+            connection_pool._stats[connection_pool._USAGE_MS] += int(  # noqa: SLF001
                 1000.0 * (t1 - t0)
             )
