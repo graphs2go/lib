@@ -22,7 +22,7 @@ class PostgresConnectionPool(ConfigurableResource):
 
     @classmethod
     def from_env_vars(cls) -> PostgresConnectionPool:
-        return cls(conninfo=EnvVar("POSTGRES_CONNINFO"))
+        return cls(conninfo=EnvVar("POSTGRES_CONNINFO").get_value())
 
     @contextmanager
     def connect(
@@ -48,11 +48,15 @@ class PostgresConnectionPool(ConfigurableResource):
             if schema_name is not None:
                 connection_pool_kwds["options"] = f"-c search_path={schema_name}"
             connection_pool = ConnectionPool(
-                conninfo=self.conninfo, kwargs=connection_pool_kwds
+                conninfo=self.conninfo,
+                kwargs=connection_pool_kwds,
+                max_size=8,  # Otherwise it defaults to min_size
+                min_size=1,
+                timeout=5,  # Fail quickly if the pool is exhausted
             )
             self.__connection_pools[database_name][schema_name] = connection_pool
 
-        # Adapt from ConnectionPool.connection()
+        # Adapted from ConnectionPool.connection()
         conn = connection_pool.getconn()
         try:
             t0 = monotonic()
