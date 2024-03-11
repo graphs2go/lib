@@ -1,15 +1,19 @@
 from __future__ import annotations
+
 from contextlib import contextmanager
+from time import monotonic
+from typing import TYPE_CHECKING, Any
+
 from dagster import ConfigurableResource, EnvVar
 from psycopg_pool import ConnectionPool
+
 from graphs2go.models.postgres_database import PostgresDatabase
 from graphs2go.models.postgres_schema import PostgresSchema
 from graphs2go.models.postgres_tables import PostgresTables
-from typing import TYPE_CHECKING, Any
-from time import monotonic
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
     from psycopg import Connection
 
 

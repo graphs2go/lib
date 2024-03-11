@@ -3,12 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
-    from graphs2go.resources.postgres_connection_pool import PostgresConnectionPool
     from logging import Logger
 
     from graphs2go.models.postgres_database import PostgresDatabase
+    from graphs2go.resources.postgres_connection_pool import PostgresConnectionPool
 
 
 @dataclass(frozen=True)
