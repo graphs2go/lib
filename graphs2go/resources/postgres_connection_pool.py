@@ -17,12 +17,12 @@ if TYPE_CHECKING:
     from psycopg import Connection
 
 
-class PostgresConnectionPool(ConfigurableResource):
+class PostgresConnectionPool(ConfigurableResource):  # type: ignore
     conninfo: str
 
     def __init__(self, *args, **kwds):  # noqa: ANN002, ANN003
         ConfigurableResource.__init__(self, *args, **kwds)
-        self.__connection_pools: dict[str, dict[str | None, ConnectionPool]] = {}
+        self.__connection_pools: dict[str | None, dict[str | None, ConnectionPool]] = {}
 
     @classmethod
     def from_env_vars(cls) -> PostgresConnectionPool:
