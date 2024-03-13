@@ -19,8 +19,7 @@ class PostgresDatabase:
     def create(
         cls, *, connection_pool: PostgresConnectionPool, logger: Logger, name: str
     ) -> PostgresDatabase:
-        inst = cls(name=name)
-        with connection_pool.connect(inst) as conn:
+        with connection_pool.connect(None) as conn:
             conn.autocommit = True
             try:
                 with conn.cursor() as cur:
@@ -32,4 +31,4 @@ class PostgresDatabase:
             finally:
                 conn.autocommit = False
 
-            return inst
+            return cls(name=name)

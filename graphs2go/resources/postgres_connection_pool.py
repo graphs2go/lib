@@ -30,11 +30,14 @@ class PostgresConnectionPool(ConfigurableResource):
 
     @contextmanager
     def connect(
-        self, to: PostgresDatabase | PostgresSchema | PostgresTables
+        self, to: PostgresDatabase | PostgresSchema | PostgresTables | None
     ) -> Iterator[Connection[Any]]:
-        if isinstance(to, PostgresDatabase):
+        database_name = None
+        schema_name = None
+        if to is None:
+            pass
+        elif isinstance(to, PostgresDatabase):
             database_name = to.name
-            schema_name = None
         elif isinstance(to, PostgresSchema):
             database_name = to.database.name
             schema_name = to.name
@@ -48,7 +51,9 @@ class PostgresConnectionPool(ConfigurableResource):
             schema_name
         )
         if connection_pool is None:
-            connection_pool_kwds = {"dbname": database_name}
+            connection_pool_kwds = {}
+            if database_name is not None:
+                connection_pool_kwds["dbname"] = database_name
             if schema_name is not None:
                 connection_pool_kwds["options"] = f"-c search_path={schema_name}"
             connection_pool = ConnectionPool(
