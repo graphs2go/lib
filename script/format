@@ -4,4 +4,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-poetry run black loaders
+poetry run isort graphs2go
+poetry run black graphs2go

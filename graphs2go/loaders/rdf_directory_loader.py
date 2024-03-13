@@ -1,13 +1,14 @@
 from __future__ import annotations
+
+from pathlib import Path
+from typing import IO, TYPE_CHECKING
+
 from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph, Graph
+
 from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
-
 from graphs2go.loaders.directory_loader import DirectoryLoader
-from typing import IO, TYPE_CHECKING
 from graphs2go.loaders.rdf_loader import RdfLoader
-from pathlib import Path
-
 
 if TYPE_CHECKING:
     from graphs2go.models.rdf_format import RdfFormat
