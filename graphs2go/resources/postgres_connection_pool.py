@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class PostgresConnectionPool(ConfigurableResource):  # type: ignore
     conninfo: str
 
-    def __init__(self, *args, **kwds):  # noqa: ANN002, ANN003
+    def __init__(self, *args, **kwds) -> None:  # noqa: ANN002, ANN003
         ConfigurableResource.__init__(self, *args, **kwds)
         self.__connection_pools: dict[str | None, dict[str | None, ConnectionPool]] = {}
 

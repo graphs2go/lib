@@ -4,8 +4,8 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-poetry run black --check graphs2go
+poetry run black --check graphs2go tests
 # poetry run isort --check graphs2go
-poetry run mypy graphs2go
-poetry run ruff graphs2go
+poetry run mypy graphs2go tests
+poetry run ruff graphs2go tests
 poetry run pytest tests
