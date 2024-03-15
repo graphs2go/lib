@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import markus
 from contextlib import contextmanager
 from time import monotonic
 from typing import TYPE_CHECKING, Any
@@ -15,6 +16,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from psycopg import Connection
+
+
+metrics = markus.get_metrics(__name__)
 
 
 class PostgresConnectionPool(ConfigurableResource):  # type: ignore
@@ -66,7 +70,8 @@ class PostgresConnectionPool(ConfigurableResource):  # type: ignore
             self.__connection_pools[database_name][schema_name] = connection_pool
 
         # Adapted from ConnectionPool.connection()
-        conn = connection_pool.getconn()
+        with metrics.timer("connection_pool_getconn"):
+            conn = connection_pool.getconn()
         try:
             t0 = monotonic()
             with conn:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
+import markus
 from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph, Graph
 
@@ -13,6 +14,9 @@ from graphs2go.loaders.rdf_loader import RdfLoader
 if TYPE_CHECKING:
     from graphs2go.models.rdf_format import RdfFormat
     from graphs2go.models.rdf_graph_record import RdfGraphRecord
+
+
+metrics = markus.get_metrics(__name__)
 
 
 class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
@@ -54,9 +58,11 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
 
     def close(self) -> None:
         for stream, graph in self.rdf_graphs_by_stream.items():
-            graph.serialize(
-                destination=self._stream_file_path(stream), format=str(self._rdf_format)
-            )
+            with metrics.timer("buffered_graph_write"):
+                graph.serialize(
+                    destination=self._stream_file_path(stream),
+                    format=str(self._rdf_format),
+                )
 
 
 class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
@@ -77,21 +83,22 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
                 )
             )
 
-        serializable_graph: Graph
-        if self._rdf_format.supports_quads:
-            if isinstance(rdf_graph_record.graph, ConjunctiveGraph):
-                serializable_graph = rdf_graph_record.graph
+        with metrics.timer("streaming_graph_write"):
+            serializable_graph: Graph
+            if self._rdf_format.supports_quads:
+                if isinstance(rdf_graph_record.graph, ConjunctiveGraph):
+                    serializable_graph = rdf_graph_record.graph
+                else:
+                    serializable_graph = ConjunctiveGraph()
+                    for triple in rdf_graph_record.graph:
+                        serializable_graph.add(triple)
             else:
-                serializable_graph = ConjunctiveGraph()
-                for triple in rdf_graph_record.graph:
-                    serializable_graph.add(triple)
-        else:
-            serializable_graph = rdf_graph_record.graph
+                serializable_graph = rdf_graph_record.graph
 
-        serializable_graph.serialize(
-            destination=open_file, format=str(self._rdf_format)
-        )
-        open_file.flush()
+            serializable_graph.serialize(
+                destination=open_file, format=str(self._rdf_format)
+            )
+            open_file.flush()
 
     def close(self) -> None:
         for open_file in self.__open_files_by_stream.values():
