@@ -701,6 +701,21 @@ files = [
 ]
 
 [[package]]
+name = "markus"
+version = "4.2.0"
+description = "Metrics system for generating statistics about your app"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "markus-4.2.0-py3-none-any.whl", hash = "sha256:156398b7de56db4e8ef420a80fcce1c49b6d3d41405874a3e128cb209cf4bfd8"},
+    {file = "markus-4.2.0.tar.gz", hash = "sha256:9dd41ce53b25a3e806b0d065808fec00c4ec945e80cf5a72431bf9b61b44d7fb"},
+]
+
+[package.extras]
+datadog = ["datadog (>=0.45.0)"]
+statsd = ["statsd"]
+
+[[package]]
 name = "mdurl"
 version = "0.1.2"
 description = "Markdown URL utilities"
@@ -1707,4 +1722,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "cbb95e29e20cbbdb2b326acabdfc2605bba758e0003ea013fec25403d214798c"
+content-hash = "e07dfb01f17d032ec8beba0dd1bd88c06a449ec8e6269b71bc3cfba3593449be"
