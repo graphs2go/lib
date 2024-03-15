@@ -1,10 +1,7 @@
-from pathlib import Path
 import pytest
-
 from rdflib import ConjunctiveGraph, Graph
-from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
-from graphs2go.models.rdf_format import RdfFormat
 
+from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
 from graphs2go.models.rdf_graph_record import RdfGraphRecord
 
 
