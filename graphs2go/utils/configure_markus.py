@@ -1,5 +1,5 @@
-from dagster import get_dagster_logger
 import markus
+from dagster import get_dagster_logger
 from markus.backends.logging import LoggingRollupMetrics
 
 

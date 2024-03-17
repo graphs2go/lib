@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from rdflib import RDF, Literal, URIRef
 from rdflib.resource import Resource
+
 from graphs2go.models.interchange.concept import Concept
 from graphs2go.models.interchange.model import Model
 from graphs2go.utils.uuid_urn import uuid_urn

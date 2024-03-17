@@ -2,6 +2,7 @@ from collections.abc import Iterable
 
 from dagster import AssetsDefinition, asset, get_dagster_logger
 from rdflib import BNode, ConjunctiveGraph, URIRef
+
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models.interchange.dataset import Dataset
 from graphs2go.models.interchange.model import Model

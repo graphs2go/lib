@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dagster import ConfigurableResource, EnvVar
+
 from graphs2go.models.rdf_format import RdfFormat
 from graphs2go.utils.parse_directory_path_config_value import (
     parse_directory_path_config_value,

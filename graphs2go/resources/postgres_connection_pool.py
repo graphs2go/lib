@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import markus
 from contextlib import contextmanager
 from time import monotonic
 from typing import TYPE_CHECKING, Any
 
+import markus
 from dagster import ConfigurableResource, EnvVar
 from psycopg_pool import ConnectionPool
 
