@@ -39,7 +39,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
     def _rdf_format(self) -> RdfFormat:
         return self.__rdf_format
 
-    def rdf_graph_file_path(self, identifier: URIRef) -> Path:
+    def graph_file_path(self, identifier: URIRef) -> Path:
         return (
             self._directory_path / f"{sanitize_filename(identifier)}.{self._rdf_format}"
         )
@@ -61,7 +61,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
         for stream, graph in self.rdf_graphs_by_identifier.items():
             with metrics.timer("buffered_graph_write"):
                 graph.serialize(
-                    destination=self.rdf_graph_file_path(stream),
+                    destination=self.graph_file_path(stream),
                     format=str(self._rdf_format),
                 )
 
@@ -82,7 +82,7 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         if open_file is None:
             open_file = self.__open_files_by_graph_identifier[rdf_graph.identifier] = (
                 Path.open(
-                    self.rdf_graph_file_path(rdf_graph.identifier),
+                    self.graph_file_path(rdf_graph.identifier),
                     "w+b",
                 )
             )
