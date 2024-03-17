@@ -5,7 +5,7 @@ from typing import IO, TYPE_CHECKING
 
 import markus
 from pathvalidate import sanitize_filename
-from rdflib import ConjunctiveGraph, Graph
+from rdflib import ConjunctiveGraph, Graph, URIRef
 
 from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
 from graphs2go.loaders.directory_loader import DirectoryLoader
@@ -13,7 +13,6 @@ from graphs2go.loaders.rdf_loader import RdfLoader
 
 if TYPE_CHECKING:
     from graphs2go.models.rdf_format import RdfFormat
-    from graphs2go.models.loadable_rdf_graph import LoadableRdfGraph
 
 
 metrics = markus.get_metrics(__name__)
@@ -40,8 +39,10 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
     def _rdf_format(self) -> RdfFormat:
         return self.__rdf_format
 
-    def stream_file_path(self, stream: str) -> Path:
-        return self._directory_path / f"{sanitize_filename(stream)}.{self._rdf_format}"
+    def graph_file_path(self, identifier: URIRef) -> Path:
+        return (
+            self._directory_path / f"{sanitize_filename(identifier)}.{self._rdf_format}"
+        )
 
 
 class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
@@ -57,10 +58,10 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
         )
 
     def close(self) -> None:
-        for stream, graph in self.rdf_graphs_by_stream.items():
+        for stream, graph in self.rdf_graphs_by_identifier.items():
             with metrics.timer("buffered_graph_write"):
                 graph.serialize(
-                    destination=self.stream_file_path(stream),
+                    destination=self.graph_file_path(stream),
                     format=str(self._rdf_format),
                 )
 
@@ -70,15 +71,18 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         RdfDirectoryLoader.__init__(
             self, directory_path=directory_path, rdf_format=rdf_format
         )
-        self.__open_files_by_stream: dict[str, IO[bytes]] = {}
+        self.__open_files_by_graph_identifier: dict[str, IO[bytes]] = {}
         assert self._rdf_format.line_oriented
 
-    def __call__(self, loadable_rdf_graph: LoadableRdfGraph) -> None:
-        open_file = self.__open_files_by_stream.get(loadable_rdf_graph.stream)
+    def __call__(self, rdf_graph: Graph) -> None:
+        if not isinstance(rdf_graph.identifier, URIRef):
+            raise ValueError("graph must have a named identifier")  # noqa: TRY004
+
+        open_file = self.__open_files_by_graph_identifier.get(rdf_graph.identifier)
         if open_file is None:
-            open_file = self.__open_files_by_stream[loadable_rdf_graph.stream] = (
+            open_file = self.__open_files_by_graph_identifier[rdf_graph.identifier] = (
                 Path.open(
-                    self.stream_file_path(loadable_rdf_graph.stream),
+                    self.graph_file_path(rdf_graph.identifier),
                     "w+b",
                 )
             )
@@ -86,14 +90,14 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         with metrics.timer("streaming_graph_write"):
             serializable_graph: Graph
             if self._rdf_format.supports_quads:
-                if isinstance(loadable_rdf_graph.graph, ConjunctiveGraph):
-                    serializable_graph = loadable_rdf_graph.graph
+                if isinstance(rdf_graph, ConjunctiveGraph):
+                    serializable_graph = rdf_graph
                 else:
                     serializable_graph = ConjunctiveGraph()
-                    for triple in loadable_rdf_graph.graph:
+                    for triple in rdf_graph:
                         serializable_graph.add(triple)
             else:
-                serializable_graph = loadable_rdf_graph.graph
+                serializable_graph = rdf_graph
 
             serializable_graph.serialize(
                 destination=open_file, format=str(self._rdf_format)
@@ -101,5 +105,5 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
             open_file.flush()
 
     def close(self) -> None:
-        for open_file in self.__open_files_by_stream.values():
+        for open_file in self.__open_files_by_graph_identifier.values():
             open_file.close()
