@@ -13,7 +13,7 @@ from graphs2go.loaders.rdf_loader import RdfLoader
 
 if TYPE_CHECKING:
     from graphs2go.models.rdf_format import RdfFormat
-    from graphs2go.models.rdf_graph_record import RdfGraphRecord
+    from graphs2go.models.loadable_rdf_graph import LoadableRdfGraph
 
 
 metrics = markus.get_metrics(__name__)
@@ -73,12 +73,12 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         self.__open_files_by_stream: dict[str, IO[bytes]] = {}
         assert self._rdf_format.line_oriented
 
-    def __call__(self, rdf_graph_record: RdfGraphRecord) -> None:
-        open_file = self.__open_files_by_stream.get(rdf_graph_record.stream)
+    def __call__(self, loadable_rdf_graph: LoadableRdfGraph) -> None:
+        open_file = self.__open_files_by_stream.get(loadable_rdf_graph.stream)
         if open_file is None:
-            open_file = self.__open_files_by_stream[rdf_graph_record.stream] = (
+            open_file = self.__open_files_by_stream[loadable_rdf_graph.stream] = (
                 Path.open(
-                    self._stream_file_path(rdf_graph_record.stream),
+                    self._stream_file_path(loadable_rdf_graph.stream),
                     "w+b",
                 )
             )
@@ -86,14 +86,14 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         with metrics.timer("streaming_graph_write"):
             serializable_graph: Graph
             if self._rdf_format.supports_quads:
-                if isinstance(rdf_graph_record.graph, ConjunctiveGraph):
-                    serializable_graph = rdf_graph_record.graph
+                if isinstance(loadable_rdf_graph.graph, ConjunctiveGraph):
+                    serializable_graph = loadable_rdf_graph.graph
                 else:
                     serializable_graph = ConjunctiveGraph()
-                    for triple in rdf_graph_record.graph:
+                    for triple in loadable_rdf_graph.graph:
                         serializable_graph.add(triple)
             else:
-                serializable_graph = rdf_graph_record.graph
+                serializable_graph = loadable_rdf_graph.graph
 
             serializable_graph.serialize(
                 destination=open_file, format=str(self._rdf_format)
