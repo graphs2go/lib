@@ -16,7 +16,7 @@ def test_load(
     for rdf_graph in rdf_graphs:
         assert not isinstance(rdf_graph, ConjunctiveGraph)
         if rdf_graph_type == ConjunctiveGraph:
-            quad_graph = ConjunctiveGraph()
+            quad_graph = ConjunctiveGraph(identifier=rdf_graph.identifier)
             for triple in rdf_graph:
                 quad_graph.add(triple)
             loader(quad_graph)

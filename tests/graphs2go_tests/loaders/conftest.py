@@ -12,14 +12,14 @@ def rdf_graphs(
 
 @pytest.fixture(scope="session")
 def schema_rdf_graph() -> Graph:
-    graph = Graph(URIRef("http://example.com/graph/schema"))
+    graph = Graph(identifier=URIRef("http://example.com/graph/schema"))
     graph.add((URIRef("http://example.com/class"), RDF.type, RDFS.Class))
     return graph
 
 
 @pytest.fixture(scope="session")
 def vocab_rdf_graph() -> Graph:
-    graph = Graph(URIRef("http://example.com/graph/vocab"))
+    graph = Graph(identifier=URIRef("http://example.com/graph/vocab"))
     graph.add(
         (URIRef("http://example.com/instance"), SDO.name, Literal("Test instance"))
     )
