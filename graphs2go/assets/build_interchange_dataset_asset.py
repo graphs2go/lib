@@ -33,7 +33,10 @@ def build_interchange_dataset_asset(
                     "interchange dataset %s already exists, skipping build",
                     dataset_file_path,
                 )
-                return Dataset(identifier=interchange_dataset_identifier)
+                return Dataset(
+                    file_path=dataset_file_path,
+                    identifier=interchange_dataset_identifier,
+                )
 
         for interchange_model in interchange_models:
             # Always load conjunctive graph with the dataset identifier so that everything ends up in the same place
@@ -55,6 +58,8 @@ def build_interchange_dataset_asset(
 
             loader(graph)
 
-        return Dataset(identifier=interchange_dataset_identifier)
+        return Dataset(
+            file_path=dataset_file_path, identifier=interchange_dataset_identifier
+        )
 
     return interchange_dataset
