@@ -11,12 +11,14 @@ class Statement(Model):
     def create(
         cls,
         *,
-        graph: Graph,
         object_: Concept | Literal,
         predicate: URIRef,
         subject: Concept,
+        graph: Graph | None = None,
         uri: URIRef | None = None,
     ) -> Statement:
+        if graph is None:
+            graph = Graph()
         if uri is None:
             uri = uuid_urn()
         resource = graph.resource(uri)

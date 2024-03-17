@@ -4,4 +4,4 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class Dataset:
-    store_path: Path
+    file_path: Path

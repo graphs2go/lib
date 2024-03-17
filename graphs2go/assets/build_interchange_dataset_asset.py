@@ -1,9 +1,10 @@
 from collections.abc import Iterable
 
 from dagster import AssetsDefinition, asset, get_dagster_logger
-from pathvalidate import sanitize_filename
+from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models.interchange.dataset import Dataset
 from graphs2go.models.interchange.model import Model
+from graphs2go.models.loadable_rdf_graph import LoadableRdfGraph
 from graphs2go.resources.interchange_config import InterchangeConfig
 
 
@@ -13,24 +14,35 @@ def build_interchange_dataset_asset(
     @asset(code_version="1")
     def interchange_dataset(interchange_config: InterchangeConfig) -> Dataset:
         interchange_config_parsed = interchange_config.parse()
+        loader = RdfDirectoryLoader.create(
+            directory_path=interchange_config_parsed.directory_path,
+            rdf_format=interchange_config_parsed.rdf_format,
+        )
+        dataset_file_path = loader.stream_file_path(stream=interchange_dataset_name)
         logger = get_dagster_logger()
 
-        store_path = interchange_config_parsed.directory_path / sanitize_filename(
-            interchange_dataset_name
-        )
-        if store_path.is_file():
+        if dataset_file_path.is_file():
             if interchange_config_parsed.recreate:
                 logger.info(
-                    "interchange %s already exists but recreate specified, deleting",
-                    store_path,
+                    "interchange dataset %s already exists but recreate specified, deleting",
+                    dataset_file_path,
                 )
-                store_path.unlink()
+                dataset_file_path.unlink()
             else:
                 logger.info(
-                    "interchange store %s already exists, skipping build", store_path
+                    "interchange dataset %s already exists, skipping build",
+                    dataset_file_path,
                 )
-                return Dataset(store_path=store_path)
+                return Dataset(file_path=dataset_file_path)
 
-        return Dataset(store_path=store_path)
+        for interchange_model in interchange_models:
+            loader(
+                LoadableRdfGraph(
+                    graph=interchange_model.resource.graph,
+                    stream=interchange_dataset_name,
+                )
+            )
+
+        return Dataset(file_path=dataset_file_path)
 
     return interchange_dataset
