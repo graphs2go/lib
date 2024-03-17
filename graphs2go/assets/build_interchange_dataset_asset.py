@@ -12,13 +12,25 @@ def build_interchange_dataset_asset(
 ) -> AssetsDefinition:
     @asset(code_version="1")
     def interchange_dataset(interchange_config: InterchangeConfig) -> Dataset:
+        interchange_config_parsed = interchange_config.parse()
         logger = get_dagster_logger()
 
-        store_path = (
-            interchange_config.parse().interchange_directory_path
-            / sanitize_filename(interchange_dataset_name)
+        store_path = interchange_config_parsed.directory_path / sanitize_filename(
+            interchange_dataset_name
         )
-        if store_path.is_dir():
-            logger.info("interchange store %s already exists", interchange)
+        if store_path.is_file():
+            if interchange_config_parsed.recreate:
+                logger.info(
+                    "interchange %s already exists but recreate specified, deleting",
+                    store_path,
+                )
+                store_path.unlink()
+            else:
+                logger.info(
+                    "interchange store %s already exists, skipping build", store_path
+                )
+                return Dataset(store_path=store_path)
 
-    return _asset
+        return Dataset(store_path=store_path)
+
+    return interchange_dataset
