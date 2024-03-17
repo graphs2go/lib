@@ -35,7 +35,6 @@ def build_interchange_dataset_asset(
                     dataset_file_path,
                 )
                 return Dataset(
-                    file_path=dataset_file_path,
                     identifier=interchange_dataset_identifier,
                 )
 
@@ -59,8 +58,6 @@ def build_interchange_dataset_asset(
 
             loader(graph)
 
-        return Dataset(
-            file_path=dataset_file_path, identifier=interchange_dataset_identifier
-        )
+        return Dataset(identifier=interchange_dataset_identifier)
 
     return interchange_dataset
