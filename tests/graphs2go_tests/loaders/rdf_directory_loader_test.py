@@ -38,5 +38,5 @@ def test_load(
     for rdf_graph in rdf_graphs:
         quad_graph = ConjunctiveGraph()
         assert isinstance(rdf_graph.identifier, URIRef)
-        quad_graph.parse(loader.graph_file_path(rdf_graph.identifier))
+        quad_graph.parse(loader.rdf_graph_file_path(rdf_graph.identifier))
         assert len(tuple(quad_graph.quads())) == 1

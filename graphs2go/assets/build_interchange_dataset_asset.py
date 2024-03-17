@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
 from dagster import AssetsDefinition, asset, get_dagster_logger
-from rdflib import URIRef
+from rdflib import BNode, ConjunctiveGraph, URIRef
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models.interchange.dataset import Dataset
 from graphs2go.models.interchange.model import Model
@@ -18,7 +18,7 @@ def build_interchange_dataset_asset(
             directory_path=interchange_config_parsed.directory_path,
             rdf_format=interchange_config_parsed.rdf_format,
         )
-        dataset_file_path = loader.graph_file_path(interchange_dataset_identifier)
+        dataset_file_path = loader.rdf_graph_file_path(interchange_dataset_identifier)
         logger = get_dagster_logger()
 
         if dataset_file_path.is_file():
@@ -33,11 +33,28 @@ def build_interchange_dataset_asset(
                     "interchange dataset %s already exists, skipping build",
                     dataset_file_path,
                 )
-                return Dataset(file_path=dataset_file_path)
+                return Dataset(identifier=interchange_dataset_identifier)
 
         for interchange_model in interchange_models:
-            loader(interchange_model.resource.graph)
+            # Always load conjunctive graph with the dataset identifier so that everything ends up in the same place
+            conjunctive_graph = ConjunctiveGraph(
+                identifier=interchange_dataset_identifier
+            )
 
-        return Dataset(file_path=dataset_file_path)
+            # Copy the model graph to the conjunctive graph
+            if isinstance(interchange_model.resource.graph.identifier, BNode):
+                # No explicit graph identifier = dump the triples into the conjunctive graph's default graph
+                graph = conjunctive_graph.default_context
+            else:
+                # Else put the triples into the right named graph on the conjunctive graph
+                # A model can't be spread across multiple named graphs
+                graph = conjunctive_graph.get_context(
+                    interchange_model.resource.graph.identifier
+                )
+            graph += interchange_model.resource.graph
+
+            loader(graph)
+
+        return Dataset(identifier=interchange_dataset_identifier)
 
     return interchange_dataset

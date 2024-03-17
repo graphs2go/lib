@@ -1,4 +1,4 @@
-from rdflib import URIRef
+from rdflib import RDF, Graph, URIRef
 from rdflib.resource import Resource
 
 
@@ -7,6 +7,12 @@ class Model:
         if not isinstance(resource.identifier, URIRef):
             raise ValueError("model resource must be named")  # noqa: TRY004
         self.__resource = resource
+
+    @staticmethod
+    def _create_resource(*, type_: URIRef, uri: URIRef) -> Resource:
+        resource = Graph().resource(uri)
+        resource.add(RDF.type, type_)
+        return resource
 
     @property
     def resource(self) -> Resource:

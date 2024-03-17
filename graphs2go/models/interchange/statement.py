@@ -9,26 +9,15 @@ from graphs2go.utils.uuid_urn import uuid_urn
 class Statement(Model):
     @classmethod
     def create(
-        cls,
-        *,
-        object_: Concept | Literal,
-        predicate: URIRef,
-        subject: Concept,
-        graph: Graph | None = None,
-        uri: URIRef | None = None,
+        cls, *, object_: Concept | Literal, predicate: URIRef, subject: Concept
     ) -> Statement:
-        if graph is None:
-            graph = Graph()
-        if uri is None:
-            uri = uuid_urn()
-        resource = graph.resource(uri)
+        resource = cls._create_resource(type_=RDF.Statement, uri=uuid_urn())
         if isinstance(object_, Concept):
             resource.add(RDF.object, object_.uri)
         elif isinstance(object_, Literal):
             resource.add(RDF.object, object_)
         resource.add(RDF.predicate, predicate)
         resource.add(RDF.subject, subject.uri)
-        resource.add(RDF.type, RDF.Statement)
         return Statement(resource=resource)
 
     def object_(self) -> Concept | Literal:
