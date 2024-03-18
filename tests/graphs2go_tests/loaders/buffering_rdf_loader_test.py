@@ -19,10 +19,10 @@ def test_load(
             quad_graph = ConjunctiveGraph(identifier=rdf_graph.identifier)
             for triple in rdf_graph:
                 quad_graph.add(triple)
-            loader(quad_graph)
+            loader.load(quad_graph)
         else:
             assert rdf_graph_type == Graph
-            loader(rdf_graph)
+            loader.load(rdf_graph)
 
     assert len(loader.rdf_graphs_by_identifier) == 2
     for graph in loader.rdf_graphs_by_identifier.values():

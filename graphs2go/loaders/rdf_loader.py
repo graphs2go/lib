@@ -5,5 +5,5 @@ from rdflib import Graph
 
 class RdfLoader(ABC):
     @abstractmethod
-    def __call__(self, rdf_graph: Graph) -> None:
+    def load(self, rdf_graph: Graph) -> None:
         pass

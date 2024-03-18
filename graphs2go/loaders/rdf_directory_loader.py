@@ -74,7 +74,7 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         self.__open_files_by_graph_identifier: dict[str, IO[bytes]] = {}
         assert self._rdf_format.line_oriented
 
-    def __call__(self, rdf_graph: Graph) -> None:
+    def load(self, rdf_graph: Graph) -> None:
         if not isinstance(rdf_graph.identifier, URIRef):
             raise ValueError("graph must have a named identifier")  # noqa: TRY004
 

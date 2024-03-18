@@ -8,7 +8,7 @@ class BufferingRdfLoader(RdfLoader):
         self.__default_rdf_graph_type = default_rdf_graph_type
         self.__rdf_graphs_by_identifier: dict[URIRef, Graph] = {}
 
-    def __call__(self, rdf_graph: Graph) -> None:
+    def load(self, rdf_graph: Graph) -> None:
         if not isinstance(rdf_graph.identifier, URIRef):
             raise ValueError("graph must have a named identifier")  # noqa: TRY004
 
