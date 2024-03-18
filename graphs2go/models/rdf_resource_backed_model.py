@@ -57,7 +57,7 @@ class RdfResourceBackedModel:
         self.__resource = resource
 
     @classmethod
-    def _create_resource(cls, *, uri: URIRef) -> Resource:
+    def _create_resource(cls, uri: URIRef) -> Resource:
         resource = Graph().resource(uri)
         resource.add(RDF.type, cls.rdf_type_uri())
         return resource

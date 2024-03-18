@@ -1,0 +1,34 @@
+from __future__ import annotations
+from rdflib import RDF, Literal, URIRef
+from graphs2go.models.interchange.model import Model
+from graphs2go.namespaces.interchange import INTERCHANGE
+from graphs2go.utils.hash_urn import hash_urn
+from graphs2go.utils.uuid_urn import uuid_urn
+
+
+class Property(Model):
+    """
+    A node->node or node->literal relationship, equivalent to a property in a labeled property graph.
+    """
+
+    @classmethod
+    def builder(
+        cls,
+        *,
+        predicate: URIRef,
+        object_: Literal | URIRef,
+        subject: URIRef,
+        uri: URIRef | None = None,
+    ) -> Property.Builder:
+        resource = cls._create_resource(
+            uri if uri is not None else hash_urn(subject, predicate, object_)
+        )
+        resource.add(RDF.object, object_)
+        resource.add(RDF.predicate, predicate)
+        resource.add(RDF.subject, subject)
+        resource.add(RDF.type, RDF.Statement)
+        return cls.Builder(resource)
+
+    @classmethod
+    def rdf_type_uri(cls) -> URIRef:
+        return INTERCHANGE.Property

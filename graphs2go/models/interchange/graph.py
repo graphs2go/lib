@@ -9,6 +9,10 @@ from graphs2go.resources.interchange_config import InterchangeConfig
 
 @dataclass(frozen=True)
 class Graph:
+    """
+    A picklable dataclass identifying an interchange graph.
+    """
+
     identifier: URIRef
 
     def to_rdflib_graph(self, interchange_config: InterchangeConfig) -> rdflib.Graph:
