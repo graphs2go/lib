@@ -13,3 +13,5 @@ class Concept(Node):
         resource = cls._create_resource(uri)
         resource.add(RDF.type, SKOS.Concept)
         return cls.Builder(resource)
+
+    # Don't override rdf_type_uri, leave Node
