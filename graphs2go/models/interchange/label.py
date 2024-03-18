@@ -17,6 +17,10 @@ class Label(Model):
     A label for a Node in the interchange graph.
     """
 
+    class Builder(Model.Builder):
+        def build(self) -> Label:
+            return Label(resource=self._resource)
+
     @classmethod
     def builder(
         cls, *, literal_form: Literal, uri: URIRef | None = None

@@ -3,13 +3,16 @@ from rdflib import RDF, Literal, URIRef
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.utils.hash_urn import hash_urn
-from graphs2go.utils.uuid_urn import uuid_urn
 
 
 class Property(Model):
     """
     A node->node or node->literal relationship, equivalent to a property in a labeled property graph.
     """
+
+    class Builder(Model.Builder):
+        def build(self) -> Property:
+            return Property(resource=self._resource)
 
     @classmethod
     def builder(

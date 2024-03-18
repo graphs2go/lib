@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from datetime import date, datetime
 import logging
 from typing import Self, Any
@@ -22,8 +22,8 @@ _ValueT = TypeVar("_ValueT")
 logger = logging.getLogger(__name__)
 
 
-class RdfResourceBackedModel:
-    class Builder:
+class RdfResourceBackedModel(ABC):
+    class Builder(ABC):
         def __init__(self, resource: Resource):
             if not isinstance(resource.identifier, URIRef):
                 raise TypeError("expected URI-identified resource")
@@ -40,6 +40,10 @@ class RdfResourceBackedModel:
             else:
                 self._resource.add(p, Literal(o))
             return self
+
+        @abstractmethod
+        def build(self) -> RdfResourceBackedModel:
+            pass
 
         @property
         def _resource(self) -> Resource:

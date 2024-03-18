@@ -14,6 +14,10 @@ class Node(Model):
     Top-level node in the interchange graph, equivalent to a node in a labeled property graph.
     """
 
+    class Builder(Model.Builder):
+        def build(self) -> Node:
+            return Node(resource=self._resource)
+
     @classmethod
     def builder(cls, *, uri: URIRef) -> Node.Builder:
         return cls.Builder(cls._create_resource(uri))

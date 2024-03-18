@@ -8,6 +8,10 @@ class Concept(Node):
     Top-level nodes in the interchange graph that are equivalent to SKOS Concept's.
     """
 
+    class Builder(Node.Builder):
+        def build(self) -> Concept:
+            return Concept(resource=self._resource)
+
     @classmethod
     def builder(cls, *, uri: URIRef) -> Concept.Builder:
         resource = cls._create_resource(uri)

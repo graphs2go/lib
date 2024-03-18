@@ -18,6 +18,10 @@ class Relationship(Model):
     A top-level relationship between top-level Nodes, equivalent to a relationship in a labeled property graph.
     """
 
+    class Builder(Model.Builder):
+        def build(self) -> Relationship:
+            return Relationship(resource=self._resource)
+
     @classmethod
     def builder(
         cls,
