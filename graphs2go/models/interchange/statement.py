@@ -22,18 +22,18 @@ class Statement(Model):
         resource.add(RDF.subject, subject.uri)
         return Statement(resource=resource)
 
-    def object_(self) -> Concept | Literal:
-        object_ = self.resource.value(RDF.object)
-        if isinstance(object_, Literal):
-            return object_
-        if isinstance(object_, Resource):
-            return Concept(resource=object_)
-        raise TypeError(type(object_))
+    # def object_(self) -> Concept | Literal:
+    #     object_ = self.resource.value(RDF.object)
+    #     if isinstance(object_, Literal):
+    #         return object_
+    #     if isinstance(object_, Resource):
+    #         return Concept(resource=object_)
+    #     raise TypeError(type(object_))
 
-    def subject(self) -> Concept:
-        subject = self.resource.value(RDF.subject)
-        if not isinstance(subject, Resource):
-            raise ValueError(  # noqa: TRY004
-                "rdf:subject of a relationship is not a resource"
-            )
-        return Concept(resource=subject)
+    # def subject(self) -> Concept:
+    #     subject = self.resource.value(RDF.subject)
+    #     if not isinstance(subject, Resource):
+    #         raise ValueError(  # noqa: TRY004
+    #             "rdf:subject of a relationship is not a resource"
+    #         )
+    #     return Concept(resource=subject)
