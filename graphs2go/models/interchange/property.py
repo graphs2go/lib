@@ -30,6 +30,9 @@ class Property(Model):
         resource.add(RDF.predicate, predicate)
         resource.add(RDF.subject, subject)
         resource.add(RDF.type, RDF.Statement)
+        resource.graph.add(
+            (subject, predicate, object_)
+        )  # Add a direct statement for ease of querying
         return cls.Builder(resource)
 
     @classmethod

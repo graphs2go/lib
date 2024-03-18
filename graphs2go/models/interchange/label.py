@@ -23,11 +23,20 @@ class Label(Model):
 
     @classmethod
     def builder(
-        cls, *, literal_form: Literal, uri: URIRef | None = None
+        cls,
+        *,
+        literal_form: Literal,
+        predicate: URIRef,
+        subject: URIRef,
+        uri: URIRef | None = None,
     ) -> Label.Builder:
         resource = cls._create_resource(uri if uri is not None else uuid_urn())
+        resource.add(RDF.subject, subject)
         resource.add(RDF.type, SKOSXL.Label)
         resource.add(SKOSXL.literalForm, literal_form)
+        resource.graph.add(
+            (subject, predicate, resource.identifier)
+        )  # Add a direct statement for ease of querying
         return cls.Builder(resource)
 
     @classmethod

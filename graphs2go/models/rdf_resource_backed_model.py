@@ -29,18 +29,6 @@ class RdfResourceBackedModel(ABC):
                 raise TypeError("expected URI-identified resource")
             self.__resource = resource
 
-        def add(self, p: URIRef, o: Any) -> Self:  # noqa: ANN401
-            if o is None:
-                pass
-            elif isinstance(o, Node | Resource):
-                self._resource.add(p, o)
-            elif isinstance(o, list | tuple):
-                for sub_o in o:
-                    self.add(p, sub_o)
-            else:
-                self._resource.add(p, Literal(o))
-            return self
-
         @abstractmethod
         def build(self) -> RdfResourceBackedModel:
             pass
@@ -48,12 +36,6 @@ class RdfResourceBackedModel(ABC):
         @property
         def _resource(self) -> Resource:
             return self.__resource
-
-        def set(self, p: URIRef, o: Any) -> Self:  # noqa: A003, ANN401
-            if o is None:
-                return self
-            self._resource.remove(p)
-            return self.add(p, o)
 
     def __init__(self, *, resource: Resource):
         if not isinstance(resource.identifier, URIRef):
