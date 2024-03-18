@@ -7,7 +7,7 @@ from typing import TypeVar
 ReleaseT = TypeVar("ReleaseT")
 
 
-def find_releases(
+def find_directory_releases(
     *,
     logger: Logger,
     release_directory_path: Path,
