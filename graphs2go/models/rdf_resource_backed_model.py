@@ -2,14 +2,15 @@ from __future__ import annotations
 from abc import abstractmethod
 from datetime import date, datetime
 import logging
+from typing import Self, Any
 import rdflib.collection
 from typing import TypeVar, TYPE_CHECKING
 from rdflib import RDF, Graph, Literal, URIRef
 from rdflib.resource import Resource
+from rdflib.term import Node
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-    from rdflib.term import Node
     from collections.abc import Callable
 
 
@@ -22,15 +23,43 @@ logger = logging.getLogger(__name__)
 
 
 class RdfResourceBackedModel:
+    class Builder:
+        def __init__(self, resource: Resource):
+            if not isinstance(resource.identifier, URIRef):
+                raise TypeError("expected URI-identified resource")
+            self.__resource = resource
+
+        def add(self, p: URIRef, o: Any) -> Self:  # noqa: ANN401
+            if o is None:
+                pass
+            elif isinstance(o, Node | Resource):
+                self._resource.add(p, o)
+            elif isinstance(o, list | tuple):
+                for sub_o in o:
+                    self.add(p, sub_o)
+            else:
+                self._resource.add(p, Literal(o))
+            return self
+
+        @property
+        def _resource(self) -> Resource:
+            return self.__resource
+
+        def set(self, p: URIRef, o: Any) -> Self:  # noqa: A003, ANN401
+            if o is None:
+                return self
+            self._resource.remove(p)
+            return self.add(p, o)
+
     def __init__(self, *, resource: Resource):
         if not isinstance(resource.identifier, URIRef):
             raise ValueError("model resource must be named")  # noqa: TRY004
         self.__resource = resource
 
-    @staticmethod
-    def _create_resource(*, type_: URIRef, uri: URIRef) -> Resource:
+    @classmethod
+    def _create_resource(cls, *, uri: URIRef) -> Resource:
         resource = Graph().resource(uri)
-        resource.add(RDF.type, type_)
+        resource.add(RDF.type, cls.rdf_type_uri())
         return resource
 
     @staticmethod

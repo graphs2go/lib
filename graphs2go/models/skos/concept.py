@@ -31,6 +31,20 @@ class Concept(Model):
         )
 
     @property
+    def close_match(self) -> Iterable[Concept | URIRef]:
+        yield from self._values(
+            SKOS.closeMatch,
+            lambda term: self._map_term_to_model_or_uri(self.__class__, term),
+        )
+
+    @property
+    def exact_match(self) -> Iterable[Concept | URIRef]:
+        yield from self._values(
+            SKOS.exactMatch,
+            lambda term: self._map_term_to_model_or_uri(self.__class__, term),
+        )
+
+    @property
     def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
         yield from self._values(
             SKOS.ConceptScheme,
