@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from rdflib import RDF, SKOS, URIRef
+
 from graphs2go.models.interchange.node import Node
 
 

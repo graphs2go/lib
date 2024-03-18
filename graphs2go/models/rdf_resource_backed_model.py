@@ -1,17 +1,17 @@
 from __future__ import annotations
-from abc import abstractmethod, ABC
-from datetime import date, datetime
+
 import logging
-from typing import Self, Any
+from abc import ABC, abstractmethod
+from datetime import date, datetime
+from typing import TYPE_CHECKING, Any, Self, TypeVar
+
 import rdflib.collection
-from typing import TypeVar, TYPE_CHECKING
 from rdflib import RDF, Graph, Literal, URIRef
 from rdflib.resource import Resource
 from rdflib.term import Node
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
-    from collections.abc import Callable
+    from collections.abc import Callable, Generator
 
 
 _ModelT = TypeVar("_ModelT", bound="RdfResourceBackedModel")

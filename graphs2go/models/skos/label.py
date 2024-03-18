@@ -1,4 +1,5 @@
-from rdflib import URIRef, Literal
+from rdflib import Literal, URIRef
+
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
 

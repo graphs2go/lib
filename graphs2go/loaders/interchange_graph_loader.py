@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from rdflib import Graph, URIRef
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models.rdf_format import RdfFormat
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from graphs2go.models.interchange.model import Model

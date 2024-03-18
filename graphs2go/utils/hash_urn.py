@@ -1,4 +1,5 @@
 import hashlib
+
 from rdflib import URIRef
 
 

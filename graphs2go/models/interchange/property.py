@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from rdflib import RDF, Literal, URIRef
+
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.utils.hash_urn import hash_urn

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from rdflib import RDF
+
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.namespaces.skosxl import SKOSXL
-from typing import TYPE_CHECKING
-
 from graphs2go.utils.uuid_urn import uuid_urn
 
 if TYPE_CHECKING:

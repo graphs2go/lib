@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from rdflib import SKOS, URIRef, Literal
+from typing import TYPE_CHECKING
+
+from rdflib import SKOS, Literal, URIRef
+
 from graphs2go.models.skos.concept_scheme import ConceptScheme
 from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
