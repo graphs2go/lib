@@ -60,7 +60,7 @@ class RdfStore(ABC):
             return OxigraphRdfStore.open(descriptor)
         raise TypeError(type(descriptor))
 
-    @abstractmethod
     @property
+    @abstractmethod
     def rdflib_store(self) -> Store:
         pass

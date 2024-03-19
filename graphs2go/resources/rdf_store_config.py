@@ -25,14 +25,6 @@ class RdfStoreConfig(ConfigurableResource):  # type: ignore
         )
 
     def parse(self) -> Parsed:
-        directory_path: Path | None
-        if self.directory_path:
-            directory_path = Path(self.directory_path)
-            if not directory_path.is_dir():
-                directory_path = None
-        else:
-            directory_path = None
-
         return RdfStoreConfig.Parsed(
-            directory_path=directory_path,
+            directory_path=Path(self.directory_path),
         )

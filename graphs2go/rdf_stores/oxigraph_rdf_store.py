@@ -28,7 +28,7 @@ class OxigraphRdfStore(RdfStore):
     ):
         self.__oxigraph_directory_path = oxigraph_directory_path
         self.__pyoxigraph_store = pyoxigraph.Store(oxigraph_directory_path)
-        self.__rdflib_store = oxrdflib.OxigraphStore(self.__pyoxigraph_store)
+        self.__rdflib_store = oxrdflib.OxigraphStore(store=self.__pyoxigraph_store)
 
     def close(self) -> None:
         del self.__pyoxigraph_store
@@ -40,9 +40,7 @@ class OxigraphRdfStore(RdfStore):
         rdf_store_config_parsed: RdfStoreConfig.Parsed,
     ) -> OxigraphRdfStore:
         oxigraph_directory_path = (
-            rdf_store_config_parsed.directory_path
-            / "oxigraph"
-            / sanitize_filename(identifier)
+            rdf_store_config_parsed.directory_path / sanitize_filename(identifier)
         )
         oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
         return OxigraphRdfStore(
@@ -63,7 +61,7 @@ class OxigraphRdfStore(RdfStore):
 
     @property
     def rdflib_store(self) -> rdflib.store.Store:
-        return self.__oxrdflib_store
+        return self.__rdflib_store
 
     @property
     def pyoxigraph_store(self) -> pyoxigraph.Store:

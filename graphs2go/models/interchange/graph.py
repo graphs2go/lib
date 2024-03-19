@@ -27,7 +27,7 @@ class Graph:
         rdf_store_descriptor: RdfStore.Descriptor
 
     def __init__(self, *, rdf_store: RdfStore):
-        self.__rdf_graph = rdflib.ConjunctiveGraph(store=rdf_store.to_rdflib_store())
+        self.__rdf_graph = rdflib.ConjunctiveGraph(store=rdf_store.rdflib_store)
         self.__rdf_store = rdf_store
 
     def add(self, model: Model) -> None:
