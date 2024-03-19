@@ -9,7 +9,7 @@ from graphs2go.namespaces.interchange import INTERCHANGE
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from graphs2go.resources.oxigraph_config import OxigraphConfig
+    from graphs2go.resources.rdf_store_config import RdfStoreConfig
     from graphs2go.models.interchange.model import Model
     from pathlib import Path
     from collections.abc import Iterable
@@ -36,11 +36,11 @@ class Graph(ABC):
     def create(
         *,
         identifier: rdflib.URIRef,
-        oxigraph_config: OxigraphConfig,
+        rdf_store_config: RdfStoreConfig,
     ) -> Graph:
         return _OxigraphGraph.create(
             identifier=identifier,
-            oxigraph_config_parsed=oxigraph_config.parse(),
+            oxigraph_config_parsed=rdf_store_config.parse(),
         )
 
     @property
@@ -101,7 +101,7 @@ class _OxigraphGraph(Graph):
     def create(
         *,
         identifier: rdflib.URIRef,
-        oxigraph_config_parsed: OxigraphConfig.Parsed,
+        oxigraph_config_parsed: RdfStoreConfig.Parsed,
     ) -> _OxigraphGraph:
         oxigraph_directory_path = (
             oxigraph_config_parsed.directory_path
