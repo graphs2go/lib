@@ -34,11 +34,11 @@ class InterchangeConfig(ConfigurableResource):  # type: ignore
             recreate=EnvVar.int("INTERCHANGE_RECREATE").get_value() == 1,
         )
 
-    def parse(self) -> Parsed:
+    def parse(self, *, directory_path_default: Path) -> Parsed:
         return InterchangeConfig.Parsed(
             directory_path=parse_directory_path_config_value(
                 self.directory_path,
-                default=Path(__file__).parent.parent.parent / "data" / "interchange",
+                default=directory_path_default,
             ),
             rdf_format=(
                 getattr(RdfFormat, self.rdf_format.upper())

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 
 from dagster import ConfigurableResource, EnvVar
 
 from graphs2go.utils.parse_directory_path_config_value import (
     parse_directory_path_config_value,
 )
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class OxigraphConfig(ConfigurableResource):  # type: ignore
@@ -27,10 +30,10 @@ class OxigraphConfig(ConfigurableResource):  # type: ignore
             directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(""),  # type: ignore
         )
 
-    def parse(self) -> Parsed:
+    def parse(self, *, directory_path_default: Path) -> Parsed:
         return OxigraphConfig.Parsed(
             directory_path=parse_directory_path_config_value(
                 self.directory_path,
-                default=Path(__file__).parent.parent.parent / "data" / "oxigraph",
+                default=directory_path_default,
             ),
         )
