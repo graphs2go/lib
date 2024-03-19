@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import rdflib
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-class RdfStoreBackedGraph:
+class PersistentRdfGraph:
     @dataclass(frozen=True)
     class Descriptor:
         """
-        A picklable dataclass identifying an interchange graph.
+        A picklable dataclass identifying a graph.
         """
 
         rdf_store_descriptor: RdfStore.Descriptor
@@ -30,7 +30,7 @@ class RdfStoreBackedGraph:
         *,
         identifier: rdflib.URIRef,
         rdf_store_config: RdfStoreConfig,
-    ) -> RdfStoreBackedGraph:
+    ) -> Self:
         return cls(
             rdf_store=RdfStore.create(
                 identifier=identifier, rdf_store_config=rdf_store_config
@@ -52,5 +52,5 @@ class RdfStoreBackedGraph:
         return self.__rdf_store.is_empty
 
     @classmethod
-    def open(cls, descriptor: Descriptor) -> RdfStoreBackedGraph:
+    def open(cls, descriptor: Descriptor) -> Self:
         return cls(rdf_store=RdfStore.open(descriptor.rdf_store_descriptor))

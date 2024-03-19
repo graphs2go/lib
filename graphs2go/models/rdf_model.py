@@ -23,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 class RdfModel(ABC):
+    """
+    Abstract base class for models backed by an rdflib Resource.
+    """
+
     class Builder(ABC):
         def __init__(self, resource: Resource):
             if not isinstance(resource.identifier, URIRef):
