@@ -4,13 +4,7 @@ from dataclasses import dataclass
 
 from dagster import ConfigurableResource, EnvVar
 
-from graphs2go.utils.parse_directory_path_config_value import (
-    parse_directory_path_config_value,
-)
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from pathlib import Path
 
 
 class OxigraphConfig(ConfigurableResource):  # type: ignore
@@ -21,19 +15,24 @@ class OxigraphConfig(ConfigurableResource):  # type: ignore
     directory_path: str
 
     @classmethod
-    def default(cls) -> OxigraphConfig:
-        return OxigraphConfig(directory_path="")
+    def default(cls, *, directory_path_default: Path) -> OxigraphConfig:
+        return OxigraphConfig(directory_path=str(directory_path_default))
 
     @classmethod
-    def from_env_vars(cls) -> OxigraphConfig:
+    def from_env_vars(cls, *, directory_path_default: Path) -> OxigraphConfig:
         return cls(
-            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(""),  # type: ignore
+            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(str(directory_path_default)),  # type: ignore
         )
 
-    def parse(self, *, directory_path_default: Path) -> Parsed:
+    def parse(self) -> Parsed:
+        directory_path: Path | None
+        if self.directory_path:
+            directory_path = Path(self.directory_path)
+            if not directory_path.is_dir():
+                directory_path = None
+        else:
+            directory_path = None
+
         return OxigraphConfig.Parsed(
-            directory_path=parse_directory_path_config_value(
-                self.directory_path,
-                default=directory_path_default,
-            ),
+            directory_path=directory_path,
         )
