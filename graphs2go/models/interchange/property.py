@@ -9,7 +9,7 @@ from graphs2go.utils.hash_urn import hash_urn
 
 class Property(Model):
     """
-    A node->node or node->literal relationship, equivalent to a property in a labeled property graph.
+    A node->literal relationship, equivalent to a property in a labeled property graph.
     """
 
     class Builder(Model.Builder):
@@ -21,7 +21,7 @@ class Property(Model):
         cls,
         *,
         predicate: URIRef,
-        object_: Literal | URIRef,
+        object_: Literal,
         subject: URIRef,
         uri: URIRef | None = None,
     ) -> Property.Builder:
