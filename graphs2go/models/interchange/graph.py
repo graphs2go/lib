@@ -57,9 +57,7 @@ class Graph:
 
     @property
     def is_empty(self) -> bool:
-        for _ in self.__rdf_graph.triples((None, None, None)):
-            return False
-        return True
+        return self.__rdf_store.is_empty
 
     @property
     def nodes(self) -> Iterable[Node]:

@@ -18,6 +18,16 @@ class RdfStore(ABC):
         A picklable dataclass identifying an RDF store. It can be used to open an RDF store.
         """
 
+    @abstractmethod
+    def close(self) -> None:
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
+        self.close()
+
     @staticmethod
     def create(
         *,
@@ -36,6 +46,12 @@ class RdfStore(ABC):
     def descriptor(self) -> Descriptor:
         pass
 
+    @property
+    def is_empty(self) -> bool:
+        for _ in self.rdflib_store.triples((None, None, None)):
+            return False
+        return True
+
     @staticmethod
     def open(descriptor: Descriptor) -> RdfStore:
         from .oxigraph_rdf_store import OxigraphRdfStore
@@ -45,5 +61,6 @@ class RdfStore(ABC):
         raise TypeError(type(descriptor))
 
     @abstractmethod
-    def to_rdflib_store(self) -> Store:
+    @property
+    def rdflib_store(self) -> Store:
         pass
