@@ -89,7 +89,6 @@ class _OxigraphInterchangeGraphLoader(InterchangeGraphLoader):
             interchange_graph_identifier=interchange_graph_identifier,
         )
         self.__oxigraph_directory_path = oxigraph_directory_path
-        self.__oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
         self.__graph = ConjunctiveGraph(
             store=oxrdflib.OxigraphStore(
                 store=pyoxigraph.Store(self.__oxigraph_directory_path)
