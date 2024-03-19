@@ -12,20 +12,20 @@ from graphs2go.loaders.directory_loader import DirectoryLoader
 from graphs2go.loaders.rdf_loader import RdfLoader
 
 if TYPE_CHECKING:
-    from graphs2go.models.rdf_format import RdfFormat
+    from graphs2go.models import rdf
 
 
 metrics = markus.get_metrics(__name__)
 
 
 class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
-    def __init__(self, *, directory_path: Path, rdf_format: RdfFormat):
+    def __init__(self, *, directory_path: Path, rdf_format: rdf.Format):
         DirectoryLoader.__init__(self, directory_path=directory_path)
         self.__rdf_format = rdf_format
 
     @classmethod
     def create(
-        cls, *, directory_path: Path, rdf_format: RdfFormat
+        cls, *, directory_path: Path, rdf_format: rdf.Format
     ) -> RdfDirectoryLoader:
         if rdf_format.line_oriented:
             return _StreamingRdfDirectoryLoader(
@@ -36,7 +36,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
         )
 
     @property
-    def _rdf_format(self) -> RdfFormat:
+    def _rdf_format(self) -> Format:
         return self.__rdf_format
 
     def rdf_graph_file_path(self, identifier: URIRef) -> Path:
@@ -46,7 +46,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
 
 
 class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
-    def __init__(self, *, directory_path: Path, rdf_format: RdfFormat):
+    def __init__(self, *, directory_path: Path, rdf_format: Format):
         BufferingRdfLoader.__init__(
             self,
             default_rdf_graph_type=(
@@ -67,7 +67,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
 
 
 class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
-    def __init__(self, *, directory_path: Path, rdf_format: RdfFormat):
+    def __init__(self, *, directory_path: Path, rdf_format: Format):
         RdfDirectoryLoader.__init__(
             self, directory_path=directory_path, rdf_format=rdf_format
         )

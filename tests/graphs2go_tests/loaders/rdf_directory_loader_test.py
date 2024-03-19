@@ -4,7 +4,7 @@ import pytest
 from rdflib import ConjunctiveGraph, Graph, URIRef
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
-from graphs2go.models.rdf_format import RdfFormat
+from graphs2go.models import rdf
 
 
 @pytest.mark.parametrize(
@@ -12,13 +12,13 @@ from graphs2go.models.rdf_format import RdfFormat
     argvalues=tuple(
         (rdf_graph_type, rdf_format)
         for rdf_graph_type in (ConjunctiveGraph, Graph)
-        for rdf_format in RdfFormat
+        for rdf_format in rdf.Format
     ),
 )
 def test_load(
     rdf_graph_type: type[Graph],
     rdf_graphs: tuple[Graph, ...],
-    rdf_format: RdfFormat,
+    rdf_format: rdf.Format,
     tmp_path: Path,
 ) -> None:
     with RdfDirectoryLoader.create(
