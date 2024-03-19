@@ -1,6 +1,6 @@
 from dagster import AssetsDefinition, asset, get_dagster_logger
 
-from graphs2go.models.postgres_database import postgres.Database
+from graphs2go.models import postgres
 from graphs2go.resources.postgres_connection_pool import PostgresConnectionPool
 
 

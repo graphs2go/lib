@@ -8,9 +8,7 @@ import markus
 from dagster import ConfigurableResource, EnvVar
 from psycopg_pool import ConnectionPool
 
-from graphs2go.models.postgres_database import postgres.Database
-from graphs2go.models.postgres_schema import postgres.Schema
-from graphs2go.models.postgres_tables import postgres.Tables
+from graphs2go.models import postgres
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
