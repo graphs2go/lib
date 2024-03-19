@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from pathlib import Path
-from typing import IO, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from rdflib import ConjunctiveGraph
 
 if TYPE_CHECKING:
+    from pathlib import Path
     from rdflib import URIRef
     from rdflib.store import Store
 
