@@ -1,16 +1,19 @@
 from __future__ import annotations
-from dataclasses import dataclass
-import rdflib
 
-from graphs2go.rdf_stores.rdf_store import RdfStore
-from graphs2go.models.interchange.node import Node
-from graphs2go.namespaces.interchange import INTERCHANGE
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import rdflib
+
+from graphs2go.models.interchange.node import Node
+from graphs2go.namespaces.interchange import INTERCHANGE
+from graphs2go.rdf_stores.rdf_store import RdfStore
+
 if TYPE_CHECKING:
-    from graphs2go.resources.rdf_store_config import RdfStoreConfig
-    from graphs2go.models.interchange.model import Model
     from collections.abc import Iterable
+
+    from graphs2go.models.interchange.model import Model
+    from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
 class Graph:

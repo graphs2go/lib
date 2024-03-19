@@ -1,14 +1,14 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
-    from graphs2go.resources.rdf_store_config import RdfStoreConfig
-    from rdflib.store import Store
     from rdflib import URIRef
+    from rdflib.store import Store
+
+    from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
 class RdfStore(ABC):

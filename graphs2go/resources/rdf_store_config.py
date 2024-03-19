@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from dagster import ConfigurableResource, EnvVar
-
-from pathlib import Path
 
 
 class RdfStoreConfig(ConfigurableResource):  # type: ignore

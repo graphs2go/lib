@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-import oxrdflib
-import pyoxigraph
-
 from dataclasses import dataclass
-
-from pathvalidate import sanitize_filename
-from graphs2go.rdf_stores.rdf_store import RdfStore
 from typing import TYPE_CHECKING
 
+import oxrdflib
+import pyoxigraph
+from pathvalidate import sanitize_filename
+
+from graphs2go.rdf_stores.rdf_store import RdfStore
+
 if TYPE_CHECKING:
-    import rdflib.store
-    from graphs2go.resources.rdf_store_config import RdfStoreConfig
-    from rdflib import URIRef
     from pathlib import Path
+
+    import rdflib.store
+    from rdflib import URIRef
+
+    from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
 class OxigraphRdfStore(RdfStore):
