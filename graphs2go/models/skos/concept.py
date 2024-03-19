@@ -23,28 +23,28 @@ class Concept(Model):
         yield from self._values(
             SKOSXL.altLabel,
             lambda term: self._map_term_to_model(self._LABEL_CLASS, term),
-        )
+        )  # type: ignore
 
     @property
     def broader(self) -> Iterable[Concept | URIRef]:
         yield from self._values(
             SKOS.broader,
             lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )
+        )  # type: ignore
 
     @property
     def close_match(self) -> Iterable[Concept | URIRef]:
         yield from self._values(
             SKOS.closeMatch,
             lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )
+        )  # type: ignore
 
     @property
     def exact_match(self) -> Iterable[Concept | URIRef]:
         yield from self._values(
             SKOS.exactMatch,
             lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )
+        )  # type: ignore
 
     @property
     def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
@@ -53,7 +53,7 @@ class Concept(Model):
             lambda term: self._map_term_to_model_or_uri(
                 self._CONCEPT_SCHEME_CLASS, term
             ),
-        )
+        )  # type: ignore
 
     @property
     def pref_label(self) -> Iterable[Label | Literal]:
@@ -61,7 +61,7 @@ class Concept(Model):
         yield from self._values(
             SKOSXL.prefLabel,
             lambda term: self._map_term_to_model(self._LABEL_CLASS, term),
-        )
+        )  # type: ignore
 
     @classmethod
     def rdf_type_uri(cls) -> URIRef:
@@ -72,4 +72,4 @@ class Concept(Model):
         yield from self._values(
             SKOS.broader,
             lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )
+        )  # type: ignore

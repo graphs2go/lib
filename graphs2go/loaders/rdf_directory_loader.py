@@ -36,7 +36,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
         )
 
     @property
-    def _rdf_format(self) -> Format:
+    def _rdf_format(self) -> rdf.Format:
         return self.__rdf_format
 
     def rdf_graph_file_path(self, identifier: URIRef) -> Path:
@@ -46,7 +46,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
 
 
 class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
-    def __init__(self, *, directory_path: Path, rdf_format: Format):
+    def __init__(self, *, directory_path: Path, rdf_format: rdf.Format):
         BufferingRdfLoader.__init__(
             self,
             default_rdf_graph_type=(
@@ -67,7 +67,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
 
 
 class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
-    def __init__(self, *, directory_path: Path, rdf_format: Format):
+    def __init__(self, *, directory_path: Path, rdf_format: rdf.Format):
         RdfDirectoryLoader.__init__(
             self, directory_path=directory_path, rdf_format=rdf_format
         )

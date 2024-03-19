@@ -53,7 +53,7 @@ class RdfStore(ABC):
 
         return OxigraphRdfStore.create(
             identifier=identifier,
-            rdf_store_config_parsed=rdf_store_config.parse(),
+            rdf_store_config=rdf_store_config,
         )
 
     @property

@@ -43,10 +43,10 @@ class OxigraphRdfStore(RdfStore):
     def create(
         *,
         identifier: URIRef,
-        rdf_store_config_parsed: RdfStoreConfig.Parsed,
+        rdf_store_config: RdfStoreConfig,
     ) -> OxigraphRdfStore:
         oxigraph_directory_path = (
-            rdf_store_config_parsed.directory_path / sanitize_filename(identifier)
+            rdf_store_config.parse().directory_path / sanitize_filename(identifier)
         )
         oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
         return OxigraphRdfStore(
@@ -60,7 +60,8 @@ class OxigraphRdfStore(RdfStore):
         )
 
     @staticmethod
-    def open(descriptor: Descriptor) -> OxigraphRdfStore:
+    def open(descriptor: RdfStore.Descriptor) -> OxigraphRdfStore:
+        assert isinstance(descriptor, OxigraphRdfStore.Descriptor)
         return OxigraphRdfStore(
             oxigraph_directory_path=descriptor.oxigraph_directory_path,
         )

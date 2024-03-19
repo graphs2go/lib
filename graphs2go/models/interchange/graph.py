@@ -20,11 +20,11 @@ class Graph(rdf.Graph):
     """
 
     def add(self, model: Model) -> None:
-        self.__rdf_graph += model.resource.graph
+        self._rdflib_graph += model.resource.graph
 
     @property
     def nodes(self) -> Iterable[Node]:
-        for subject_uri in self.__rdf_graph.subjects(
+        for subject_uri in self._rdflib_graph.subjects(
             predicate=rdflib.RDF.type, object=INTERCHANGE.Node
         ):
-            yield Node(resource=self.__rdf_graph.resource(subject_uri))
+            yield Node(resource=self._rdflib_graph.resource(subject_uri))
