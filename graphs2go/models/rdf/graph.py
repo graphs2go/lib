@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-class PersistentRdfGraph:
+class Graph:
     @dataclass(frozen=True)
     class Descriptor:
         """

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import rdflib
 
-from graphs2go.models.persistent_rdf_graph import PersistentRdfGraph
+from graphs2go.models import rdf
 from graphs2go.models.interchange.node import Node
 from graphs2go.namespaces.interchange import INTERCHANGE
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from graphs2go.models.interchange.model import Model
 
 
-class Graph(PersistentRdfGraph):
+class Graph(rdf.Graph):
     """
     Non-picklable interchange graph. Used as an entry point for accessing top-level graph models.
     """
