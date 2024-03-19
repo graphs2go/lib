@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
 
-_ModelT = TypeVar("_ModelT", bound="RdfModel")
+_ModelT = TypeVar("_ModelT", bound="Model")
 _Predicates = URIRef | tuple[URIRef, ...]
 _StatementObject = Literal | Resource
 _ValueT = TypeVar("_ValueT")
@@ -22,7 +22,7 @@ _ValueT = TypeVar("_ValueT")
 logger = logging.getLogger(__name__)
 
 
-class RdfModel(ABC):
+class Model(ABC):
     """
     Abstract base class for models backed by an rdflib Resource.
     """
@@ -34,7 +34,7 @@ class RdfModel(ABC):
             self.__resource = resource
 
         @abstractmethod
-        def build(self) -> RdfModel:
+        def build(self) -> Model:
             pass
 
         @property
@@ -155,7 +155,7 @@ class RdfModel(ABC):
     def _map_term_to_model(
         model_class: type[_ModelT], term: _StatementObject
     ) -> _ModelT | None:
-        model_or_uri = RdfModel._map_term_to_model_or_uri(model_class, term)
+        model_or_uri = Model._map_term_to_model_or_uri(model_class, term)
         return model_or_uri if isinstance(model_or_uri, model_class) else None
 
     @staticmethod
