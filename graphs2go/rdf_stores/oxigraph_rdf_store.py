@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import oxrdflib
@@ -31,6 +32,9 @@ class OxigraphRdfStore(RdfStore):
         self.__oxigraph_directory_path = oxigraph_directory_path
         self.__pyoxigraph_store = pyoxigraph.Store(oxigraph_directory_path)
         self.__rdflib_store = oxrdflib.OxigraphStore(store=self.__pyoxigraph_store)
+
+    def bulk_load(self, *, mime_type: str, source: Path) -> None:
+        self.pyoxigraph_store.bulk_load(input=source, mime_type=mime_type)
 
     def close(self) -> None:
         del self.__pyoxigraph_store

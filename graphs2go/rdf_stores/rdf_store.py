@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import IO, TYPE_CHECKING
+
+from rdflib import ConjunctiveGraph
 
 if TYPE_CHECKING:
     from rdflib import URIRef
@@ -17,6 +20,18 @@ class RdfStore(ABC):
         """
         A picklable dataclass identifying an RDF store. It can be used to open an RDF store.
         """
+
+    def bulk_load(self, *, mime_type: str, source: Path) -> None:
+        """
+        Bulk load the contents of the input into the store.
+
+        No transactional guarantee.
+        """
+
+        ConjunctiveGraph(store=self.rdflib_store).parse(
+            format=mime_type,
+            source=source,
+        )
 
     @abstractmethod
     def close(self) -> None:
