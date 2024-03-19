@@ -1,5 +1,5 @@
-from graphs2go.models.rdf_resource_backed_model import RdfResourceBackedModel
+from graphs2go.models.rdf_model import RdfModel
 
 
-class Model(RdfResourceBackedModel):
+class Model(RdfModel):
     pass

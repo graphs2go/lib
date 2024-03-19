@@ -3,18 +3,18 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, Self, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 import rdflib.collection
 from rdflib import RDF, Graph, Literal, URIRef
 from rdflib.resource import Resource
-from rdflib.term import Node
 
 if TYPE_CHECKING:
+    from rdflib.term import Node
     from collections.abc import Callable, Generator
 
 
-_ModelT = TypeVar("_ModelT", bound="RdfResourceBackedModel")
+_ModelT = TypeVar("_ModelT", bound="RdfModel")
 _Predicates = URIRef | tuple[URIRef, ...]
 _StatementObject = Literal | Resource
 _ValueT = TypeVar("_ValueT")
@@ -22,7 +22,7 @@ _ValueT = TypeVar("_ValueT")
 logger = logging.getLogger(__name__)
 
 
-class RdfResourceBackedModel(ABC):
+class RdfModel(ABC):
     class Builder(ABC):
         def __init__(self, resource: Resource):
             if not isinstance(resource.identifier, URIRef):
@@ -30,7 +30,7 @@ class RdfResourceBackedModel(ABC):
             self.__resource = resource
 
         @abstractmethod
-        def build(self) -> RdfResourceBackedModel:
+        def build(self) -> RdfModel:
             pass
 
         @property
@@ -151,9 +151,7 @@ class RdfResourceBackedModel(ABC):
     def _map_term_to_model(
         model_class: type[_ModelT], term: _StatementObject
     ) -> _ModelT | None:
-        model_or_uri = RdfResourceBackedModel._map_term_to_model_or_uri(
-            model_class, term
-        )
+        model_or_uri = RdfModel._map_term_to_model_or_uri(model_class, term)
         return model_or_uri if isinstance(model_or_uri, model_class) else None
 
     @staticmethod
