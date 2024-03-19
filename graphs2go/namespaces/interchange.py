@@ -8,6 +8,7 @@ class INTERCHANGE(DefinedNamespace):
     _fail = True
 
     # Classes
+    Label: URIRef
     Node: URIRef
     Property: URIRef
     Relationship: URIRef

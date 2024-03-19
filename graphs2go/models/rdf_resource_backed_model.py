@@ -172,7 +172,7 @@ class RdfResourceBackedModel(ABC):
             logger.warning("term %s rdf:type is not a Resource", term.identifier)
             return resource.identifier
         if value_type.identifier == model_class.rdf_type_uri():
-            return model_class.from_rdf(resource)  # type: ignore
+            return model_class(resource=resource)
 
         return resource.identifier
 

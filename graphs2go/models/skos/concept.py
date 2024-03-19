@@ -63,6 +63,10 @@ class Concept(Model):
             lambda term: self._map_term_to_model(self._LABEL_CLASS, term),
         )
 
+    @classmethod
+    def rdf_type_uri(cls) -> URIRef:
+        return SKOS.Concept
+
     @property
     def related(self) -> Iterable[Concept | URIRef]:
         yield from self._values(
