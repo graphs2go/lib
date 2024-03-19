@@ -1,9 +1,8 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from pathvalidate import sanitize_filename
 import rdflib
 
+from graphs2go.rdf_stores.rdf_store import RdfStore
 from graphs2go.models.interchange.node import Node
 from graphs2go.namespaces.interchange import INTERCHANGE
 from typing import TYPE_CHECKING
@@ -11,11 +10,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
     from graphs2go.models.interchange.model import Model
-    from pathlib import Path
     from collections.abc import Iterable
 
 
-class Graph(ABC):
+class Graph:
     """
     Non-picklable interchange graph. Used as an entry point for accessing top-level graph models.
     """
@@ -23,11 +21,14 @@ class Graph(ABC):
     @dataclass(frozen=True)
     class Descriptor:
         """
-        A picklable dataclass identifying an interchange graph. It can be used to open an InterchangeGraph.
+        A picklable dataclass identifying an interchange graph.
         """
 
-    def __init__(self, *, rdf_graph: rdflib.Graph):
-        self.__rdf_graph = rdf_graph
+        rdf_store_descriptor: RdfStore.Descriptor
+
+    def __init__(self, *, rdf_store: RdfStore):
+        self.__rdf_graph = rdflib.ConjunctiveGraph(store=rdf_store.to_rdflib_store())
+        self.__rdf_store = rdf_store
 
     def add(self, model: Model) -> None:
         self.__rdf_graph += model.resource.graph
@@ -38,15 +39,15 @@ class Graph(ABC):
         identifier: rdflib.URIRef,
         rdf_store_config: RdfStoreConfig,
     ) -> Graph:
-        return _OxigraphGraph.create(
-            identifier=identifier,
-            oxigraph_config_parsed=rdf_store_config.parse(),
+        return Graph(
+            rdf_store=RdfStore.create(
+                identifier=identifier, rdf_store_config=rdf_store_config
+            )
         )
 
     @property
-    @abstractmethod
     def descriptor(self) -> Descriptor:
-        pass
+        return self.Descriptor(rdf_store_descriptor=self.__rdf_store.descriptor)
 
     def __enter__(self):
         return self
@@ -68,59 +69,5 @@ class Graph(ABC):
             yield Node(resource=self.__rdf_graph.resource(subject_uri))
 
     @staticmethod
-    def open(*, descriptor: Descriptor) -> Graph:
-        if isinstance(descriptor, _OxigraphGraph.Descriptor):
-            return _OxigraphGraph.open(descriptor=descriptor)
-        raise TypeError(type(descriptor))
-
-
-class _OxigraphGraph(Graph):
-    @dataclass(frozen=True)
-    class Descriptor(Graph.Descriptor):
-        oxigraph_directory_path: Path
-
-    def __init__(
-        self,
-        *,
-        oxigraph_directory_path: Path,
-    ):
-        import oxrdflib
-        import pyoxigraph
-
-        Graph.__init__(
-            self,
-            rdf_graph=rdflib.ConjunctiveGraph(
-                store=oxrdflib.OxigraphStore(
-                    store=pyoxigraph.Store(oxigraph_directory_path)
-                )
-            ),
-        )
-        self.__oxigraph_directory_path = oxigraph_directory_path
-
-    @staticmethod
-    def create(
-        *,
-        identifier: rdflib.URIRef,
-        oxigraph_config_parsed: RdfStoreConfig.Parsed,
-    ) -> _OxigraphGraph:
-        oxigraph_directory_path = (
-            oxigraph_config_parsed.directory_path
-            / "interchange"
-            / sanitize_filename(identifier)
-        )
-        oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
-        return _OxigraphGraph(
-            oxigraph_directory_path=oxigraph_directory_path,
-        )
-
-    @property
-    def descriptor(self) -> Descriptor:
-        return self.Descriptor(
-            oxigraph_directory_path=self.__oxigraph_directory_path,
-        )
-
-    @staticmethod
-    def open(*, descriptor: Descriptor) -> _OxigraphGraph:
-        return _OxigraphGraph(
-            oxigraph_directory_path=descriptor.oxigraph_directory_path,
-        )
+    def open(descriptor: Descriptor) -> Graph:
+        return Graph(rdf_store=RdfStore.open(descriptor.rdf_store_descriptor))
