@@ -8,9 +8,9 @@ import markus
 from dagster import ConfigurableResource, EnvVar
 from psycopg_pool import ConnectionPool
 
-from graphs2go.models.postgres_database import PostgresDatabase
-from graphs2go.models.postgres_schema import PostgresSchema
-from graphs2go.models.postgres_tables import PostgresTables
+from graphs2go.models.postgres_database import postgres.Database
+from graphs2go.models.postgres_schema import postgres.Schema
+from graphs2go.models.postgres_tables import postgres.Tables
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -34,18 +34,18 @@ class PostgresConnectionPool(ConfigurableResource):  # type: ignore
 
     @contextmanager
     def connect(
-        self, to: PostgresDatabase | PostgresSchema | PostgresTables | None
+        self, to: postgres.Database | postgres.Schema | postgres.Tables | None
     ) -> Iterator[Connection[Any]]:
         database_name = None
         schema_name = None
         if to is None:
             pass
-        elif isinstance(to, PostgresDatabase):
+        elif isinstance(to, postgres.Database):
             database_name = to.name
-        elif isinstance(to, PostgresSchema):
+        elif isinstance(to, postgres.Schema):
             database_name = to.database.name
             schema_name = to.name
-        elif isinstance(to, PostgresTables):
+        elif isinstance(to, postgres.Tables):
             database_name = to.schema.database.name
             schema_name = to.schema.name
         else:

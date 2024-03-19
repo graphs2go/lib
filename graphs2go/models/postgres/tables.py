@@ -1,12 +1,12 @@
 import dataclasses
 from dataclasses import dataclass
 
-from graphs2go.models.postgres_schema import PostgresSchema
-from graphs2go.models.postgres_table import PostgresTable
+from graphs2go.models.postgres.schema import Schema
+from graphs2go.models.postgres.table import Table
 
 
 @dataclass(frozen=True)
-class PostgresTables:
+class Tables:
     def _post_init(self) -> None:
         database_names: set[str] = set()
         schema_names: set[str] = set()
@@ -21,14 +21,14 @@ class PostgresTables:
             raise ValueError("tables in different schemas: " + " ".join(schema_names))
 
     @property
-    def schema(self) -> PostgresSchema:
+    def schema(self) -> Schema:
         return self._tables[0].schema
 
     @property
-    def _tables(self) -> tuple[PostgresTable, ...]:
-        result: list[PostgresTable] = []
+    def _tables(self) -> tuple[Table, ...]:
+        result: list[Table] = []
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            assert isinstance(value, PostgresTable)
+            assert isinstance(value, Table)
             result.append(value)
         return tuple(result)
