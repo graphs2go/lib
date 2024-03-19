@@ -12,10 +12,14 @@ if TYPE_CHECKING:
 
 
 class Graph:
+    """
+    Non-picklable RDF graph backed by RDF store.
+    """
+
     @dataclass(frozen=True)
     class Descriptor:
         """
-        A picklable dataclass identifying a graph.
+        A picklable dataclass identifying an RDF graph.
         """
 
         rdf_store_descriptor: RdfStore.Descriptor
