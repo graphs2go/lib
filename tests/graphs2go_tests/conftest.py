@@ -2,7 +2,7 @@ import itertools
 import pytest
 from rdflib import SKOS, Literal
 
-from graphs2go.models import interchange
+from graphs2go.models import interchange, skos
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.utils.uuid_urn import uuid_urn
 
@@ -106,3 +106,36 @@ def interchange_relationship(
         for relationship in concept.relationships:
             return relationship
     pytest.fail("no relationships")
+
+
+@pytest.fixture(scope="session")
+def skos_graph() -> skos.Graph:
+    graph = skos.Graph(rdf_store=MemoryRdfStore())
+
+    concept_builders: list[skos.Concept.Builder] = []
+    for concept_i in range(2):
+        concept_builder = skos.Concept.builder(uri=uuid_urn())
+
+        concept_builder.add_alt_label(
+            skos.Label.builder(
+                literal_form=Literal("altLabel" + str(concept_i + 1)), uri=uuid_urn()
+            ).build()
+        )
+
+        concept_builder.add_pref_label(
+            skos.Label.builder(
+                literal_form=Literal("prefLabel" + str(concept_i + 1)), uri=uuid_urn()
+            ).build()
+        )
+
+        concept_builders.append(concept_builder)
+
+    for concept_builder_1, concept_builder_2 in itertools.combinations(
+        concept_builders, 2
+    ):
+        concept_builder_1.add_broader(concept_builder_2.build())
+
+    for concept_builder in concept_builders:
+        graph.add(concept_builder.build())
+
+    return graph

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from rdflib import SKOS, Literal, URIRef
 
@@ -15,6 +15,52 @@ if TYPE_CHECKING:
 
 class Concept(Model):
     class Builder(Model.Builder):
+
+        def add_alt_label(self, alt_label: Label | Literal | URIRef) -> Self:
+            return self.__add_label(
+                label=alt_label,
+                skos_predicate=SKOS.altLabel,
+                skosxl_predicate=SKOSXL.altLabel,
+            )
+
+        def add_broader(self, broader: Concept | URIRef) -> Self:
+            return self.__add_relationship(object_=broader, predicate=SKOS.broader)
+
+        def __add_label(
+            self,
+            *,
+            label: Label | Literal | URIRef,
+            skos_predicate: URIRef,
+            skosxl_predicate: URIRef,
+        ) -> Self:
+            if isinstance(label, Label):
+                self._resource.add(skosxl_predicate, label.uri)
+            elif isinstance(label, Literal):
+                self._resource.add(skos_predicate, label)
+            elif isinstance(label, URIRef):
+                self._resource.add(skosxl_predicate, label)
+            else:
+                raise TypeError(type(label))
+            return self
+
+        def add_pref_label(self, pref_label: Label | Literal | URIRef) -> Self:
+            return self.__add_label(
+                label=pref_label,
+                skos_predicate=SKOS.prefLabel,
+                skosxl_predicate=SKOSXL.prefLabel,
+            )
+
+        def __add_relationship(
+            self, *, object_: Concept | URIRef, predicate: URIRef
+        ) -> Self:
+            if isinstance(object_, Concept):
+                self._resource.add(predicate, object_.uri)
+            elif isinstance(object_, URIRef):
+                self._resource.add(predicate, object_)
+            else:
+                raise TypeError(type(object_))
+            return self
+
         def build(self) -> Concept:
             return Concept(resource=self._resource)
 
