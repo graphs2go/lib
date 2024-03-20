@@ -25,6 +25,16 @@ class Graph(rdf.Graph):
         self._rdflib_graph += model.resource.graph
 
     @property
+    def concepts(self) -> Iterable[Concept]:
+        for concept_uri in self._rdflib_graph.subjects(
+            predicate=RDF.type, object=Concept.rdf_type_uri(), unique=True
+        ):
+            if not isinstance(concept_uri, URIRef):
+                continue
+
+            yield Concept(resource=self._rdflib_graph.resource(concept_uri))
+
+    @property
     def nodes(self) -> Iterable[Node]:
         yielded_node_uris: set[URIRef] = set()
         for node_class in self.__NODE_CLASSES:

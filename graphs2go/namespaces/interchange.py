@@ -12,4 +12,8 @@ class INTERCHANGE(DefinedNamespace):
     Node: URIRef
     Property: URIRef
     Relationship: URIRef
-    RelationshipGroup: URIRef
+
+    # Properties
+    label: URIRef  # Node->Label
+    property: URIRef  # Node -> Property
+    relationship: URIRef  # Node -> Relationship

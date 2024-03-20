@@ -32,10 +32,22 @@ class Property(Model):
         resource.add(RDF.predicate, predicate)
         resource.add(RDF.subject, subject)
         resource.add(RDF.type, RDF.Statement)
-        resource.graph.add(
-            (subject, predicate, object_)
-        )  # Add a direct statement for ease of querying
+        # Add direct statements for ease of querying
+        for node_to_property_predicate in (predicate, INTERCHANGE.property):
+            resource.graph.add((subject, node_to_property_predicate, object_))
         return cls.Builder(resource)
+
+    @property
+    def object_(self) -> URIRef:
+        return self._required_value(RDF.object_, self._map_term_to_uri)
+
+    @property
+    def predicate(self) -> URIRef:
+        return self._required_value(RDF.predicate, self._map_term_to_uri)
+
+    @property
+    def subject(self) -> URIRef:
+        return self._required_value(RDF.subject, self._map_term_to_uri)
 
     @classmethod
     def rdf_type_uri(cls) -> URIRef:

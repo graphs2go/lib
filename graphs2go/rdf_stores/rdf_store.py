@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 
 from rdflib import ConjunctiveGraph
 
-from graphs2go.rdf_stores.memory_rdf_store import MemRdfStore
-
 if TYPE_CHECKING:
     from pathlib import Path
     from rdflib import URIRef

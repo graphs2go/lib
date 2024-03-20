@@ -33,11 +33,12 @@ class Label(Model):
     ) -> Label.Builder:
         resource = cls._create_resource(uri if uri is not None else uuid_urn())
         resource.add(RDF.subject, subject)
+        resource.add(RDF.predicate, predicate)
         resource.add(RDF.type, SKOSXL.Label)
         resource.add(SKOSXL.literalForm, literal_form)
-        resource.graph.add(
-            (subject, predicate, resource.identifier)
-        )  # Add a direct statement for ease of querying
+        # Add direct statements for ease of querying
+        for node_to_label_predicate in (predicate, INTERCHANGE.label):
+            resource.graph.add((subject, node_to_label_predicate, resource.identifier))
         return cls.Builder(resource)
 
     @classmethod
