@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 
 from rdflib import ConjunctiveGraph
 
+from graphs2go.rdf_stores.memory_rdf_store import MemRdfStore
+
 if TYPE_CHECKING:
     from pathlib import Path
     from rdflib import URIRef
@@ -69,8 +71,11 @@ class RdfStore(ABC):
 
     @staticmethod
     def open(descriptor: Descriptor) -> RdfStore:
+        from .memory_rdf_store import MemoryRdfStore
         from .oxigraph_rdf_store import OxigraphRdfStore
 
+        if isinstance(descriptor, MemoryRdfStore.Descriptor):
+            return MemoryRdfStore()
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
             return OxigraphRdfStore.open(descriptor)
         raise TypeError(type(descriptor))
