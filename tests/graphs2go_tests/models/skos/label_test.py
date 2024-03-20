@@ -1,4 +1,5 @@
 from rdflib import Literal
+
 from graphs2go.models import skos
 
 
