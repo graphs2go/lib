@@ -17,7 +17,9 @@ class Concept(Node):
     @classmethod
     def builder(cls, *, uri: URIRef) -> Concept.Builder:
         resource = cls._create_resource(uri)
-        resource.add(RDF.type, SKOS.Concept)
+        resource.add(RDF.type, Node.rdf_type_uri())
         return cls.Builder(resource)
 
-    # Don't override rdf_type_uri, leave Node
+    @classmethod
+    def rdf_type_uri(cls) -> URIRef:
+        return SKOS.Concept

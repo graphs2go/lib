@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
-import rdflib
+from rdflib import RDF, URIRef
 
 from graphs2go.models import rdf
+from graphs2go.models.interchange.concept import Concept
 from graphs2go.models.interchange.node import Node
-from graphs2go.namespaces.interchange import INTERCHANGE
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -19,12 +19,22 @@ class Graph(rdf.Graph):
     Non-picklable interchange graph. Used as an entry point for accessing top-level graph models.
     """
 
+    __NODE_CLASSES: ClassVar[tuple[type[Node], ...]] = (Concept, Node)
+
     def add(self, model: Model) -> None:
         self._rdflib_graph += model.resource.graph
 
     @property
     def nodes(self) -> Iterable[Node]:
-        for subject_uri in self._rdflib_graph.subjects(
-            predicate=rdflib.RDF.type, object=INTERCHANGE.Node
-        ):
-            yield Node(resource=self._rdflib_graph.resource(subject_uri))
+        yielded_node_uris: set[URIRef] = set()
+        for node_class in self.__NODE_CLASSES:
+            for node_uri in self._rdflib_graph.subjects(
+                predicate=RDF.type, object=node_class.rdf_type_uri(), unique=True
+            ):
+                if not isinstance(node_uri, URIRef):
+                    continue
+                if node_uri in yielded_node_uris:
+                    continue
+
+                yield node_class(resource=self._rdflib_graph.resource(node_uri))
+                yielded_node_uris.add(node_uri)
