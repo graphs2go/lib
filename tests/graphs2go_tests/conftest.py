@@ -108,21 +108,25 @@ def skos_concept_scheme(skos_graph: skos.Graph) -> skos.ConceptScheme:
 def skos_graph() -> skos.Graph:
     graph = skos.Graph(rdf_store=MemoryRdfStore())
 
+    concept_scheme = skos.ConceptScheme.builder(uri=uuid_urn()).build()
+    graph.add(concept_scheme)
+
     concept_builders: list[skos.Concept.Builder] = []
     for concept_i in range(2):
         concept_builder = skos.Concept.builder(uri=uuid_urn())
+        concept_builder.add_in_scheme(concept_scheme)
 
-        concept_builder.add_alt_label(
-            skos.Label.builder(
-                literal_form=Literal("altLabel" + str(concept_i + 1)), uri=uuid_urn()
-            ).build()
-        )
+        alt_label = skos.Label.builder(
+            literal_form=Literal("altLabel" + str(concept_i + 1)), uri=uuid_urn()
+        ).build()
+        graph.add(alt_label)
+        concept_builder.add_alt_label(alt_label)
 
-        concept_builder.add_pref_label(
-            skos.Label.builder(
-                literal_form=Literal("prefLabel" + str(concept_i + 1)), uri=uuid_urn()
-            ).build()
-        )
+        pref_label = skos.Label.builder(
+            literal_form=Literal("prefLabel" + str(concept_i + 1)), uri=uuid_urn()
+        ).build()
+        graph.add(pref_label)
+        concept_builder.add_pref_label(pref_label)
 
         concept_builders.append(concept_builder)
 

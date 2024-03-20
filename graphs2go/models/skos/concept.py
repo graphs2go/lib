@@ -15,7 +15,6 @@ if TYPE_CHECKING:
 
 class Concept(Model):
     class Builder(Model.Builder):
-
         def add_alt_label(self, alt_label: Label | Literal | URIRef) -> Self:
             return self.__add_label(
                 label=alt_label,
@@ -25,6 +24,15 @@ class Concept(Model):
 
         def add_broader(self, broader: Concept | URIRef) -> Self:
             return self.__add_relationship(object_=broader, predicate=SKOS.broader)
+
+        def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
+            if isinstance(in_scheme, ConceptScheme):
+                self._resource.add(SKOS.inScheme, in_scheme.uri)
+            elif isinstance(in_scheme, URIRef):
+                self._resource.add(SKOS.inScheme, in_scheme)
+            else:
+                raise TypeError(type(in_scheme))
+            return self
 
         def __add_label(
             self,
