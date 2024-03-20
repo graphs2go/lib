@@ -1,4 +1,5 @@
 import itertools
+
 import pytest
 from rdflib import SKOS, Literal
 

@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib
 
-from graphs2go.rdf_stores.rdf_store import RdfStore
 from graphs2go.models.rdf.model import Model
+from graphs2go.rdf_stores.rdf_store import RdfStore
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 

@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from graphs2go.rdf_stores.rdf_store import RdfStore
+
 from rdflib.plugins.stores.memory import Memory
 from rdflib.store import Store
+
+from graphs2go.rdf_stores.rdf_store import RdfStore
 
 
 class MemoryRdfStore(RdfStore):

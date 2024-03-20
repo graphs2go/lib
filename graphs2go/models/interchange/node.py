@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeVar
 
+from rdflib import URIRef
+
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.property import Property
 from graphs2go.models.interchange.relationship import Relationship
 from graphs2go.namespaces.interchange import INTERCHANGE
-from rdflib import URIRef
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

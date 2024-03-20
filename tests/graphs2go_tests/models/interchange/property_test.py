@@ -1,4 +1,5 @@
 from rdflib import Literal, URIRef
+
 from graphs2go.models import interchange
 
 

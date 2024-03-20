@@ -8,6 +8,7 @@ from rdflib import ConjunctiveGraph
 
 if TYPE_CHECKING:
     from pathlib import Path
+
     from rdflib import URIRef
     from rdflib.store import Store
 

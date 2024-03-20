@@ -10,8 +10,9 @@ from rdflib import RDF, Graph, Literal, URIRef
 from rdflib.resource import Resource
 
 if TYPE_CHECKING:
-    from rdflib.term import Node
     from collections.abc import Callable, Generator
+
+    from rdflib.term import Node
 
 
 _ModelT = TypeVar("_ModelT", bound="Model")

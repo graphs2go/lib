@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from rdflib import SKOS, URIRef
 
 from graphs2go.models.skos.model import Model
