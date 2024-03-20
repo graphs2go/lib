@@ -79,6 +79,13 @@ def interchange_graph() -> interchange.Graph:
 
 
 @pytest.fixture(scope="session")
+def interchange_label(
+    interchange_concept_label: interchange.Label,
+) -> interchange.Label:
+    return interchange_concept_label
+
+
+@pytest.fixture(scope="session")
 def interchange_node(interchange_concept: interchange.Concept) -> interchange.Node:
     return interchange_concept
 

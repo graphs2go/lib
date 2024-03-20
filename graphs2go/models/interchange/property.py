@@ -33,13 +33,15 @@ class Property(Model):
         resource.add(RDF.subject, subject)
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
-        for node_to_property_predicate in (predicate, INTERCHANGE.property):
-            resource.graph.add((subject, node_to_property_predicate, object_))
+        # (s, p, o)
+        resource.graph.add((subject, predicate, object_))
+        # Node -> Property instance
+        resource.graph.add((subject, INTERCHANGE.property, resource.identifier))
         return cls.Builder(resource)
 
     @property
-    def object_(self) -> URIRef:
-        return self._required_value(RDF.object_, self._map_term_to_uri)
+    def object(self) -> URIRef:
+        return self._required_value(RDF.object, self._map_term_to_literal)
 
     @property
     def predicate(self) -> URIRef:

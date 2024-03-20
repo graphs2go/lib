@@ -38,13 +38,15 @@ class Relationship(Model):
         resource.add(RDF.subject, subject)
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
-        for node_to_relationship_predicate in (predicate, INTERCHANGE.relationship):
-            resource.graph.add((subject, node_to_relationship_predicate, object_))
+        # (s, p, o)
+        resource.graph.add((subject, predicate, object_))
+        # Node -> Relationship instances
+        resource.graph.add((subject, INTERCHANGE.relationship, resource.identifier))
         return cls.Builder(resource)
 
     @property
-    def object_(self) -> URIRef:
-        return self._required_value(RDF.object_, self._map_term_to_uri)
+    def object(self) -> URIRef:
+        return self._required_value(RDF.object, self._map_term_to_uri)
 
     @property
     def predicate(self) -> URIRef:
