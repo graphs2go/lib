@@ -111,7 +111,7 @@ class Concept(Model):
     @property
     def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
         yield from self._values(
-            SKOS.ConceptScheme,
+            SKOS.inScheme,
             lambda term: self._map_term_to_model_or_uri(
                 self._CONCEPT_SCHEME_CLASS, term
             ),

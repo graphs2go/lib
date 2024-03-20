@@ -117,16 +117,18 @@ def skos_graph() -> skos.Graph:
         concept_builder.add_in_scheme(concept_scheme)
 
         alt_label = skos.Label.builder(
-            literal_form=Literal("altLabel" + str(concept_i + 1)), uri=uuid_urn()
+            literal_form=Literal("xlAltLabel" + str(concept_i + 1)), uri=uuid_urn()
         ).build()
         graph.add(alt_label)
         concept_builder.add_alt_label(alt_label)
+        concept_builder.add_alt_label(Literal("altLabel" + str(concept_i + 1)))
 
         pref_label = skos.Label.builder(
-            literal_form=Literal("prefLabel" + str(concept_i + 1)), uri=uuid_urn()
+            literal_form=Literal("xlPrefLabel" + str(concept_i + 1)), uri=uuid_urn()
         ).build()
         graph.add(pref_label)
         concept_builder.add_pref_label(pref_label)
+        concept_builder.add_pref_label(Literal("prefLabel" + str(concept_i + 1)))
 
         concept_builders.append(concept_builder)
 
