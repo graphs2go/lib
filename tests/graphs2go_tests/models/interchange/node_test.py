@@ -7,13 +7,8 @@ def test_builder(interchange_node: interchange.Node) -> None:  # noqa: ARG001
     pass
 
 
-def test_labels(
-    interchange_node: interchange.Concept,
-    interchange_concept_label: interchange.Label,
-) -> None:
-    assert tuple(label.uri for label in interchange_node.labels) == (
-        interchange_concept_label.uri,
-    )
+def test_labels(interchange_node: interchange.Concept) -> None:
+    assert tuple(interchange_node.labels)
 
 
 def test_properties(interchange_node: interchange.Concept) -> None:

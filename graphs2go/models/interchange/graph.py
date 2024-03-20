@@ -26,25 +26,8 @@ class Graph(rdf.Graph):
 
     @property
     def concepts(self) -> Iterable[Concept]:
-        for concept_uri in self._rdflib_graph.subjects(
-            predicate=RDF.type, object=Concept.rdf_type_uri(), unique=True
-        ):
-            if not isinstance(concept_uri, URIRef):
-                continue
-
-            yield Concept(resource=self._rdflib_graph.resource(concept_uri))
+        return self._models_by_rdf_type(Concept)
 
     @property
     def nodes(self) -> Iterable[Node]:
-        yielded_node_uris: set[URIRef] = set()
-        for node_class in self.__NODE_CLASSES:
-            for node_uri in self._rdflib_graph.subjects(
-                predicate=RDF.type, object=node_class.rdf_type_uri(), unique=True
-            ):
-                if not isinstance(node_uri, URIRef):
-                    continue
-                if node_uri in yielded_node_uris:
-                    continue
-
-                yield node_class(resource=self._rdflib_graph.resource(node_uri))
-                yielded_node_uris.add(node_uri)
+        return self._models_by_rdf_type(self.__NODE_CLASSES)

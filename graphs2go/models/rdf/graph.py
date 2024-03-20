@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib
 
 from graphs2go.rdf_stores.rdf_store import RdfStore
+from graphs2go.models.rdf.model import Model
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
+
+
+_ModelT = TypeVar("_ModelT", bound=Model)
 
 
 class Graph:
@@ -54,6 +59,36 @@ class Graph:
     @property
     def is_empty(self) -> bool:
         return self.__rdf_store.is_empty
+
+    def _models_by_rdf_type(
+        self, model_classes: type[_ModelT] | tuple[type[_ModelT, ...]]
+    ) -> Iterable[_ModelT]:
+        """
+        Generate models from the graph according to their rdf:type's.
+
+        A given model resource (subject URI) will only produce a single Model instance.
+        Resources with multiple rdf:type statements will match the first rdf:type in the model_classes tuple.
+        This means that "subclasses" can be included earlier in the tuple in order to wrap the resource in the
+        subclass rather than the parent class.
+        """
+
+        if not isinstance(model_classes, tuple):
+            model_classes = (model_classes,)
+
+        yielded_model_uris: set[rdflib.URIRef] = set()
+        for model_class in model_classes:
+            for model_uri in self._rdflib_graph.subjects(
+                predicate=rdflib.RDF.type,
+                object=model_class.rdf_type_uri(),
+                unique=True,
+            ):
+                if not isinstance(model_uri, rdflib.URIRef):
+                    continue
+                if model_uri in yielded_model_uris:
+                    continue
+
+                yield model_class(resource=self._rdflib_graph.resource(model_uri))
+                yielded_model_uris.add(model_uri)
 
     @classmethod
     def open(cls, descriptor: Descriptor) -> Self:

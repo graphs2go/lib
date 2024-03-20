@@ -8,35 +8,16 @@ from graphs2go.utils.uuid_urn import uuid_urn
 
 
 @pytest.fixture(scope="session")
-def interchange_concept_label(
-    interchange_concept_labels: tuple[interchange.Label, interchange.Label]
-) -> interchange.Label:
-    return interchange_concept_labels[0]
-
-
-@pytest.fixture(scope="session")
-def interchange_concept_labels(
-    interchange_concepts: tuple[interchange.Concept, ...]
-) -> tuple[interchange.Label, ...]:
-    labels: list[interchange.Label] = []
-    for concept in interchange_concepts:
-        concept_labels = tuple(concept.labels)
-        assert len(concept_labels) == 1
-        labels.extend(concept_labels)
-    return tuple(labels)
-
-
-@pytest.fixture(scope="session")
 def interchange_concept(
-    interchange_concepts: tuple[interchange.Concept, ...]
+    interchange_graph: interchange.Graph,
 ) -> interchange.Concept:
-    return interchange_concepts[0]
+    for concept in interchange_graph.concepts:
+        return concept
+    pytest.fail("no concepts")
 
 
 @pytest.fixture(scope="session")
-def interchange_concepts(
-    interchange_graph: interchange.Graph,
-) -> tuple[interchange.Concept, ...]:
+def interchange_concepts() -> tuple[interchange.Concept, ...]:
     concepts = tuple(interchange_graph.concepts)
     assert concepts
     return concepts
@@ -79,15 +60,15 @@ def interchange_graph() -> interchange.Graph:
 
 
 @pytest.fixture(scope="session")
-def interchange_label(
-    interchange_concept_label: interchange.Label,
-) -> interchange.Label:
-    return interchange_concept_label
+def interchange_label(interchange_concept: interchange.Concept) -> interchange.Label:
+    return next(iter(interchange_concept.labels))
 
 
 @pytest.fixture(scope="session")
-def interchange_node(interchange_concept: interchange.Concept) -> interchange.Node:
-    return interchange_concept
+def interchange_node(interchange_graph: interchange.Graph) -> interchange.Node:
+    for node in interchange_graph.nodes:
+        return node
+    pytest.fail("no nodes")
 
 
 @pytest.fixture(scope="session")
@@ -106,6 +87,20 @@ def interchange_relationship(
         for relationship in concept.relationships:
             return relationship
     pytest.fail("no relationships")
+
+
+@pytest.fixture(scope="session")
+def skos_concept(skos_graph: skos.Graph) -> skos.Concept:
+    for concept in skos_graph.concepts:
+        return concept
+    pytest.fail("no concepts")
+
+
+@pytest.fixture(scope="session")
+def skos_concept_scheme(skos_graph: skos.Graph) -> skos.ConceptScheme:
+    for concept_scheme in skos_graph.concept_schemes:
+        return concept_scheme
+    pytest.fail("no concept schemes")
 
 
 @pytest.fixture(scope="session")
@@ -139,3 +134,10 @@ def skos_graph() -> skos.Graph:
         graph.add(concept_builder.build())
 
     return graph
+
+
+@pytest.fixture(scope="session")
+def skos_label(skos_graph: skos.Graph) -> skos.Label:
+    for label in skos_graph.labels:
+        return label
+    pytest.fail("no labels")
