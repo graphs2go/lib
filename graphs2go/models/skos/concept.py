@@ -14,6 +14,10 @@ if TYPE_CHECKING:
 
 
 class Concept(Model):
+    class Builder(Model.Builder):
+        def build(self) -> Concept:
+            return Concept(resource=self._resource)
+
     _CONCEPT_SCHEME_CLASS = ConceptScheme
     _LABEL_CLASS = Label
 
@@ -31,6 +35,10 @@ class Concept(Model):
             SKOS.broader,
             lambda term: self._map_term_to_model_or_uri(self.__class__, term),
         )  # type: ignore
+
+    @classmethod
+    def builder(cls, *, uri: URIRef) -> Builder:
+        return cls.Builder(cls._create_resource(uri=uri))
 
     @property
     def close_match(self) -> Iterable[Concept | URIRef]:
