@@ -11,7 +11,7 @@ def test_alt_label(skos_concept: skos.Concept) -> None:
     assert any(isinstance(alt_label, Literal) for alt_label in alt_labels)
 
 
-def test_builder(skos_concept: skos.Concept) -> None:
+def test_builder(skos_concept: skos.Concept) -> None:  # noqa: ARG001
     pass
 
 

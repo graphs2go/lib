@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
-from rdflib import RDF, URIRef
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.concept import Concept

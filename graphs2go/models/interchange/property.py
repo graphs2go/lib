@@ -40,7 +40,7 @@ class Property(Model):
         return cls.Builder(resource)
 
     @property
-    def object(self) -> URIRef:
+    def object(self) -> Literal:
         return self._required_value(RDF.object, self._map_term_to_literal)
 
     @property

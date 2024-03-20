@@ -62,7 +62,7 @@ class Graph:
         return self.__rdf_store.is_empty
 
     def _models_by_rdf_type(
-        self, model_classes: type[_ModelT] | tuple[type[_ModelT, ...]]
+        self, model_classes: type[_ModelT] | tuple[type[_ModelT], ...]
     ) -> Iterable[_ModelT]:
         """
         Generate models from the graph according to their rdf:type's.

@@ -3,7 +3,7 @@ from rdflib import Literal
 from graphs2go.models import skos
 
 
-def test_builder(skos_label: skos.Label) -> None:
+def test_builder(skos_label: skos.Label) -> None:  # noqa: ARG001
     pass
 
 

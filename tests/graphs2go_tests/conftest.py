@@ -18,7 +18,9 @@ def interchange_concept(
 
 
 @pytest.fixture(scope="session")
-def interchange_concepts() -> tuple[interchange.Concept, ...]:
+def interchange_concepts(
+    interchange_graph: interchange.Graph,
+) -> tuple[interchange.Concept, ...]:
     concepts = tuple(interchange_graph.concepts)
     assert concepts
     return concepts
