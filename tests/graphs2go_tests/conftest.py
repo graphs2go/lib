@@ -39,8 +39,8 @@ def interchange_graph() -> interchange.Graph:
         graph.add(
             interchange.Label.builder(
                 literal_form=Literal("label" + str(concept_i + 1)),
-                predicate=SKOS.prefLabel,
                 subject=concept.uri,
+                type_=interchange.Label.Type.PREFERRED,
             ).build()
         )
 
