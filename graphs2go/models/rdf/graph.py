@@ -33,7 +33,9 @@ class Graph:
 
     def __init__(self, *, identifier: rdflib.URIRef, rdf_store: RdfStore):
         self.__identifier = identifier
-        self._rdflib_graph = rdflib.ConjunctiveGraph(store=rdf_store.rdflib_store)
+        self._rdflib_graph = rdflib.ConjunctiveGraph(
+            identifier=identifier, store=rdf_store.rdflib_store
+        )
         self.__rdf_store = rdf_store
 
     @classmethod
@@ -104,3 +106,6 @@ class Graph:
     @classmethod
     def open(cls, descriptor: Descriptor) -> Self:
         return cls(rdf_store=RdfStore.open(descriptor.rdf_store_descriptor))
+
+    def to_rdflib_graph(self) -> rdflib.Graph:
+        return self._rdflib_graph
