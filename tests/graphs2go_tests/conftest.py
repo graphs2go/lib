@@ -28,7 +28,7 @@ def interchange_concepts(
 
 @pytest.fixture(scope="session")
 def interchange_graph() -> interchange.Graph:
-    graph = interchange.Graph(rdf_store=MemoryRdfStore())
+    graph = interchange.Graph(identifier=uuid_urn(), rdf_store=MemoryRdfStore())
 
     concepts = tuple(
         interchange.Concept.builder(uri=uuid_urn()).build() for _ in range(2)

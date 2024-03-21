@@ -8,9 +8,10 @@ from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
 
 
 def test_transform(interchange_graph: interchange.Graph) -> None:
-    skos_graph = skos.Graph(rdf_store=MemoryRdfStore())
-    for skos_model in transform_interchange_graph_to_skos_models(interchange_graph):
-        skos_graph.add(skos_model)
+    skos_graph = skos.Graph(
+        identifier=interchange_graph.identifier, rdf_store=MemoryRdfStore()
+    )
+    skos_graph.add_all(transform_interchange_graph_to_skos_models(interchange_graph))
 
     skos_concepts_by_uri = {concept.uri: concept for concept in skos_graph.concepts}
 

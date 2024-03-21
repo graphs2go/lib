@@ -23,6 +23,10 @@ class Graph(rdf.Graph):
     def add(self, model: Model) -> None:
         self._rdflib_graph += model.resource.graph
 
+    def add_all(self, models: Iterable[Model]) -> None:
+        for model in models:
+            self.add(model)
+
     @property
     def concepts(self) -> Iterable[Concept]:
         return self._models_by_rdf_type(Concept)
