@@ -33,7 +33,7 @@ class Label(Model):
         None: RDFS.label,
     }
 
-    _PREDICATE_TO_TYPE_MAP: ClassVar[dict[URIRef, Type | None]] = {
+    __PREDICATE_TO_TYPE_MAP: ClassVar[dict[URIRef, Type | None]] = {
         value: key for key, value in __TYPE_TO_PREDICATE_MAP.items()
     }
 
@@ -67,10 +67,15 @@ class Label(Model):
 
         return cls.Builder(resource)
 
+    @property
+    def literal_form(self) -> Literal:
+        return self._required_value(SKOSXL.literalForm, self._map_term_to_literal)
+
     @classmethod
     def rdf_type_uri(cls) -> URIRef:
         return INTERCHANGE.Label
 
+    @property
     def type(self) -> Type | None:
         return self.__PREDICATE_TO_TYPE_MAP[
             self._required_value(RDF.predicate, self._map_term_to_uri)
