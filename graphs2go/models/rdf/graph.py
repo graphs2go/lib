@@ -46,7 +46,7 @@ class Graph:
         rdf_store_config: RdfStoreConfig,
     ) -> Self:
         return cls(
-            identifier=identifer,
+            identifier=identifier,
             rdf_store=RdfStore.create(
                 identifier=identifier, rdf_store_config=rdf_store_config
             ),
@@ -105,7 +105,10 @@ class Graph:
 
     @classmethod
     def open(cls, descriptor: Descriptor) -> Self:
-        return cls(rdf_store=RdfStore.open(descriptor.rdf_store_descriptor))
+        return cls(
+            identifier=descriptor.identifier,
+            rdf_store=RdfStore.open(descriptor.rdf_store_descriptor),
+        )
 
     def to_rdflib_graph(self) -> rdflib.Graph:
         return self._rdflib_graph

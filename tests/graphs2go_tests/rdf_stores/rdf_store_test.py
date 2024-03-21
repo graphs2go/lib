@@ -8,7 +8,7 @@ from graphs2go.rdf_stores.rdf_store import RdfStore
 
 class RdfStoreTest:
     @pytest.fixture()
-    def rdf_store(self) -> Iterable[RdfStore]:  # noqa: PT004
+    def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:  # noqa: PT004
         raise NotImplementedError
 
     def test_bulk_load(self, rdf_store: RdfStore) -> None:

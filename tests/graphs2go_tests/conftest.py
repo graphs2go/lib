@@ -108,7 +108,7 @@ def skos_concept_scheme(skos_graph: skos.Graph) -> skos.ConceptScheme:
 
 @pytest.fixture(scope="session")
 def skos_graph() -> skos.Graph:
-    graph = skos.Graph(rdf_store=MemoryRdfStore())
+    graph = skos.Graph(identifier=uuid_urn(), rdf_store=MemoryRdfStore())
 
     concept_scheme = skos.ConceptScheme.builder(uri=uuid_urn()).build()
     graph.add(concept_scheme)
