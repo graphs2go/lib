@@ -23,7 +23,7 @@ class Concept(Model):
             )
 
         def add_broader(self, broader: Concept | URIRef) -> Self:
-            return self.__add_relationship(object_=broader, predicate=SKOS.broader)
+            return self.add_relationship(object_=broader, predicate=SKOS.broader)
 
         def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
             if isinstance(in_scheme, ConceptScheme):
@@ -58,7 +58,7 @@ class Concept(Model):
                 skosxl_predicate=SKOSXL.prefLabel,
             )
 
-        def __add_relationship(
+        def add_relationship(
             self, *, object_: Concept | URIRef, predicate: URIRef
         ) -> Self:
             if isinstance(object_, Concept):
