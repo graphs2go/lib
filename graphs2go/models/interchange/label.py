@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from rdflib import RDF, RDFS, SKOS
 
@@ -27,6 +27,16 @@ class Label(Model):
         ALTERNATIVE = 1
         PREFERRED = 2
 
+    __TYPE_TO_PREDICATE_MAP: ClassVar[dict[Type | None, URIRef]] = {
+        Type.ALTERNATIVE: SKOS.altLabel,
+        Type.PREFERRED: SKOS.prefLabel,
+        None: RDFS.label,
+    }
+
+    _PREDICATE_TO_TYPE_MAP: ClassVar[dict[URIRef, Type | None]] = {
+        value: key for key, value in __TYPE_TO_PREDICATE_MAP.items()
+    }
+
     @classmethod
     def builder(
         cls,
@@ -36,14 +46,12 @@ class Label(Model):
         type_: Type | None = None,
         uri: URIRef | None = None,
     ) -> Label.Builder:
-        if type_ == Label.Type.ALTERNATIVE:
-            skos_predicate = SKOS.altLabel
+        skos_predicate = cls.__TYPE_TO_PREDICATE_MAP[type_]
+        if skos_predicate == SKOS.altLabel:
             skosxl_predicate = SKOSXL.altLabel
-        elif type_ == Label.Type.PREFERRED:
-            skos_predicate = SKOS.prefLabel
+        elif skos_predicate == SKOS.prefLabel:
             skosxl_predicate = SKOSXL.prefLabel
         else:
-            skos_predicate = RDFS.label
             skosxl_predicate = None
 
         resource = cls._create_resource(uri if uri is not None else uuid_urn())
@@ -62,3 +70,8 @@ class Label(Model):
     @classmethod
     def rdf_type_uri(cls) -> URIRef:
         return INTERCHANGE.Label
+
+    def type(self) -> Type | None:
+        return self.__PREDICATE_TO_TYPE_MAP[
+            self._required_value(RDF.predicate, self._map_term_to_uri)
+        ]
