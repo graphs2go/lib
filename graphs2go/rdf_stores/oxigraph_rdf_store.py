@@ -37,7 +37,13 @@ class OxigraphRdfStore(RdfStore):
         self.pyoxigraph_store.bulk_load(input=source, mime_type=mime_type)
 
     def close(self) -> None:
-        del self.__pyoxigraph_store
+        # There's no explicit close on the pyoxigraph Store.
+        # Delete all references to the pyoxigraph Store so it gets garbage collected and releases its lock.
+        try:
+            del self.__pyoxigraph_store
+            del self.__rdflib_store
+        except AttributeError:
+            pass
 
     @staticmethod
     def create(
