@@ -10,3 +10,6 @@ class TestMemoryRdfStore(RdfStoreTest):
     @pytest.fixture()
     def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:  # noqa: ARG002
         yield MemoryRdfStore()  # noqa: PT022
+
+    def test_open(self, rdf_store: RdfStore) -> None:
+        pass
