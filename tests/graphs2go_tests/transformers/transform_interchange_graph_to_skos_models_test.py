@@ -1,4 +1,4 @@
-from rdflib import Literal, URIRef
+from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
 from graphs2go.models import interchange, skos
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
@@ -15,8 +15,8 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
 
     skos_concepts_by_uri = {concept.uri: concept for concept in skos_graph.concepts}
 
-    for interchange_concept in interchange_graph.concepts:
-        skos_concept = skos_concepts_by_uri[interchange_concept.uri]
+    for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
+        skos_concept = skos_concepts_by_uri[interchange_node.uri]
 
         skos_alt_labels = tuple(skos_concept.alt_label)
         skos_pref_labels = tuple(skos_concept.pref_label)
@@ -39,7 +39,7 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
                 and skos_label_.literal_form == expected_literal_form
             )
 
-        for interchange_label in interchange_concept.labels:
+        for interchange_label in interchange_node.labels:
             if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
                 assert_equivalent_skos_labels(interchange_label, skos_alt_labels)
             elif interchange_label.type == interchange.Label.Type.PREFERRED:
@@ -47,7 +47,7 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
             else:
                 raise NotImplementedError(str(interchange_label.type))
 
-        for interchange_relationship in interchange_concept.relationships:
+        for interchange_relationship in interchange_node.relationships:
             other_skos_concept_resource = skos_concept.resource.value(
                 p=interchange_relationship.predicate
             )

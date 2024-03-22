@@ -8,11 +8,11 @@ def test_builder(interchange_node: interchange.Node) -> None:  # noqa: ARG001
     pass
 
 
-def test_labels(interchange_node: interchange.Concept) -> None:
+def test_labels(interchange_node: interchange.Node) -> None:
     assert tuple(interchange_node.labels)
 
 
-def test_properties(interchange_node: interchange.Concept) -> None:
+def test_properties(interchange_node: interchange.Node) -> None:
     properties = tuple(interchange_node.properties)
     assert properties
     for property_ in properties:
@@ -20,8 +20,8 @@ def test_properties(interchange_node: interchange.Concept) -> None:
 
 
 def test_relationships(interchange_graph: interchange.Graph) -> None:
-    all_node_uris = {node.uri for node in interchange_graph.nodes}
-    for node in interchange_graph.nodes:
+    all_node_uris = {node.uri for node in interchange_graph.nodes()}
+    for node in interchange_graph.nodes():
         relationships = tuple(node.relationships)
         if not relationships:
             continue

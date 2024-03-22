@@ -11,10 +11,10 @@ def transform_interchange_graph_to_skos_models(
 ) -> Iterable[skos.Model]:
     logger = get_dagster_logger()
 
-    for interchange_concept in interchange_graph.concepts:
-        skos_concept_builder = skos.Concept.builder(uri=interchange_concept.uri)
+    for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
+        skos_concept_builder = skos.Concept.builder(uri=interchange_node.uri)
 
-        for interchange_label in interchange_concept.labels:
+        for interchange_label in interchange_node.labels:
             if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
                 skos_concept_builder.add_alt_label(interchange_label.literal_form)
                 skos_label = skos.Label.builder(
@@ -34,12 +34,12 @@ def transform_interchange_graph_to_skos_models(
             else:
                 logger.warning(
                     "interchange concept %s has non-SKOS label %s",
-                    interchange_concept.uri,
+                    interchange_node.uri,
                     interchange_label.uri,
                 )
                 continue
 
-        for interchange_relationship in interchange_concept.relationships:
+        for interchange_relationship in interchange_node.relationships:
             if interchange_relationship.predicate.startswith(SKOS._NS):  # noqa: SLF001
                 skos_concept_builder.add_relationship(
                     object_=interchange_relationship.object,

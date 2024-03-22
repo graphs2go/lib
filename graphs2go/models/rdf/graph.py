@@ -77,7 +77,7 @@ class Graph:
         self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef | None = None
     ) -> Iterable[_ModelT]:
         if rdf_type is None:
-            rdf_type = model_class.rdf_type()
+            rdf_type = model_class.primary_rdf_type()
 
         yielded_model_uris: set[rdflib.URIRef] = set()
         for model_uri in self._rdflib_graph.subjects(

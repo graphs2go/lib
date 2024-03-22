@@ -9,29 +9,12 @@ from graphs2go.utils.uuid_urn import uuid_urn
 
 
 @pytest.fixture(scope="session")
-def interchange_concept(
-    interchange_graph: interchange.Graph,
-) -> interchange.Concept:
-    for concept in interchange_graph.concepts:
-        return concept
-    pytest.fail("no concepts")
-
-
-@pytest.fixture(scope="session")
-def interchange_concepts(
-    interchange_graph: interchange.Graph,
-) -> tuple[interchange.Concept, ...]:
-    concepts = tuple(interchange_graph.concepts)
-    assert concepts
-    return concepts
-
-
-@pytest.fixture(scope="session")
 def interchange_graph() -> interchange.Graph:
     graph = interchange.Graph(identifier=uuid_urn(), rdf_store=MemoryRdfStore())
 
     concepts = tuple(
-        interchange.Concept.builder(uri=uuid_urn()).build() for _ in range(2)
+        interchange.Node.builder(uri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
+        for _ in range(2)
     )
     for concept_i, concept in enumerate(concepts):
         graph.add(concept)
@@ -63,21 +46,21 @@ def interchange_graph() -> interchange.Graph:
 
 
 @pytest.fixture(scope="session")
-def interchange_label(interchange_concept: interchange.Concept) -> interchange.Label:
-    return next(iter(interchange_concept.labels))
+def interchange_label(interchange_node: interchange.Node) -> interchange.Label:
+    return next(iter(interchange_node.labels))
 
 
 @pytest.fixture(scope="session")
 def interchange_node(interchange_graph: interchange.Graph) -> interchange.Node:
-    for node in interchange_graph.nodes:
+    for node in interchange_graph.nodes():
         return node
     pytest.fail("no nodes")
 
 
 @pytest.fixture(scope="session")
 def interchange_property(interchange_graph: interchange.Graph) -> interchange.Property:
-    for concept in interchange_graph.concepts:
-        for property_ in concept.properties:
+    for node in interchange_graph.nodes():
+        for property_ in node.properties:
             return property_
     pytest.fail("no properties")
 
@@ -86,8 +69,8 @@ def interchange_property(interchange_graph: interchange.Graph) -> interchange.Pr
 def interchange_relationship(
     interchange_graph: interchange.Graph,
 ) -> interchange.Relationship:
-    for concept in interchange_graph.concepts:
-        for relationship in concept.relationships:
+    for node in interchange_graph.nodes():
+        for relationship in node.relationships:
             return relationship
     pytest.fail("no relationships")
 

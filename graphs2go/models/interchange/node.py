@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Self, TypeVar
 
-from rdflib import URIRef
+from rdflib import RDF, URIRef
 
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model
@@ -22,6 +22,10 @@ class Node(Model):
     """
 
     class Builder(Model.Builder):
+        def add_rdf_type(self, rdf_type: URIRef) -> Self:
+            self._resource.add(RDF.type, rdf_type)
+            return self
+
         def build(self) -> Node:
             return Node(resource=self._resource)
 

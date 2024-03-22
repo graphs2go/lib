@@ -15,7 +15,7 @@ def test_object(
 ) -> None:
     assert isinstance(interchange_relationship.object, URIRef)
     assert interchange_relationship.subject in {
-        node.uri for node in interchange_graph.nodes
+        node.uri for node in interchange_graph.nodes()
     }
 
 
@@ -33,5 +33,5 @@ def test_subject(
 ) -> None:
     assert isinstance(interchange_relationship.subject, URIRef)
     assert interchange_relationship.subject in {
-        node.uri for node in interchange_graph.nodes
+        node.uri for node in interchange_graph.nodes()
     }

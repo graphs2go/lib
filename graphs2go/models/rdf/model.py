@@ -234,6 +234,10 @@ class Model(ABC):
         raise KeyError
 
     @property
+    def rdf_types(self) -> tuple[URIRef, ...]:
+        return tuple(self._values(RDF.type, self._map_term_to_uri))
+
+    @property
     def resource(self) -> Resource:
         return self.__resource
 
