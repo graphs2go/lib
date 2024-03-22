@@ -74,34 +74,24 @@ class Graph:
         return self.__rdf_store.is_empty
 
     def _models_by_rdf_type(
-        self, model_classes: type[_ModelT] | tuple[type[_ModelT], ...]
+        self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef | None = None
     ) -> Iterable[_ModelT]:
-        """
-        Generate models from the graph according to their rdf:type's.
-
-        A given model resource (subject URI) will only produce a single Model instance.
-        Resources with multiple rdf:type statements will match the first rdf:type in the model_classes tuple.
-        This means that "subclasses" can be included earlier in the tuple in order to wrap the resource in the
-        subclass rather than the parent class.
-        """
-
-        if not isinstance(model_classes, tuple):
-            model_classes = (model_classes,)
+        if rdf_type is None:
+            rdf_type = model_class.rdf_type()
 
         yielded_model_uris: set[rdflib.URIRef] = set()
-        for model_class in model_classes:
-            for model_uri in self._rdflib_graph.subjects(
-                predicate=rdflib.RDF.type,
-                object=model_class.rdf_type_uri(),
-                unique=True,
-            ):
-                if not isinstance(model_uri, rdflib.URIRef):
-                    continue
-                if model_uri in yielded_model_uris:
-                    continue
+        for model_uri in self._rdflib_graph.subjects(
+            predicate=rdflib.RDF.type,
+            object=rdf_type,
+            unique=True,
+        ):
+            if not isinstance(model_uri, rdflib.URIRef):
+                continue
+            if model_uri in yielded_model_uris:
+                continue
 
-                yield model_class(resource=self._rdflib_graph.resource(model_uri))
-                yielded_model_uris.add(model_uri)
+            yield model_class(resource=self._rdflib_graph.resource(model_uri))
+            yielded_model_uris.add(model_uri)
 
     @classmethod
     def open(cls, descriptor: Descriptor) -> Self:
