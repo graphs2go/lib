@@ -172,11 +172,12 @@ class Model(ABC):
 
         value_type = resource.value(RDF.type)
         if not isinstance(value_type, Resource):
-            logger.warning(
-                "term %s rdf:type is a %s, not a Resource",
-                term.identifier,
-                type(value_type),
-            )
+            if value_type is not None:
+                logger.warning(
+                    "term %s rdf:type is a %s, not a Resource",
+                    term.identifier,
+                    type(value_type),
+                )
             return resource.identifier
         if value_type.identifier == model_class.rdf_type_uri():
             return model_class(resource=resource)
