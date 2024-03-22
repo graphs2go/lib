@@ -1,5 +1,7 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset
 
+from rdflib import URIRef
+from urllib.parse import quote
 from graphs2go.models import interchange, skos
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
@@ -18,7 +20,8 @@ def build_skos_graph_asset(
         with interchange.Graph.open(
             interchange_graph, read_only=True
         ) as open_interchange_graph, skos.Graph.create(
-            identifier=interchange_graph.identifier, rdf_store_config=rdf_store_config
+            identifier=URIRef(f"urn:skos:{quote(interchange_graph.identifier)}"),
+            rdf_store_config=rdf_store_config,
         ) as open_skos_graph:
             open_skos_graph.add_all(
                 transform_interchange_graph_to_skos_models(open_interchange_graph)
