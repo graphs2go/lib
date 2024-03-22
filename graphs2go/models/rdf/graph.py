@@ -64,6 +64,7 @@ class Graph:
 
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
         self._rdflib_graph.close()
+        self.__rdf_store.close()
 
     @property
     def identifier(self) -> rdflib.URIRef:
@@ -94,10 +95,12 @@ class Graph:
             yielded_model_uris.add(model_uri)
 
     @classmethod
-    def open(cls, descriptor: Descriptor) -> Self:
+    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
             identifier=descriptor.identifier,
-            rdf_store=RdfStore.open(descriptor.rdf_store_descriptor),
+            rdf_store=RdfStore.open(
+                descriptor.rdf_store_descriptor, read_only=read_only
+            ),
         )
 
     def to_rdflib_graph(self) -> rdflib.Graph:

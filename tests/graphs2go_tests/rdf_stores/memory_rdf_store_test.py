@@ -11,5 +11,8 @@ class TestMemoryRdfStore(RdfStoreTest):
     def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:  # noqa: ARG002
         yield MemoryRdfStore()  # noqa: PT022
 
-    def test_open(self, rdf_store: RdfStore) -> None:
+    def test_open_read_only(self, rdf_store: RdfStore) -> None:
+        pass
+
+    def test_open_read_write(self, rdf_store: RdfStore) -> None:
         pass

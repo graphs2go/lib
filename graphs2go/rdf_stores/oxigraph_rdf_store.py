@@ -24,13 +24,13 @@ class OxigraphRdfStore(RdfStore):
     class Descriptor(RdfStore.Descriptor):
         oxigraph_directory_path: Path
 
-    def __init__(
-        self,
-        *,
-        oxigraph_directory_path: Path,
-    ):
+    def __init__(self, *, oxigraph_directory_path: Path, read_only: bool):
         self.__oxigraph_directory_path = oxigraph_directory_path
-        self.__pyoxigraph_store = pyoxigraph.Store(oxigraph_directory_path)
+        self.__pyoxigraph_store = (
+            pyoxigraph.Store.secondary(str(oxigraph_directory_path))
+            if read_only
+            else pyoxigraph.Store(oxigraph_directory_path)
+        )
         self.__rdflib_store = oxrdflib.OxigraphStore(store=self.__pyoxigraph_store)
 
     def bulk_load(self, *, mime_type: str, source: Path) -> None:
@@ -56,7 +56,7 @@ class OxigraphRdfStore(RdfStore):
         )
         oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
         return OxigraphRdfStore(
-            oxigraph_directory_path=oxigraph_directory_path,
+            oxigraph_directory_path=oxigraph_directory_path, read_only=False
         )
 
     @property
@@ -66,10 +66,13 @@ class OxigraphRdfStore(RdfStore):
         )
 
     @staticmethod
-    def open(descriptor: RdfStore.Descriptor) -> OxigraphRdfStore:
+    def open(
+        descriptor: RdfStore.Descriptor, *, read_only: bool = False
+    ) -> OxigraphRdfStore:
         assert isinstance(descriptor, OxigraphRdfStore.Descriptor)
         return OxigraphRdfStore(
             oxigraph_directory_path=descriptor.oxigraph_directory_path,
+            read_only=read_only,
         )
 
     @property

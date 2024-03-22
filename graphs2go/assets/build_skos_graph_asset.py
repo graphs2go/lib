@@ -16,7 +16,7 @@ def build_skos_graph_asset(
         rdf_store_config: RdfStoreConfig,
     ) -> skos.Graph.Descriptor:
         with interchange.Graph.open(
-            interchange_graph
+            interchange_graph, read_only=True
         ) as open_interchange_graph, skos.Graph.create(
             identifier=interchange_graph.identifier, rdf_store_config=rdf_store_config
         ) as open_skos_graph:

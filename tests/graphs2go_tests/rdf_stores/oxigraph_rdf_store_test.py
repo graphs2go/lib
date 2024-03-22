@@ -9,5 +9,7 @@ from tests.graphs2go_tests.rdf_stores.rdf_store_test import RdfStoreTest
 class TestOxigraphRdfStore(RdfStoreTest):
     @pytest.fixture()
     def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:
-        with OxigraphRdfStore(oxigraph_directory_path=tmp_path) as rdf_store:
+        with OxigraphRdfStore(
+            oxigraph_directory_path=tmp_path, read_only=False
+        ) as rdf_store:
             yield rdf_store

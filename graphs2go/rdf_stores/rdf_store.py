@@ -69,14 +69,14 @@ class RdfStore(ABC):
         return True
 
     @staticmethod
-    def open(descriptor: Descriptor) -> RdfStore:
+    def open(descriptor: Descriptor, *, read_only: bool = False) -> RdfStore:
         from .memory_rdf_store import MemoryRdfStore
         from .oxigraph_rdf_store import OxigraphRdfStore
 
         if isinstance(descriptor, MemoryRdfStore.Descriptor):
             return MemoryRdfStore()
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
-            return OxigraphRdfStore.open(descriptor)
+            return OxigraphRdfStore.open(descriptor, read_only=read_only)
         raise TypeError(type(descriptor))
 
     @property
