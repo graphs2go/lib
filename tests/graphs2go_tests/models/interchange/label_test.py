@@ -11,5 +11,5 @@ def test_literal_form(interchange_label: interchange.Label) -> None:
     assert isinstance(interchange_label.literal_form, Literal)
 
 
-def test_rdf_type_uri() -> None:
-    assert isinstance(interchange.Label.rdf_type_uri(), URIRef)
+def test_primary_rdf_type() -> None:
+    assert isinstance(interchange.Label.primary_rdf_type(), URIRef)

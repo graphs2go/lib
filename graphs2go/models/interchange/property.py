@@ -47,10 +47,10 @@ class Property(Model):
     def predicate(self) -> URIRef:
         return self._required_value(RDF.predicate, self._map_term_to_uri)
 
+    @classmethod
+    def primary_rdf_type(cls) -> URIRef:
+        return INTERCHANGE.Property
+
     @property
     def subject(self) -> URIRef:
         return self._required_value(RDF.subject, self._map_term_to_uri)
-
-    @classmethod
-    def rdf_type_uri(cls) -> URIRef:
-        return INTERCHANGE.Property

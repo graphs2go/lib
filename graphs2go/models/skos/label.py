@@ -20,10 +20,10 @@ class Label(Model):
         resource.add(SKOSXL.literalForm, literal_form)
         return cls.Builder(resource)
 
+    @classmethod
+    def primary_rdf_type(cls) -> URIRef:
+        return SKOSXL.Label
+
     @property
     def literal_form(self) -> Literal:
         return self._required_value(SKOSXL.literalForm, self._map_term_to_literal)
-
-    @classmethod
-    def rdf_type_uri(cls) -> URIRef:
-        return SKOSXL.Label

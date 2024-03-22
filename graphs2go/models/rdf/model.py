@@ -50,7 +50,7 @@ class Model(ABC):
     @classmethod
     def _create_resource(cls, uri: URIRef) -> Resource:
         resource = Graph().resource(uri)
-        resource.add(RDF.type, cls.rdf_type_uri())
+        resource.add(RDF.type, cls.primary_rdf_type())
         return resource
 
     @staticmethod
@@ -179,7 +179,7 @@ class Model(ABC):
                     type(value_type),
                 )
             return resource.identifier
-        if value_type.identifier == model_class.rdf_type_uri():
+        if value_type.identifier == model_class.primary_rdf_type():
             return model_class(resource=resource)
 
         return resource.identifier
@@ -219,6 +219,11 @@ class Model(ABC):
             return value
         return None
 
+    @classmethod
+    @abstractmethod
+    def primary_rdf_type(cls) -> URIRef:
+        pass
+
     def _required_value(
         self,
         p: _Predicates,
@@ -227,11 +232,6 @@ class Model(ABC):
         for value in self._values(p, mapper):
             return value
         raise KeyError
-
-    @classmethod
-    @abstractmethod
-    def rdf_type_uri(cls) -> URIRef:
-        pass
 
     @property
     def resource(self) -> Resource:

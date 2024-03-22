@@ -43,6 +43,10 @@ class Node(Model):
     def labels(self) -> Iterable[Label]:
         return self.__dependent_models(Label, INTERCHANGE.label)
 
+    @classmethod
+    def primary_rdf_type(cls) -> URIRef:
+        return INTERCHANGE.Node
+
     @property
     def properties(self) -> Iterable[Property]:
         return self.__dependent_models(Property, INTERCHANGE.property)
@@ -50,7 +54,3 @@ class Node(Model):
     @property
     def relationships(self) -> Iterable[Relationship]:
         return self.__dependent_models(Relationship, INTERCHANGE.relationship)
-
-    @classmethod
-    def rdf_type_uri(cls) -> URIRef:
-        return INTERCHANGE.Node

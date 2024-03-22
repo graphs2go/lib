@@ -17,8 +17,8 @@ def test_predicate(interchange_property: interchange.Property) -> None:
     assert isinstance(interchange_property.predicate, URIRef)
 
 
-def test_rdf_type_uri() -> None:
-    assert isinstance(interchange.Property.rdf_type_uri(), URIRef)
+def test_primary_rdf_type() -> None:
+    assert isinstance(interchange.Property.primary_rdf_type(), URIRef)
 
 
 def test_subject(

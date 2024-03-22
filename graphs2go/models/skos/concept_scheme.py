@@ -15,5 +15,5 @@ class ConceptScheme(Model):
         return cls.Builder(cls._create_resource(uri=uri))
 
     @classmethod
-    def rdf_type_uri(cls) -> URIRef:
+    def primary_rdf_type(cls) -> URIRef:
         return SKOS.ConceptScheme

@@ -23,8 +23,8 @@ def test_predicate(interchange_relationship: interchange.Relationship) -> None:
     assert isinstance(interchange_relationship.predicate, URIRef)
 
 
-def test_rdf_type_uri() -> None:
-    assert isinstance(interchange.Relationship.rdf_type_uri(), URIRef)
+def test_primary_rdf_type() -> None:
+    assert isinstance(interchange.Relationship.primary_rdf_type(), URIRef)
 
 
 def test_subject(

@@ -126,7 +126,7 @@ class Concept(Model):
         )  # type: ignore
 
     @classmethod
-    def rdf_type_uri(cls) -> URIRef:
+    def primary_rdf_type(cls) -> URIRef:
         return SKOS.Concept
 
     @property

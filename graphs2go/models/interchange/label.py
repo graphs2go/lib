@@ -72,7 +72,7 @@ class Label(Model):
         return self._required_value(SKOSXL.literalForm, self._map_term_to_literal)
 
     @classmethod
-    def rdf_type_uri(cls) -> URIRef:
+    def primary_rdf_type(cls) -> URIRef:
         return INTERCHANGE.Label
 
     @property

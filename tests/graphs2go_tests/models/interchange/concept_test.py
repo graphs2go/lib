@@ -7,5 +7,5 @@ def test_builder(interchange_node: interchange.Concept) -> None:  # noqa: ARG001
     pass
 
 
-def test_rdf_type_uri() -> None:
-    assert isinstance(interchange.Concept.rdf_type_uri(), URIRef)
+def test_primary_rdf_type() -> None:
+    assert isinstance(interchange.Concept.primary_rdf_type(), URIRef)

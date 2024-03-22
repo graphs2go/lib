@@ -33,5 +33,5 @@ def test_relationships(interchange_graph: interchange.Graph) -> None:
     pytest.fail("didn't find node with relationships")
 
 
-def test_rdf_type_uri() -> None:
-    assert isinstance(interchange.Node.rdf_type_uri(), URIRef)
+def test_primary_rdf_type() -> None:
+    assert isinstance(interchange.Node.primary_rdf_type(), URIRef)
