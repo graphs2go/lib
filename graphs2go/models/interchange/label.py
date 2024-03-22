@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class Label(Model):
     """
-    A label for a Node in the interchange graph.
+    A human-readable label for a Node in the interchange graph.
     """
 
     class Builder(Model.Builder):
