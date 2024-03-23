@@ -63,6 +63,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
             with metrics.timer("buffered_graph_write"):
                 graph.serialize(
                     destination=self.rdf_graph_file_path(stream),
+                    encoding="utf-8",
                     format=self._rdf_format.name.lower(),
                 )
 
@@ -101,7 +102,9 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
                 serializable_graph = rdf_graph
 
             serializable_graph.serialize(
-                destination=open_file, format=self._rdf_format.name.lower()
+                destination=open_file,
+                encoding="utf-8",
+                format=self._rdf_format.name.lower(),
             )
             open_file.flush()
 
