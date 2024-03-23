@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 
-from dagster import get_dagster_logger
 from rdflib import SKOS
 
 from graphs2go.models import interchange, skos
@@ -9,8 +8,7 @@ from graphs2go.models import interchange, skos
 def transform_interchange_graph_to_skos_models(
     interchange_graph: interchange.Graph,
 ) -> Iterable[skos.Model]:
-    logger = get_dagster_logger()
-
+    # Outer loop: interchange nodes with rdf:type skos:Concept or skos:ConceptScheme
     for interchange_node_rdf_type, skos_model_class in (
         (SKOS.Concept, skos.Concept),
         (SKOS.ConceptScheme, skos.ConceptScheme),
@@ -24,16 +22,9 @@ def transform_interchange_graph_to_skos_models(
                 .set_modified(interchange_node.modified)
             )
 
+            # Interchange label -> SKOS label
             for interchange_label in interchange_node.labels:
-                if interchange_label.type not in {
-                    interchange.Label.Type.ALTERNATIVE,
-                    interchange_label.Type.PREFERRED,
-                }:
-                    logger.warning(
-                        "interchange concept %s has non-SKOS label %s",
-                        interchange_node.uri,
-                        interchange_label.uri,
-                    )
+                if interchange_label.type is None:
                     continue
 
                 skos_model_builder.add_lexical_label(
@@ -54,6 +45,7 @@ def transform_interchange_graph_to_skos_models(
                     label=skos_label, type_=interchange_label.type
                 )
 
+            # Interchange relationships between concepts -> SKOS semantic relations
             if isinstance(skos_model_builder, skos.Concept.Builder):
                 for interchange_relationship in interchange_node.relationships:
                     if interchange_relationship.predicate == SKOS.inScheme:

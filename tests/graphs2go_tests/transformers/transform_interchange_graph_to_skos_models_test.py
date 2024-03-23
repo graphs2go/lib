@@ -2,6 +2,7 @@ from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
 
 from graphs2go.models import interchange, skos
+from graphs2go.models.interchange.label import Label
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
     transform_interchange_graph_to_skos_models,
@@ -26,34 +27,29 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
     for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
         skos_concept = skos_concepts_by_uri[interchange_node.uri]
 
-        skos_alt_labels = tuple(skos_concept.alt_label)
-        skos_pref_labels = tuple(skos_concept.pref_label)
-
-        def assert_equivalent_skos_labels(
-            interchange_label: interchange.Label,
-            skos_labels: tuple[skos.Label | Literal, ...],
-        ) -> None:
-            expected_literal_form = interchange_label.literal_form
-            assert any(
-                True
-                for skos_label_ in skos_labels
-                if isinstance(skos_label_, Literal)
-                and skos_label_ == expected_literal_form
-            )
-            assert any(
-                True
-                for skos_label_ in skos_labels
-                if isinstance(skos_label_, skos.Label)
-                and skos_label_.literal_form == expected_literal_form
+        skos_lexical_labels_by_type = {}
+        for label_type, skos_lexical_label in skos_concept.lexical_labels:
+            skos_lexical_labels_by_type.setdefault(label_type, []).append(
+                skos_lexical_label
             )
 
         for interchange_label in interchange_node.labels:
-            if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
-                assert_equivalent_skos_labels(interchange_label, skos_alt_labels)
-            elif interchange_label.type == interchange.Label.Type.PREFERRED:
-                assert_equivalent_skos_labels(interchange_label, skos_pref_labels)
-            else:
-                raise NotImplementedError(str(interchange_label.type))
+            assert any(
+                True
+                for skos_lexical_label in skos_lexical_labels_by_type[
+                    interchange_label.type
+                ]
+                if isinstance(skos_lexical_label, Literal)
+                and skos_lexical_label == interchange_label.literal_form
+            )
+            assert any(
+                True
+                for skos_lexical_label in skos_lexical_labels_by_type[
+                    interchange_label.type
+                ]
+                if isinstance(skos_lexical_label, Label)
+                and skos_lexical_label.literal_form == interchange_label.literal_form
+            )
 
         for interchange_relationship in interchange_node.relationships:
             other_resource = skos_concept.resource.value(

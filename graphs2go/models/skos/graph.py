@@ -19,6 +19,7 @@ class Graph(rdf.Graph):
     """
 
     _CONCEPT_CLASS = Concept
+    _CONCEPT_SCHEME_CLASS = ConceptScheme
     _LABEL_CLASS = Label
 
     def add(self, model: Model) -> None:
@@ -30,11 +31,11 @@ class Graph(rdf.Graph):
 
     @property
     def concepts(self) -> Iterable[Concept]:
-        return self._models_by_rdf_type(Concept)
+        return self._models_by_rdf_type(self._CONCEPT_CLASS)
 
     @property
     def concept_schemes(self) -> Iterable[ConceptScheme]:
-        return self._models_by_rdf_type(self._CONCEPT_CLASS)
+        return self._models_by_rdf_type(self._CONCEPT_SCHEME_CLASS)
 
     @property
     def labels(self) -> Iterable[Label]:
