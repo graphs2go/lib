@@ -44,8 +44,8 @@ def transform_interchange_graph_to_skos_models(
 
             for interchange_relationship in interchange_node.relationships:
                 if interchange_relationship.predicate.startswith(
-                    SKOS._NS
-                ):  # noqa: SLF001
+                    SKOS._NS  # noqa: SLF001
+                ):
                     skos_concept_builder.add_relationship(
                         object_=interchange_relationship.object,
                         predicate=interchange_relationship.predicate,
