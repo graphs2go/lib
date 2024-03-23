@@ -47,7 +47,7 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
                 for skos_lexical_label in skos_lexical_labels_by_type[
                     interchange_label.type
                 ]
-                if isinstance(skos_lexical_label, Label)
+                if isinstance(skos_lexical_label, skos.Label)
                 and skos_lexical_label.literal_form == interchange_label.literal_form
             )
 
