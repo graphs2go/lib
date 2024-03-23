@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from pathlib import Path
+
 import pytest
 import rdflib.store
 

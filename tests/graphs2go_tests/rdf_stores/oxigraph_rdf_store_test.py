@@ -1,6 +1,8 @@
 from collections.abc import Iterable
 from pathlib import Path
+
 import pytest
+
 from graphs2go.rdf_stores.oxigraph_rdf_store import OxigraphRdfStore
 from graphs2go.rdf_stores.rdf_store import RdfStore
 from tests.graphs2go_tests.rdf_stores.rdf_store_test import RdfStoreTest

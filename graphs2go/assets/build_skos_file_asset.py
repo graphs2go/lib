@@ -1,5 +1,4 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset
-from pathvalidate import sanitize_filename
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import skos

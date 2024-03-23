@@ -1,7 +1,8 @@
-from dagster import AssetsDefinition, PartitionsDefinition, asset
-
-from rdflib import URIRef
 from urllib.parse import quote
+
+from dagster import AssetsDefinition, PartitionsDefinition, asset
+from rdflib import URIRef
+
 from graphs2go.models import interchange, skos
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (

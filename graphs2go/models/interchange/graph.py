@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-
 from graphs2go.models import rdf
 from graphs2go.models.interchange.node import Node
 from graphs2go.namespaces.interchange import INTERCHANGE
 
 if TYPE_CHECKING:
-    from rdflib import URIRef
     from collections.abc import Iterable
+
+    from rdflib import URIRef
 
     from graphs2go.models.interchange.model import Model
 

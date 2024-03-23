@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import TYPE_CHECKING, ClassVar
 
 from rdflib import RDF, RDFS, SKOS
 
-from enum import Enum
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.namespaces.skosxl import SKOSXL

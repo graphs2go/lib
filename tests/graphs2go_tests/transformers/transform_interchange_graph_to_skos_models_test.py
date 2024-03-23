@@ -1,5 +1,6 @@
 from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
+
 from graphs2go.models import interchange, skos
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (

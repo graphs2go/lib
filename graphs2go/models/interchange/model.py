@@ -1,7 +1,9 @@
 from datetime import date, datetime
-from graphs2go.models import rdf
 from typing import Self
+
 from rdflib import DCTERMS, Literal
+
+from graphs2go.models import rdf
 
 
 class Model(rdf.Model):
