@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from rdflib import RDF, RDFS, SKOS
 
+from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.namespaces.skosxl import SKOSXL
@@ -42,7 +43,7 @@ class Label(Model):
         cls,
         *,
         literal_form: Literal,
-        subject: URIRef,
+        subject: rdf.Model | URIRef,
         type_: Type | None = None,
         uri: URIRef | None = None,
     ) -> Label.Builder:
@@ -56,14 +57,15 @@ class Label(Model):
 
         resource = cls._create_resource(uri if uri is not None else uuid_urn())
         resource.add(RDF.predicate, skos_predicate)
-        resource.add(RDF.subject, subject)
+        subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
+        resource.add(RDF.subject, subject_uri)
         resource.add(RDF.type, SKOSXL.Label)
         resource.add(SKOSXL.literalForm, literal_form)
 
         # Add direct statements for ease of querying
-        resource.graph.add((subject, INTERCHANGE.label, resource.identifier))
+        resource.graph.add((subject_uri, INTERCHANGE.label, resource.identifier))
         if skosxl_predicate is not None:
-            resource.graph.add((subject, skosxl_predicate, resource.identifier))
+            resource.graph.add((subject_uri, skosxl_predicate, resource.identifier))
 
         return cls.Builder(resource)
 
