@@ -1,6 +1,8 @@
 from collections.abc import Iterable
 from typing import Self
+
 from rdflib import SKOS, Literal, URIRef
+
 from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
