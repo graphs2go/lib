@@ -24,7 +24,7 @@ class Model(rdf.Model):
 
     @property
     def created(self) -> datetime | None:
-        return self._required_value(DCTERMS.created, self._map_term_to_datetime)
+        return self._optional_value(DCTERMS.created, self._map_term_to_datetime)
 
     @property
     def modified(self) -> datetime | None:
