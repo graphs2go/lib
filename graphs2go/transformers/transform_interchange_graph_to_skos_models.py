@@ -4,19 +4,23 @@ from dagster import get_dagster_logger
 from rdflib import SKOS
 
 from graphs2go.models import interchange, skos
+from graphs2go.models.skos import concept_scheme
 
 
-def transform_interchange_graph_to_skos_models(
+def transform_interchange_graph_to_skos_models(  # noqa: C901
     interchange_graph: interchange.Graph,
 ) -> Iterable[skos.Model]:
     logger = get_dagster_logger()
 
-    for interchange_node_rdf_type in (SKOS.Concept, SKOS.ConceptScheme):
+    for interchange_node_rdf_type, skos_model_class in (
+        (SKOS.Concept, skos.Concept),
+        (SKOS.ConceptScheme, skos.ConceptScheme),
+    ):
         for interchange_node in interchange_graph.nodes(
             rdf_type=interchange_node_rdf_type
         ):
-            skos_concept_builder = (
-                skos.Concept.builder(uri=interchange_node.uri)
+            skos_model_builder: skos.LabeledModel.Builder = (
+                skos_model_class.builder(uri=interchange_node.uri)
                 .set_created(interchange_node.created)
                 .set_modified(interchange_node.modified)
             )
@@ -45,21 +49,29 @@ def transform_interchange_graph_to_skos_models(
                 yield skos_label
 
                 if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
-                    skos_concept_builder.add_alt_label(interchange_label.literal_form)
-                    skos_concept_builder.add_alt_label(skos_label)
+                    skos_model_builder.add_alt_label(interchange_label.literal_form)
+                    skos_model_builder.add_alt_label(skos_label)
                 elif interchange_label.type == interchange.Label.Type.PREFERRED:
-                    skos_concept_builder.add_pref_label(interchange_label.literal_form)
-                    skos_concept_builder.add_pref_label(skos_label)
+                    skos_model_builder.add_pref_label(interchange_label.literal_form)
+                    skos_model_builder.add_pref_label(skos_label)
                 else:
                     raise NotImplementedError
 
             for interchange_relationship in interchange_node.relationships:
-                if interchange_relationship.predicate.startswith(
+                if not interchange_relationship.predicate.startswith(
                     SKOS._NS  # noqa: SLF001
                 ):
-                    skos_concept_builder.add_relationship(
+                    continue
+
+                if not isinstance(skos_model_builder, skos.Concept.Builder):
+                    continue
+
+                if interchange_relationship.predicate == SKOS.inScheme:
+                    skos_model_builder.add_in_scheme(interchange_relationship.object)
+                else:
+                    skos_model_builder.add_relationship(
                         object_=interchange_relationship.object,
                         predicate=interchange_relationship.predicate,
                     )
 
-            yield skos_concept_builder.build()
+            yield skos_model_builder.build()

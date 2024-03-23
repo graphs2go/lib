@@ -12,6 +12,20 @@ from graphs2go.utils.uuid_urn import uuid_urn
 def interchange_graph() -> interchange.Graph:
     graph = interchange.Graph(identifier=uuid_urn(), rdf_store=MemoryRdfStore())
 
+    concept_scheme = (
+        interchange.Node.builder(uri=uuid_urn())
+        .add_rdf_type(SKOS.ConceptScheme)
+        .build()
+    )
+    graph.add(concept_scheme)
+    graph.add(
+        interchange.Label.builder(
+            literal_form=Literal("label"),
+            subject=concept_scheme,
+            type_=interchange.Label.Type.PREFERRED,
+        ).build()
+    )
+
     concepts = tuple(
         interchange.Node.builder(uri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
         for _ in range(2)
@@ -22,16 +36,24 @@ def interchange_graph() -> interchange.Graph:
         graph.add(
             interchange.Label.builder(
                 literal_form=Literal("label" + str(concept_i + 1)),
-                subject=concept.uri,
+                subject=concept,
                 type_=interchange.Label.Type.PREFERRED,
             ).build()
         )
 
         graph.add(
             interchange.Property.builder(
-                subject=concept.uri,
+                subject=concept,
                 predicate=SKOS.definition,
                 object_=Literal("definition" + str(concept_i + 1)),
+            ).build()
+        )
+
+        graph.add(
+            interchange.Relationship.builder(
+                object_=concept_scheme,
+                predicate=SKOS.inScheme,
+                subject=concept,
             ).build()
         )
 

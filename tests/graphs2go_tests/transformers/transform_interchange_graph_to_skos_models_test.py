@@ -14,6 +14,13 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
     )
     skos_graph.add_all(transform_interchange_graph_to_skos_models(interchange_graph))
 
+    skos_concept_schemes_by_uri = {
+        concept_scheme.uri: concept_scheme
+        for concept_scheme in skos_graph.concept_schemes
+    }
+    assert len(skos_concept_schemes_by_uri) == 1
+    concept_scheme = next(iter(skos_concept_schemes_by_uri.values()))
+
     skos_concepts_by_uri = {concept.uri: concept for concept in skos_graph.concepts}
 
     for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
@@ -49,10 +56,10 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
                 raise NotImplementedError(str(interchange_label.type))
 
         for interchange_relationship in interchange_node.relationships:
-            other_skos_concept_resource = skos_concept.resource.value(
+            other_resource = skos_concept.resource.value(
                 p=interchange_relationship.predicate
             )
-            assert isinstance(other_skos_concept_resource, Resource)
-            other_skos_concept_uri = other_skos_concept_resource.identifier
-            assert isinstance(other_skos_concept_uri, URIRef)
-            assert other_skos_concept_uri in skos_concepts_by_uri
+            assert isinstance(other_resource, Resource)
+            other_uri = other_resource.identifier
+            assert isinstance(other_uri, URIRef)
+            assert other_uri in skos_concepts_by_uri or other_uri == concept_scheme.uri

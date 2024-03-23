@@ -28,6 +28,9 @@ class Concept(LabeledModel):
         def add_relationship(
             self, *, object_: Concept | URIRef, predicate: URIRef
         ) -> Self:
+            if predicate == SKOS.inScheme:
+                raise ValueError(predicate)
+
             if isinstance(object_, Concept):
                 self._resource.add(predicate, object_.uri)
             elif isinstance(object_, URIRef):
