@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
 
@@ -10,6 +11,8 @@ if TYPE_CHECKING:
 
 
 class Label(Model):
+    Type = LabelType
+
     class Builder(Model.Builder):
         def build(self) -> Label:
             return Label(resource=self._resource)

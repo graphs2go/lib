@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-from rdflib import SKOS, URIRef
+from rdflib import SKOS, Literal, URIRef
 
+from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.concept_scheme import ConceptScheme
+from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.labeled_model import LabeledModel
 
 if TYPE_CHECKING:
@@ -13,9 +15,6 @@ if TYPE_CHECKING:
 
 class Concept(LabeledModel):
     class Builder(LabeledModel.Builder):
-        def add_broader(self, broader: Concept | URIRef) -> Self:
-            return self.add_relationship(object_=broader, predicate=SKOS.broader)
-
         def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
             if isinstance(in_scheme, ConceptScheme):
                 self._resource.add(SKOS.inScheme, in_scheme.uri)

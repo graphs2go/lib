@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import TYPE_CHECKING, ClassVar
 
-from rdflib import RDF, RDFS, SKOS
+from rdflib import RDF, RDFS
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
+from graphs2go.models.label_type import LabelType
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.utils.uuid_urn import uuid_urn
@@ -24,17 +24,14 @@ class Label(Model):
         def build(self) -> Label:
             return Label(resource=self._resource)
 
-    class Type(Enum):
-        ALTERNATIVE = 1
-        PREFERRED = 2
+    Type = LabelType
 
-    __TYPE_TO_PREDICATE_MAP: ClassVar[dict[Type | None, URIRef]] = {
-        Type.ALTERNATIVE: SKOS.altLabel,
-        Type.PREFERRED: SKOS.prefLabel,
-        None: RDFS.label,
+    __TYPE_TO_PREDICATE_MAP: ClassVar[dict[LabelType | None, URIRef]] = {
+        label_type: label_type.skos_predicate for label_type in LabelType
     }
+    __TYPE_TO_PREDICATE_MAP[None] = RDFS.label
 
-    __PREDICATE_TO_TYPE_MAP: ClassVar[dict[URIRef, Type | None]] = {
+    __PREDICATE_TO_TYPE_MAP: ClassVar[dict[URIRef, LabelType | None]] = {
         value: key for key, value in __TYPE_TO_PREDICATE_MAP.items()
     }
 
@@ -47,16 +44,8 @@ class Label(Model):
         type_: Type | None = None,
         uri: URIRef | None = None,
     ) -> Label.Builder:
-        skos_predicate = cls.__TYPE_TO_PREDICATE_MAP[type_]
-        if skos_predicate == SKOS.altLabel:
-            skosxl_predicate = SKOSXL.altLabel
-        elif skos_predicate == SKOS.prefLabel:
-            skosxl_predicate = SKOSXL.prefLabel
-        else:
-            skosxl_predicate = None
-
         resource = cls._create_resource(uri if uri is not None else uuid_urn())
-        resource.add(RDF.predicate, skos_predicate)
+        resource.add(RDF.predicate, cls.__TYPE_TO_PREDICATE_MAP[type_])
         subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
         resource.add(RDF.subject, subject_uri)
         resource.add(RDF.type, SKOSXL.Label)
@@ -64,8 +53,10 @@ class Label(Model):
 
         # Add direct statements for ease of querying
         resource.graph.add((subject_uri, INTERCHANGE.label, resource.identifier))
-        if skosxl_predicate is not None:
-            resource.graph.add((subject_uri, skosxl_predicate, resource.identifier))
+        if type_ is not None:
+            resource.graph.add(
+                (subject_uri, type_.skosxl_predicate, resource.identifier)
+            )
 
         return cls.Builder(resource)
 
