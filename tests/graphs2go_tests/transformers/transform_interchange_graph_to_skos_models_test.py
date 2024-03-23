@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
 
@@ -6,7 +8,6 @@ from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
     transform_interchange_graph_to_skos_models,
 )
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from graphs2go.models.label_type import LabelType
