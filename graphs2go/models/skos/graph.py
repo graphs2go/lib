@@ -18,6 +18,9 @@ class Graph(rdf.Graph):
     Non-picklable SKOS graph. Used as an entry point for accessing top-level graph models.
     """
 
+    _CONCEPT_CLASS = Concept
+    _LABEL_CLASS = Label
+
     def add(self, model: Model) -> None:
         self._rdflib_graph += model.resource.graph
 
@@ -31,8 +34,8 @@ class Graph(rdf.Graph):
 
     @property
     def concept_schemes(self) -> Iterable[ConceptScheme]:
-        return self._models_by_rdf_type(ConceptScheme)
+        return self._models_by_rdf_type(self._CONCEPT_CLASS)
 
     @property
     def labels(self) -> Iterable[Label]:
-        return self._models_by_rdf_type(Label)
+        return self._models_by_rdf_type(self._LABEL_CLASS)

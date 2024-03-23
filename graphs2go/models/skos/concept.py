@@ -12,8 +12,10 @@ if TYPE_CHECKING:
 
 
 class Concept(LabeledModel):
+    _CONCEPT_SCHEME_CLASS = ConceptScheme
+
     # https://www.w3.org/TR/skos-reference/#L4160
-    _SEMANTIC_RELATION_PREDICATES: ClassVar[frozenset[URIRef]] = frozenset(
+    SEMANTIC_RELATION_PREDICATES: ClassVar[frozenset[URIRef]] = frozenset(
         [
             SKOS.broader,
             SKOS.broadMatch,
@@ -41,7 +43,7 @@ class Concept(LabeledModel):
         def add_semantic_relation(
             self, *, object_: Concept | URIRef, predicate: URIRef
         ) -> Self:
-            if predicate not in Concept._SEMANTIC_RELATION_PREDICATES:
+            if predicate not in Concept.SEMANTIC_RELATION_PREDICATES:
                 raise ValueError(f"{predicate} is not a semantic relation")
 
             if isinstance(object_, Concept):
@@ -54,8 +56,6 @@ class Concept(LabeledModel):
 
         def build(self) -> Concept:
             return Concept(resource=self._resource)
-
-    _CONCEPT_SCHEME_CLASS = ConceptScheme
 
     @classmethod
     def builder(cls, *, uri: URIRef) -> Builder:
@@ -76,7 +76,7 @@ class Concept(LabeledModel):
 
     @property
     def semantic_relations(self) -> Iterable[tuple[URIRef, Concept | URIRef]]:
-        for predicate in self._SEMANTIC_RELATION_PREDICATES:
+        for predicate in self.SEMANTIC_RELATION_PREDICATES:
             yield from self._values(
                 predicate,
                 lambda term: self._map_term_to_model_or_uri(self.__class__, term),
