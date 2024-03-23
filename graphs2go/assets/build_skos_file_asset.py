@@ -16,9 +16,7 @@ def build_skos_file_asset(
         output_config_parsed = output_config.parse()
 
         with RdfDirectoryLoader.create(
-            directory_path=output_config_parsed.directory_path
-            / "skos"
-            / sanitize_filename(skos_graph.identifier),
+            directory_path=output_config_parsed.directory_path / "skos",
             rdf_format=output_config_parsed.rdf_format,
         ) as loader, skos.Graph.open(skos_graph) as open_skos_graph:
             loader.load(open_skos_graph.to_rdflib_graph())

@@ -16,9 +16,7 @@ def build_interchange_file_asset(
         output_config_parsed = output_config.parse()
 
         with RdfDirectoryLoader.create(
-            directory_path=output_config_parsed.directory_path
-            / "interchange"
-            / sanitize_filename(interchange_graph.identifier),
+            directory_path=output_config_parsed.directory_path / "interchange",
             rdf_format=output_config_parsed.rdf_format,
         ) as loader, interchange.Graph.open(
             interchange_graph
