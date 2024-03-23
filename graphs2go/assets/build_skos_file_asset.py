@@ -1,9 +1,9 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset
 from rdflib import SKOS
 
-from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import rdf, skos
+from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.resources.output_config import OutputConfig
 
 
