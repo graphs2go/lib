@@ -10,6 +10,9 @@ class Model(rdf.Model):
             self._resource.set(DCTERMS.created, Literal(created))
             return self
 
-        def set_modified(self, modified: date | datetime) -> Self:
-            self._resource.set(DCTERMS.modified, Literal(modified))
+        def set_modified(self, modified: date | datetime | None) -> Self:
+            if modified:
+                self._resource.set(DCTERMS.modified, Literal(modified))
+            else:
+                self._resource.remove(DCTERMS.modified)
             return self
