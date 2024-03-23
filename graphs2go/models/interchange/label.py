@@ -24,8 +24,6 @@ class Label(Model):
         def build(self) -> Label:
             return Label(resource=self._resource)
 
-    Type = LabelType
-
     __TYPE_TO_PREDICATE_MAP: ClassVar[dict[LabelType | None, URIRef]] = {
         label_type: label_type.skos_predicate for label_type in LabelType
     }
@@ -41,7 +39,7 @@ class Label(Model):
         *,
         literal_form: Literal,
         subject: rdf.Model | URIRef,
-        type_: Type | None = None,
+        type_: LabelType | None = None,
         uri: URIRef | None = None,
     ) -> Label.Builder:
         resource = cls._create_resource(uri if uri is not None else uuid_urn())
@@ -69,7 +67,7 @@ class Label(Model):
         return INTERCHANGE.Label
 
     @property
-    def type(self) -> Type | None:
+    def type(self) -> LabelType | None:
         return self.__PREDICATE_TO_TYPE_MAP[
             self._required_value(RDF.predicate, self._map_term_to_uri)
         ]

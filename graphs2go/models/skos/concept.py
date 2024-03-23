@@ -77,7 +77,8 @@ class Concept(LabeledModel):
     @property
     def semantic_relations(self) -> Iterable[tuple[URIRef, Concept | URIRef]]:
         for predicate in self.SEMANTIC_RELATION_PREDICATES:
-            yield from self._values(
+            for value in self._values(
                 predicate,
                 lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-            )  # type: ignore
+            ):  # type: ignore
+                yield predicate, value  # type: ignore

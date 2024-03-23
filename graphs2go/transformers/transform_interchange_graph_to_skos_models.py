@@ -16,8 +16,8 @@ def transform_interchange_graph_to_skos_models(
         for interchange_node in interchange_graph.nodes(
             rdf_type=interchange_node_rdf_type
         ):
-            skos_model_builder: skos.LabeledModel.Builder = (
-                skos_model_class.builder(uri=interchange_node.uri)
+            skos_model_builder: skos.Concept.Builder | skos.ConceptScheme.Builder = (
+                skos_model_class.builder(uri=interchange_node.uri)  # type: ignore
                 .set_created(interchange_node.created)
                 .set_modified(interchange_node.modified)
             )

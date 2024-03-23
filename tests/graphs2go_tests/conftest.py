@@ -4,6 +4,7 @@ import pytest
 from rdflib import SKOS, Literal
 
 from graphs2go.models import interchange, skos
+from graphs2go.models.label_type import LabelType
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.utils.uuid_urn import uuid_urn
 
@@ -22,7 +23,7 @@ def interchange_graph() -> interchange.Graph:
         interchange.Label.builder(
             literal_form=Literal("label"),
             subject=concept_scheme,
-            type_=interchange.Label.Type.PREFERRED,
+            type_=LabelType.PREFERRED,
         ).build()
     )
 
@@ -37,7 +38,7 @@ def interchange_graph() -> interchange.Graph:
             interchange.Label.builder(
                 literal_form=Literal("label" + str(concept_i + 1)),
                 subject=concept,
-                type_=interchange.Label.Type.PREFERRED,
+                type_=LabelType.PREFERRED,
             ).build()
         )
 
@@ -119,30 +120,32 @@ def skos_graph() -> skos.Graph:
     graph.add(concept_scheme)
 
     concept_builders: list[skos.Concept.Builder] = []
-    for concept_i in range(2):
+    for _ in range(2):
         concept_builder = skos.Concept.builder(uri=uuid_urn())
         concept_builder.add_in_scheme(concept_scheme)
 
-        alt_label = skos.Label.builder(
-            literal_form=Literal("xlAltLabel" + str(concept_i + 1)), uri=uuid_urn()
-        ).build()
-        graph.add(alt_label)
-        concept_builder.add_alt_label(alt_label)
-        concept_builder.add_alt_label(Literal("altLabel" + str(concept_i + 1)))
+        label_i = 1
+        for label_type in LabelType:
+            label = skos.Label.builder(
+                literal_form=Literal("label" + str(label_i)), uri=uuid_urn()
+            ).build()
+            graph.add(label)
+            concept_builder.add_lexical_label(label=label, type_=label_type)
+            label_i += 1
 
-        pref_label = skos.Label.builder(
-            literal_form=Literal("xlPrefLabel" + str(concept_i + 1)), uri=uuid_urn()
-        ).build()
-        graph.add(pref_label)
-        concept_builder.add_pref_label(pref_label)
-        concept_builder.add_pref_label(Literal("prefLabel" + str(concept_i + 1)))
+            concept_builder.add_lexical_label(
+                label=Literal("label" + str(label_i)), type_=label_type
+            )
+            label_i += 1
 
         concept_builders.append(concept_builder)
 
     for concept_builder_1, concept_builder_2 in itertools.combinations(
         concept_builders, 2
     ):
-        concept_builder_1.add_broader(concept_builder_2.build())
+        concept_builder_1.add_semantic_relation(
+            object_=concept_builder_2.build(), predicate=SKOS.broader
+        )
 
     for concept_builder in concept_builders:
         graph.add(concept_builder.build())

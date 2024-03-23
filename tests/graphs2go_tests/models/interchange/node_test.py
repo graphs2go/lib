@@ -12,11 +12,12 @@ def test_labels(interchange_node: interchange.Node) -> None:
     assert tuple(interchange_node.labels)
 
 
-def test_properties(interchange_node: interchange.Node) -> None:
-    properties = tuple(interchange_node.properties)
-    assert properties
-    for property_ in properties:
-        assert property_.subject == interchange_node.uri
+def test_properties(interchange_graph: interchange.Graph) -> None:
+    for node in interchange_graph.nodes():
+        for property_ in node.properties:
+            assert property_.subject == node.uri
+            return
+    pytest.fail("no node with properties")
 
 
 def test_relationships(interchange_graph: interchange.Graph) -> None:

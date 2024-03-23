@@ -2,11 +2,14 @@ from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
 
 from graphs2go.models import interchange, skos
-from graphs2go.models.interchange.label import Label
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
     transform_interchange_graph_to_skos_models,
 )
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from graphs2go.models.label_type import LabelType
 
 
 def test_transform(interchange_graph: interchange.Graph) -> None:
@@ -27,7 +30,9 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
     for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
         skos_concept = skos_concepts_by_uri[interchange_node.uri]
 
-        skos_lexical_labels_by_type = {}
+        skos_lexical_labels_by_type: dict[
+            LabelType | None, list[Literal | skos.Label | URIRef]
+        ] = {}
         for label_type, skos_lexical_label in skos_concept.lexical_labels:
             skos_lexical_labels_by_type.setdefault(label_type, []).append(
                 skos_lexical_label
