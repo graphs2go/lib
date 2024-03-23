@@ -6,11 +6,11 @@ from graphs2go.models import skos
 from graphs2go.resources.output_config import OutputConfig
 
 
-def build_skos_files_asset(
+def build_skos_file_asset(
     *, partitions_def: PartitionsDefinition | None = None
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def)
-    def skos_files(
+    def skos_file(
         output_config: OutputConfig, skos_graph: skos.Graph.Descriptor
     ) -> None:
         output_config_parsed = output_config.parse()
@@ -23,4 +23,4 @@ def build_skos_files_asset(
         ) as loader, skos.Graph.open(skos_graph) as open_skos_graph:
             loader.load(open_skos_graph.to_rdflib_graph())
 
-    return skos_files
+    return skos_file
