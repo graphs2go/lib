@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, ClassVar, Self
 
-from rdflib import SKOS, Literal, URIRef
+from rdflib import SKOS, URIRef
 
-from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.concept_scheme import ConceptScheme
-from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.labeled_model import LabeledModel
 
 if TYPE_CHECKING:
@@ -14,6 +12,22 @@ if TYPE_CHECKING:
 
 
 class Concept(LabeledModel):
+    # https://www.w3.org/TR/skos-reference/#L4160
+    _SEMANTIC_RELATION_PREDICATES: ClassVar[frozenset[URIRef]] = frozenset(
+        [
+            SKOS.broader,
+            SKOS.broadMatch,
+            SKOS.broaderTransitive,
+            SKOS.closeMatch,
+            SKOS.exactMatch,
+            SKOS.narrower,
+            SKOS.narrowerTransitive,
+            SKOS.narrowMatch,
+            SKOS.related,
+            SKOS.relatedMatch,
+        ]
+    )
+
     class Builder(LabeledModel.Builder):
         def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
             if isinstance(in_scheme, ConceptScheme):
@@ -24,11 +38,11 @@ class Concept(LabeledModel):
                 raise TypeError(type(in_scheme))
             return self
 
-        def add_relationship(
+        def add_semantic_relation(
             self, *, object_: Concept | URIRef, predicate: URIRef
         ) -> Self:
-            if predicate == SKOS.inScheme:
-                raise ValueError(predicate)
+            if predicate not in Concept._SEMANTIC_RELATION_PREDICATES:
+                raise ValueError(f"{predicate} is not a semantic relation")
 
             if isinstance(object_, Concept):
                 self._resource.add(predicate, object_.uri)
@@ -43,30 +57,9 @@ class Concept(LabeledModel):
 
     _CONCEPT_SCHEME_CLASS = ConceptScheme
 
-    @property
-    def broader(self) -> Iterable[Concept | URIRef]:
-        yield from self._values(
-            SKOS.broader,
-            lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )  # type: ignore
-
     @classmethod
     def builder(cls, *, uri: URIRef) -> Builder:
         return cls.Builder(cls._create_resource(uri=uri))
-
-    @property
-    def close_match(self) -> Iterable[Concept | URIRef]:
-        yield from self._values(
-            SKOS.closeMatch,
-            lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )  # type: ignore
-
-    @property
-    def exact_match(self) -> Iterable[Concept | URIRef]:
-        yield from self._values(
-            SKOS.exactMatch,
-            lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )  # type: ignore
 
     @property
     def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
@@ -82,8 +75,9 @@ class Concept(LabeledModel):
         return SKOS.Concept
 
     @property
-    def related(self) -> Iterable[Concept | URIRef]:
-        yield from self._values(
-            SKOS.broader,
-            lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-        )  # type: ignore
+    def semantic_relations(self) -> Iterable[tuple[URIRef, Concept | URIRef]]:
+        for predicate in self._SEMANTIC_RELATION_PREDICATES:
+            yield from self._values(
+                predicate,
+                lambda term: self._map_term_to_model_or_uri(self.__class__, term),
+            )  # type: ignore
