@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class RdfFormat(Enum):
+class Format(Enum):
     NQUADS = "nquads"
     NTRIPLES = "ntriples"
     TRIG = "trig"
@@ -9,11 +9,11 @@ class RdfFormat(Enum):
 
     @property
     def line_oriented(self) -> bool:
-        return self in (RdfFormat.NQUADS, RdfFormat.NTRIPLES)
+        return self in (Format.NQUADS, Format.NTRIPLES)
 
     def __str__(self):
         return self.value
 
     @property
     def supports_quads(self) -> bool:
-        return self in (RdfFormat.NQUADS, RdfFormat.TRIG)
+        return self in (Format.NQUADS, Format.TRIG)

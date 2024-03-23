@@ -1,28 +1,26 @@
 import pytest
 from rdflib import RDF, RDFS, SDO, Graph, Literal, URIRef
 
-from graphs2go.models.loadable_rdf_graph import LoadableRdfGraph
+
+@pytest.fixture(scope="session")
+def rdf_graphs(
+    schema_rdf_graph: Graph,
+    vocab_rdf_graph: Graph,
+) -> tuple[Graph, ...]:
+    return (schema_rdf_graph, vocab_rdf_graph)
 
 
 @pytest.fixture(scope="session")
-def loadable_rdf_graphs(
-    schema_loadable_rdf_graph: LoadableRdfGraph,
-    vocab_loadable_rdf_graph: LoadableRdfGraph,
-) -> tuple[LoadableRdfGraph, ...]:
-    return (schema_loadable_rdf_graph, vocab_loadable_rdf_graph)
-
-
-@pytest.fixture(scope="session")
-def schema_loadable_rdf_graph() -> LoadableRdfGraph:
-    graph = Graph()
+def schema_rdf_graph() -> Graph:
+    graph = Graph(identifier=URIRef("http://example.com/graph/schema"))
     graph.add((URIRef("http://example.com/class"), RDF.type, RDFS.Class))
-    return LoadableRdfGraph(stream="schema", graph=graph)
+    return graph
 
 
 @pytest.fixture(scope="session")
-def vocab_loadable_rdf_graph() -> LoadableRdfGraph:
-    graph = Graph()
+def vocab_rdf_graph() -> Graph:
+    graph = Graph(identifier=URIRef("http://example.com/graph/vocab"))
     graph.add(
         (URIRef("http://example.com/instance"), SDO.name, Literal("Test instance"))
     )
-    return LoadableRdfGraph(stream="vocab", graph=graph)
+    return graph

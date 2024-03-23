@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from graphs2go.models.loadable_rdf_graph import LoadableRdfGraph
+from rdflib import Graph
 
 
 class RdfLoader(ABC):
     @abstractmethod
-    def __call__(self, loadable_rdf_graph: LoadableRdfGraph) -> None:
+    def load(self, rdf_graph: Graph) -> None:
         pass

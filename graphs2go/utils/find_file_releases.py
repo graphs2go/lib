@@ -7,7 +7,7 @@ from typing import TypeVar
 ReleaseT = TypeVar("ReleaseT")
 
 
-def find_releases(
+def find_file_releases(
     *,
     logger: Logger,
     release_directory_path: Path,
@@ -27,22 +27,15 @@ def find_releases(
 
     releases: list[ReleaseT] = []
 
-    try:
-        releases.append(release_factory(release_directory_path))
-        logger.info("release directory %s is a release itself", release_directory_path)
-    except ValueError:
-        logger.info(
-            "release directory %s is not a release itself, scanning subdirectories",
-            release_directory_path,
-        )
+    for file_name in os.listdir(release_directory_path):
+        file_path = release_directory_path / file_name
+        if not file_path.is_file():
+            continue
 
-        for subdir_name in os.listdir(release_directory_path):
-            release_subdirectory_path = release_directory_path / subdir_name
-            try:
-                releases.append(release_factory(release_subdirectory_path))
-            except ValueError:
-                logger.debug(
-                    "directory %s is not a release, skipping", release_subdirectory_path
-                )
+        try:
+            releases.append(release_factory(file_path))
+            logger.info("file %s is a release", file_path)
+        except ValueError:
+            logger.debug("file %s is not a release", file_path)
 
     return tuple(releases)

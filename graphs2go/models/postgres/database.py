@@ -12,13 +12,13 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
-class PostgresDatabase:
+class Database:
     name: str
 
     @classmethod
     def create(
         cls, *, connection_pool: PostgresConnectionPool, logger: Logger, name: str
-    ) -> PostgresDatabase:
+    ) -> Database:
         with connection_pool.connect(None) as conn:
             conn.autocommit = True
             try:
