@@ -15,32 +15,43 @@ def transform_interchange_graph_to_skos_models(
         for interchange_node in interchange_graph.nodes(
             rdf_type=interchange_node_rdf_type
         ):
-            skos_concept_builder = skos.Concept.builder(uri=interchange_node.uri)
+            skos_concept_builder = (
+                skos.Concept.builder(uri=interchange_node.uri)
+                .set_created(interchange_node.created)
+                .set_modified(interchange_node.modified)
+            )
 
             for interchange_label in interchange_node.labels:
-                if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
-                    skos_concept_builder.add_alt_label(interchange_label.literal_form)
-                    skos_label = skos.Label.builder(
-                        literal_form=interchange_label.literal_form,
-                        uri=interchange_label.uri,
-                    ).build()
-                    yield skos_label
-                    skos_concept_builder.add_alt_label(skos_label)
-                elif interchange_label.type == interchange.Label.Type.PREFERRED:
-                    skos_concept_builder.add_pref_label(interchange_label.literal_form)
-                    skos_label = skos.Label.builder(
-                        literal_form=interchange_label.literal_form,
-                        uri=interchange_label.uri,
-                    ).build()
-                    yield skos_label
-                    skos_concept_builder.add_pref_label(skos_label)
-                else:
+                if interchange_label.type not in {
+                    interchange.Label.Type.ALTERNATIVE,
+                    interchange_label.Type.PREFERRED,
+                }:
                     logger.warning(
                         "interchange concept %s has non-SKOS label %s",
                         interchange_node.uri,
                         interchange_label.uri,
                     )
                     continue
+
+                skos_label = (
+                    skos.Label.builder(
+                        literal_form=interchange_label.literal_form,
+                        uri=interchange_label.uri,
+                    )
+                    .set_created(interchange_label.created)
+                    .set_modified(interchange_label.modified)
+                    .build()
+                )
+                yield skos_label
+
+                if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
+                    skos_concept_builder.add_alt_label(interchange_label.literal_form)
+                    skos_concept_builder.add_alt_label(skos_label)
+                elif interchange_label.type == interchange.Label.Type.PREFERRED:
+                    skos_concept_builder.add_pref_label(interchange_label.literal_form)
+                    skos_concept_builder.add_pref_label(skos_label)
+                else:
+                    raise NotImplementedError
 
             for interchange_relationship in interchange_node.relationships:
                 if interchange_relationship.predicate.startswith(
