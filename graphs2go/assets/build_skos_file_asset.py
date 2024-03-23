@@ -1,5 +1,7 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset
+from rdflib import SKOS
 
+from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import rdf, skos
 from graphs2go.resources.output_config import OutputConfig
@@ -19,6 +21,8 @@ def build_skos_file_asset(
                 directory_path=output_config.parse().directory_path / "skos",
                 rdf_format=rdf_format,
             ) as loader, skos.Graph.open(skos_graph) as open_skos_graph:
-                loader.load(open_skos_graph.to_rdflib_graph())
+                rdflib_graph = open_skos_graph.to_rdflib_graph()
+                rdflib_graph.bind("skosxl", SKOSXL)
+                loader.load(rdflib_graph)
 
     return skos_file

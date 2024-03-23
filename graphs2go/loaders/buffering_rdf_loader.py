@@ -27,6 +27,11 @@ class BufferingRdfLoader(RdfLoader):
             for triple in rdf_graph:
                 identifier_graph.add(triple)
 
+        # Copy namespaces
+        for prefix, namespace in rdf_graph.namespace_manager.namespaces():
+            if prefix not in identifier_graph.namespace_manager:
+                identifier_graph.bind(prefix, namespace)
+
     def close(self) -> None:
         pass
 
