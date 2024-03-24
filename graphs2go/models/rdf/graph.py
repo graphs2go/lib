@@ -41,7 +41,7 @@ class Graph:
     def _add(self, model: Model) -> None:
         self.__rdflib_graph += model.resource.graph
 
-    def add_all(self, models: Iterable[Model]) -> None:
+    def _add_all(self, models: Iterable[Model]) -> None:
         for model in models:
             self._add(model)
 
