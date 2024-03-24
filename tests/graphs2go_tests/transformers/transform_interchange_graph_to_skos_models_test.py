@@ -58,7 +58,10 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
             )
 
         for interchange_property in interchange_node.properties:
-            assert interchange_property.predicate in skos.Concept.NOTE_PREDICATES
+            assert (
+                interchange_property.predicate == SKOS.notation
+                or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
+            )
             assert isinstance(interchange_property.object, Literal)
 
         for interchange_relationship in interchange_node.relationships:

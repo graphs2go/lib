@@ -123,6 +123,7 @@ def skos_graph() -> skos.Graph:
     for _ in range(2):
         concept_builder = skos.Concept.builder(uri=uuid_urn())
         concept_builder.add_in_scheme(concept_scheme)
+        concept_builder.add_notation(Literal("testnotation"))
         concept_builder.add_note(SKOS.note, Literal("testnote"))
 
         label_i = 1

@@ -48,6 +48,9 @@ class Concept(LabeledModel):
         def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
             return self._add(SKOS.inScheme, in_scheme)
 
+        def add_notation(self, notation: Literal | None) -> Self:
+            return self._add(SKOS.notation, notation)
+
         def add_note(self, predicate: URIRef, object_: Literal) -> Self:
             if predicate not in Concept.NOTE_PREDICATES:
                 raise ValueError(f"{predicate} is not a note predicate")
@@ -77,6 +80,10 @@ class Concept(LabeledModel):
                 self._CONCEPT_SCHEME_CLASS, term
             ),
         )  # type: ignore
+
+    @property
+    def notations(self) -> Iterable[Literal]:
+        yield from self._values(SKOS.notation, self._map_term_to_literal)  # type: ignore
 
     @property
     def notes(self) -> Iterable[tuple[URIRef, Literal]]:

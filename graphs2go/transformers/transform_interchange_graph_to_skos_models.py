@@ -48,7 +48,9 @@ def transform_interchange_graph_to_skos_models(
             if isinstance(skos_model_builder, skos.Concept.Builder):
                 # Interchange properties with predicates that are skos:note sub-properties
                 for interchange_property in interchange_node.properties:
-                    if interchange_property.predicate in skos.Concept.NOTE_PREDICATES:
+                    if interchange_property.predicate == SKOS.notation:
+                        skos_model_builder.add_notation(interchange_property.object)
+                    elif interchange_property.predicate in skos.Concept.NOTE_PREDICATES:
                         skos_model_builder.add_note(
                             interchange_property.predicate, interchange_property.object
                         )

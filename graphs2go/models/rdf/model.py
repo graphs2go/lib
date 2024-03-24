@@ -253,7 +253,7 @@ class Model(ABC):
     ) -> _ValueT:
         for value in self._values(p, mapper):
             return value
-        raise KeyError
+        raise KeyError(f"{self.uri} missing required {p}")
 
     @property
     def rdf_types(self) -> tuple[URIRef, ...]:
