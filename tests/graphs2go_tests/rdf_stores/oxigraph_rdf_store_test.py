@@ -12,6 +12,6 @@ class TestOxigraphRdfStore(RdfStoreTest):
     @pytest.fixture()
     def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:
         with OxigraphRdfStore(
-            oxigraph_directory_path=tmp_path, read_only=False
+            oxigraph_directory_path=tmp_path, read_only=False, transactional=True
         ) as rdf_store:
             yield rdf_store

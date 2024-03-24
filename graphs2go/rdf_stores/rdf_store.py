@@ -7,9 +7,11 @@ from typing import TYPE_CHECKING
 from rdflib import ConjunctiveGraph
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from rdflib import URIRef
+    from rdflib.graph import _QuadType
     from rdflib.store import Store
 
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
@@ -22,18 +24,6 @@ class RdfStore(ABC):
         A picklable dataclass identifying an RDF store. It can be used to open an RDF store.
         """
 
-    def bulk_load(self, *, mime_type: str, source: Path) -> None:
-        """
-        Bulk load the contents of the input into the store.
-
-        No transactional guarantee.
-        """
-
-        ConjunctiveGraph(store=self.rdflib_store).parse(
-            format=mime_type,
-            source=source,
-        )
-
     @abstractmethod
     def close(self) -> None:
         pass
@@ -45,16 +35,15 @@ class RdfStore(ABC):
         self.close()
 
     @staticmethod
-    def create(
-        *,
-        identifier: URIRef,
-        rdf_store_config: RdfStoreConfig,
-    ) -> RdfStore:
+    def create(*, identifier: URIRef, rdf_store_config: RdfStoreConfig) -> RdfStore:
+        rdf_store_config_parsed = rdf_store_config.parse()
+
         from .oxigraph_rdf_store import OxigraphRdfStore
 
         return OxigraphRdfStore.create(
             identifier=identifier,
-            rdf_store_config=rdf_store_config,
+            oxigraph_directory_path=rdf_store_config_parsed.directory_path,
+            transactional=rdf_store_config_parsed.transactional,
         )
 
     @property
@@ -67,6 +56,15 @@ class RdfStore(ABC):
         for _ in self.rdflib_store.triples((None, None, None)):
             return False
         return True
+
+    def add_all(self, quads: Iterable[_QuadType]) -> None:
+        self.rdflib_store.addN(quads)
+
+    def load(self, *, mime_type: str, source: Path) -> None:
+        ConjunctiveGraph(store=self.rdflib_store).parse(
+            format=mime_type,
+            source=source,
+        )
 
     @staticmethod
     def open(descriptor: Descriptor, *, read_only: bool = False) -> RdfStore:

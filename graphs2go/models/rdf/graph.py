@@ -39,7 +39,8 @@ class Graph:
         self.__rdf_store = rdf_store
 
     def _add(self, model: Model) -> None:
-        self.__rdflib_graph += model.resource.graph
+        model_graph = model.resource.graph
+        self.__rdf_store.add_all((s, p, o, model_graph) for s, p, o in model_graph)
 
     def _add_all(self, models: Iterable[Model]) -> None:
         for model in models:
@@ -47,10 +48,7 @@ class Graph:
 
     @classmethod
     def create(
-        cls,
-        *,
-        identifier: rdflib.URIRef,
-        rdf_store_config: RdfStoreConfig,
+        cls, *, identifier: rdflib.URIRef, rdf_store_config: RdfStoreConfig
     ) -> Self:
         return cls(
             identifier=identifier,
