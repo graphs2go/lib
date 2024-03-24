@@ -1,8 +1,8 @@
 from urllib.parse import quote
-from tqdm import tqdm
 
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
 from rdflib import URIRef
+from tqdm import tqdm
 
 from graphs2go.models import interchange, skos
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
