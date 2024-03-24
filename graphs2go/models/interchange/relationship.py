@@ -43,7 +43,7 @@ class Relationship(Model):
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
-        resource.graph.add((subject_uri, predicate, object_uri))
+        # resource.graph.add((subject_uri, predicate, object_uri))
         # Node -> Relationship instances
         resource.graph.add((subject_uri, INTERCHANGE.relationship, resource.identifier))
 

@@ -51,10 +51,10 @@ class Label(Model):
 
         # Add direct statements for ease of querying
         resource.graph.add((subject_uri, INTERCHANGE.label, resource.identifier))
-        if type_ is not None:
-            resource.graph.add(
-                (subject_uri, type_.skosxl_predicate, resource.identifier)
-            )
+        # if type_ is not None:
+        #     resource.graph.add(
+        #         (subject_uri, type_.skosxl_predicate, resource.identifier)
+        #     )
 
         return cls.Builder(resource)
 

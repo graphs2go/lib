@@ -37,7 +37,7 @@ class Property(Model):
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
-        resource.graph.add((subject_uri, predicate, object_))
+        # resource.graph.add((subject_uri, predicate, object_))
         # Node -> Property instance
         resource.graph.add((subject_uri, INTERCHANGE.property, resource.identifier))
 
