@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib.collection
 from rdflib import RDF, Graph, Literal, URIRef
@@ -33,6 +33,28 @@ class Model(ABC):
             if not isinstance(resource.identifier, URIRef):
                 raise TypeError("expected URI-identified resource")
             self.__resource = resource
+
+        def _add(
+            self, predicate: URIRef, object_: Literal | Model | URIRef | None
+        ) -> Self:
+            if object_ is not None:
+                if isinstance(object_, Model):
+                    self._resource.add(predicate, object_.uri)
+                else:
+                    self._resource.add(predicate, object_)
+            return self
+
+        def _set(
+            self, predicate: URIRef, object_: Literal | Model | URIRef | None
+        ) -> Self:
+            if object_ is not None:
+                if isinstance(object_, Model):
+                    self._resource.set(predicate, object_.uri)
+                else:
+                    self._resource.set(predicate, object_)
+            else:
+                self._resource.remove(predicate)
+            return self
 
         @abstractmethod
         def build(self) -> Model:

@@ -23,8 +23,7 @@ class Node(Model):
 
     class Builder(Model.Builder):
         def add_rdf_type(self, rdf_type: URIRef) -> Self:
-            self._resource.add(RDF.type, rdf_type)
-            return self
+            return self._add(RDF.type, rdf_type)
 
         def build(self) -> Node:
             return Node(resource=self._resource)

@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Self
 
-from rdflib import DCTERMS, Literal
+from rdflib import DCTERMS, Literal, URIRef
 
 from graphs2go.models import rdf
 
@@ -9,18 +9,17 @@ from graphs2go.models import rdf
 class Model(rdf.Model):
     class Builder(rdf.Model.Builder):
         def set_created(self, created: date | datetime | None) -> Self:
-            if created:
-                self._resource.set(DCTERMS.created, Literal(created))
-            else:
-                self._resource.remove(DCTERMS.created)
-            return self
+            return self._set(
+                DCTERMS.created, Literal(created) if created is not None else None
+            )
 
         def set_modified(self, modified: date | datetime | None) -> Self:
-            if modified:
-                self._resource.set(DCTERMS.modified, Literal(modified))
-            else:
-                self._resource.remove(DCTERMS.modified)
-            return self
+            return self._set(
+                DCTERMS.modified, Literal(modified) if modified is not None else None
+            )
+
+        def set_source(self, source: URIRef | None) -> Self:
+            return self._set(DCTERMS.source, source)
 
     @property
     def created(self) -> datetime | None:

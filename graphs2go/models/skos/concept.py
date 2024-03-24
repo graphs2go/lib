@@ -32,13 +32,7 @@ class Concept(LabeledModel):
 
     class Builder(LabeledModel.Builder):
         def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
-            if isinstance(in_scheme, ConceptScheme):
-                self._resource.add(SKOS.inScheme, in_scheme.uri)
-            elif isinstance(in_scheme, URIRef):
-                self._resource.add(SKOS.inScheme, in_scheme)
-            else:
-                raise TypeError(type(in_scheme))
-            return self
+            return self._add(SKOS.inScheme, in_scheme)
 
         def add_semantic_relation(
             self, *, object_: Concept | URIRef, predicate: URIRef
@@ -46,13 +40,7 @@ class Concept(LabeledModel):
             if predicate not in Concept.SEMANTIC_RELATION_PREDICATES:
                 raise ValueError(f"{predicate} is not a semantic relation")
 
-            if isinstance(object_, Concept):
-                self._resource.add(predicate, object_.uri)
-            elif isinstance(object_, URIRef):
-                self._resource.add(predicate, object_)
-            else:
-                raise TypeError(type(object_))
-            return self
+            return self._add(predicate, object_)
 
         def build(self) -> Concept:
             return Concept(resource=self._resource)
