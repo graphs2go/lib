@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 
 _ModelT = TypeVar("_ModelT", bound="Model")
-_Predicates = URIRef | tuple[URIRef, ...]
 _StatementObject = Literal | Resource
 _ValueT = TypeVar("_ValueT")
 
@@ -232,12 +231,12 @@ class Model(ABC):
 
     def _optional_value(
         self,
-        p: _Predicates,
+        predicate: URIRef,
         mapper: Callable[
             [_StatementObject], _ValueT | None
         ] = lambda value: value,  # type: ignore
     ) -> _ValueT | None:
-        for value in self._values(p, mapper):
+        for value in self._values(predicate, mapper):
             return value
         return None
 
@@ -248,12 +247,12 @@ class Model(ABC):
 
     def _required_value(
         self,
-        p: _Predicates,
+        predicate: URIRef,
         mapper: Callable[[_StatementObject], _ValueT | None] = lambda value: value,  # type: ignore
     ) -> _ValueT:
-        for value in self._values(p, mapper):
+        for value in self._values(predicate, mapper):
             return value
-        raise KeyError(f"{self.uri} missing required {p}")
+        raise KeyError(f"{self.uri} missing required {predicate}")
 
     @property
     def rdf_types(self) -> tuple[URIRef, ...]:
@@ -269,19 +268,12 @@ class Model(ABC):
 
     def _values(
         self,
-        predicates: _Predicates,
+        predicate: URIRef,
         mapper: Callable[
             [_StatementObject], _ValueT | None
         ] = lambda value: value,  # type: ignore
     ) -> Generator[_ValueT, None, None]:
-        predicates_tuple: tuple[URIRef, ...]
-        if isinstance(predicates, URIRef):
-            predicates_tuple = (predicates,)
-        else:
-            predicates_tuple = predicates
-
-        for predicate in predicates_tuple:
-            for value in self.__resource.objects(predicate):
-                mapped_value = mapper(value)
-                if mapped_value is not None:
-                    yield mapped_value
+        for value in self.__resource.objects(predicate):
+            mapped_value = mapper(value)
+            if mapped_value is not None:
+                yield mapped_value
