@@ -31,6 +31,7 @@ def _literal_to_ox(literal: Literal) -> ox.Literal:
 def _quad_to_ox(quad: _QuadType) -> ox.Quad:
     s, p, o, c = quad
 
+    s_ox: ox.BlankNode | ox.NamedNode
     if isinstance(s, BNode):
         s_ox = ox.BlankNode(s)
     elif isinstance(s, URIRef):
@@ -41,6 +42,7 @@ def _quad_to_ox(quad: _QuadType) -> ox.Quad:
     assert isinstance(p, URIRef)
     p_ox = ox.NamedNode(p)
 
+    o_ox: ox.BlankNode | ox.Literal | ox.NamedNode
     if isinstance(o, BNode):
         o_ox = ox.BlankNode(o)
     elif isinstance(o, Literal):
@@ -50,6 +52,7 @@ def _quad_to_ox(quad: _QuadType) -> ox.Quad:
     else:
         raise TypeError(type(o))
 
+    c_ox: None | ox.DefaultGraph | ox.NamedNode
     if c is None:
         c_ox = None
     elif c == DATASET_DEFAULT_GRAPH_ID:
