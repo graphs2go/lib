@@ -1,5 +1,5 @@
 import pytest
-from rdflib import Literal
+from rdflib import SKOS, Literal
 
 from graphs2go.models import skos
 from graphs2go.models.label_type import LabelType
@@ -38,6 +38,14 @@ def test_in_scheme(
     assert len(in_schemes) == 1
     assert isinstance(in_schemes[0], skos.ConceptScheme)
     assert in_schemes[0].uri == skos_concept_scheme.uri
+
+
+def test_notes(skos_concept: skos.Concept) -> None:
+    notes = tuple(skos_concept.notes)
+    assert len(notes) == 1
+    predicate, object_ = notes[0]
+    assert predicate == SKOS.note
+    assert isinstance(object_, Literal)
 
 
 def test_semantic_relations(skos_graph: skos.Graph) -> None:
