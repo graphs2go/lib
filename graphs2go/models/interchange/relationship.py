@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from rdflib import RDF
 
+from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.utils.hash_urn import hash_urn
@@ -25,23 +26,27 @@ class Relationship(Model):
     def builder(
         cls,
         *,
-        object_: URIRef,
+        object_: rdf.Model | URIRef,
         predicate: URIRef,
-        subject: URIRef,
+        subject: rdf.Model | URIRef,
         uri: URIRef | None = None,
     ) -> Relationship.Builder:
+        object_uri = object_.uri if isinstance(object_, rdf.Model) else object_
+        subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
+
         resource = cls._create_resource(
-            uri if uri is not None else hash_urn(subject, predicate, object_)
+            uri if uri is not None else hash_urn(subject_uri, predicate, object_uri)
         )
-        resource.add(RDF.object, object_)
+        resource.add(RDF.object, object_uri)
         resource.add(RDF.predicate, predicate)
-        resource.add(RDF.subject, subject)
+        resource.add(RDF.subject, subject_uri)
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
-        resource.graph.add((subject, predicate, object_))
+        # resource.graph.add((subject_uri, predicate, object_uri))
         # Node -> Relationship instances
-        resource.graph.add((subject, INTERCHANGE.relationship, resource.identifier))
+        resource.graph.add((subject_uri, INTERCHANGE.relationship, resource.identifier))
+
         return cls.Builder(resource)
 
     @property

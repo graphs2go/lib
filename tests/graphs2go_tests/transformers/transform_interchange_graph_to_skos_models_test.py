@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
 
@@ -7,6 +9,9 @@ from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
     transform_interchange_graph_to_skos_models,
 )
 
+if TYPE_CHECKING:
+    from graphs2go.models.label_type import LabelType
+
 
 def test_transform(interchange_graph: interchange.Graph) -> None:
     skos_graph = skos.Graph(
@@ -14,45 +19,63 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
     )
     skos_graph.add_all(transform_interchange_graph_to_skos_models(interchange_graph))
 
+    skos_concept_schemes_by_uri = {
+        concept_scheme.uri: concept_scheme
+        for concept_scheme in skos_graph.concept_schemes
+    }
+    assert len(skos_concept_schemes_by_uri) == 1
+    concept_scheme = next(iter(skos_concept_schemes_by_uri.values()))
+
     skos_concepts_by_uri = {concept.uri: concept for concept in skos_graph.concepts}
 
     for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
         skos_concept = skos_concepts_by_uri[interchange_node.uri]
 
-        skos_alt_labels = tuple(skos_concept.alt_label)
-        skos_pref_labels = tuple(skos_concept.pref_label)
-
-        def assert_equivalent_skos_labels(
-            interchange_label: interchange.Label,
-            skos_labels: tuple[skos.Label | Literal, ...],
-        ) -> None:
-            expected_literal_form = interchange_label.literal_form
-            assert any(
-                True
-                for skos_label_ in skos_labels
-                if isinstance(skos_label_, Literal)
-                and skos_label_ == expected_literal_form
-            )
-            assert any(
-                True
-                for skos_label_ in skos_labels
-                if isinstance(skos_label_, skos.Label)
-                and skos_label_.literal_form == expected_literal_form
+        skos_lexical_labels_by_type: dict[
+            LabelType | None, list[Literal | skos.Label | URIRef]
+        ] = {}
+        for label_type, skos_lexical_label in skos_concept.lexical_labels:
+            skos_lexical_labels_by_type.setdefault(label_type, []).append(
+                skos_lexical_label
             )
 
         for interchange_label in interchange_node.labels:
-            if interchange_label.type == interchange.Label.Type.ALTERNATIVE:
-                assert_equivalent_skos_labels(interchange_label, skos_alt_labels)
-            elif interchange_label.type == interchange.Label.Type.PREFERRED:
-                assert_equivalent_skos_labels(interchange_label, skos_pref_labels)
-            else:
-                raise NotImplementedError(str(interchange_label.type))
+            assert any(
+                True
+                for skos_lexical_label in skos_lexical_labels_by_type[
+                    interchange_label.type
+                ]
+                if isinstance(skos_lexical_label, Literal)
+                and skos_lexical_label == interchange_label.literal_form
+            )
+            assert any(
+                True
+                for skos_lexical_label in skos_lexical_labels_by_type[
+                    interchange_label.type
+                ]
+                if isinstance(skos_lexical_label, skos.Label)
+                and skos_lexical_label.literal_form == interchange_label.literal_form
+            )
+
+        for interchange_property in interchange_node.properties:
+            assert (
+                interchange_property.predicate == SKOS.notation
+                or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
+            )
+            assert isinstance(interchange_property.object, Literal)
 
         for interchange_relationship in interchange_node.relationships:
-            other_skos_concept_resource = skos_concept.resource.value(
+            other_resource = skos_concept.resource.value(
                 p=interchange_relationship.predicate
             )
-            assert isinstance(other_skos_concept_resource, Resource)
-            other_skos_concept_uri = other_skos_concept_resource.identifier
-            assert isinstance(other_skos_concept_uri, URIRef)
-            assert other_skos_concept_uri in skos_concepts_by_uri
+            assert isinstance(other_resource, Resource)
+            other_uri = other_resource.identifier
+            assert isinstance(other_uri, URIRef)
+            if interchange_relationship.predicate == SKOS.inScheme:
+                assert other_uri == concept_scheme.uri
+            else:
+                assert (
+                    interchange_relationship.predicate
+                    in skos.Concept.SEMANTIC_RELATION_PREDICATES
+                )
+                assert other_uri in skos_concepts_by_uri

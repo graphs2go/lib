@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from rdflib import SKOS, URIRef
 
-from graphs2go.models.skos.model import Model
+from graphs2go.models.skos.labeled_model import LabeledModel
 
 
-class ConceptScheme(Model):
-    class Builder(Model.Builder):
+class ConceptScheme(LabeledModel):
+    class Builder(LabeledModel.Builder):
         def build(self) -> ConceptScheme:
             return ConceptScheme(resource=self._resource)
 

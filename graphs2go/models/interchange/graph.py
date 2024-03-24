@@ -20,11 +20,10 @@ class Graph(rdf.Graph):
     """
 
     def add(self, model: Model) -> None:
-        self._rdflib_graph += model.resource.graph
+        super()._add(model)
 
     def add_all(self, models: Iterable[Model]) -> None:
-        for model in models:
-            self.add(model)
+        super()._add_all(models)
 
     def nodes(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[Node]:
         return self._models_by_rdf_type(Node, rdf_type=rdf_type)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from datetime import date, datetime
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib.collection
 from rdflib import RDF, Graph, Literal, URIRef
@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 
 _ModelT = TypeVar("_ModelT", bound="Model")
-_Predicates = URIRef | tuple[URIRef, ...]
 _StatementObject = Literal | Resource
 _ValueT = TypeVar("_ValueT")
 
@@ -33,6 +32,28 @@ class Model(ABC):
             if not isinstance(resource.identifier, URIRef):
                 raise TypeError("expected URI-identified resource")
             self.__resource = resource
+
+        def _add(
+            self, predicate: URIRef, object_: Literal | Model | URIRef | None
+        ) -> Self:
+            if object_ is not None:
+                if isinstance(object_, Model):
+                    self._resource.add(predicate, object_.uri)
+                else:
+                    self._resource.add(predicate, object_)
+            return self
+
+        def _set(
+            self, predicate: URIRef, object_: Literal | Model | URIRef | None
+        ) -> Self:
+            if object_ is not None:
+                if isinstance(object_, Model):
+                    self._resource.set(predicate, object_.uri)
+                else:
+                    self._resource.set(predicate, object_)
+            else:
+                self._resource.remove(predicate)
+            return self
 
         @abstractmethod
         def build(self) -> Model:
@@ -210,12 +231,12 @@ class Model(ABC):
 
     def _optional_value(
         self,
-        p: _Predicates,
+        predicate: URIRef,
         mapper: Callable[
             [_StatementObject], _ValueT | None
         ] = lambda value: value,  # type: ignore
     ) -> _ValueT | None:
-        for value in self._values(p, mapper):
+        for value in self._values(predicate, mapper):
             return value
         return None
 
@@ -226,12 +247,12 @@ class Model(ABC):
 
     def _required_value(
         self,
-        p: _Predicates,
+        predicate: URIRef,
         mapper: Callable[[_StatementObject], _ValueT | None] = lambda value: value,  # type: ignore
     ) -> _ValueT:
-        for value in self._values(p, mapper):
+        for value in self._values(predicate, mapper):
             return value
-        raise KeyError
+        raise KeyError(f"{self.uri} missing required {predicate}")
 
     @property
     def rdf_types(self) -> tuple[URIRef, ...]:
@@ -247,19 +268,12 @@ class Model(ABC):
 
     def _values(
         self,
-        predicates: _Predicates,
+        predicate: URIRef,
         mapper: Callable[
             [_StatementObject], _ValueT | None
         ] = lambda value: value,  # type: ignore
     ) -> Generator[_ValueT, None, None]:
-        predicates_tuple: tuple[URIRef, ...]
-        if isinstance(predicates, URIRef):
-            predicates_tuple = (predicates,)
-        else:
-            predicates_tuple = predicates
-
-        for predicate in predicates_tuple:
-            for value in self.__resource.objects(predicate):
-                mapped_value = mapper(value)
-                if mapped_value is not None:
-                    yield mapped_value
+        for value in self.__resource.objects(predicate):
+            mapped_value = mapper(value)
+            if mapped_value is not None:
+                yield mapped_value

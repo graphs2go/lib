@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from rdflib import RDF, Literal, URIRef
 
+from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.utils.hash_urn import hash_urn
@@ -22,21 +23,24 @@ class Property(Model):
         *,
         predicate: URIRef,
         object_: Literal,
-        subject: URIRef,
+        subject: rdf.Model | URIRef,
         uri: URIRef | None = None,
     ) -> Property.Builder:
+        subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
+
         resource = cls._create_resource(
-            uri if uri is not None else hash_urn(subject, predicate, object_)
+            uri if uri is not None else hash_urn(subject_uri, predicate, object_)
         )
         resource.add(RDF.object, object_)
         resource.add(RDF.predicate, predicate)
-        resource.add(RDF.subject, subject)
+        resource.add(RDF.subject, subject_uri)
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
-        resource.graph.add((subject, predicate, object_))
+        # resource.graph.add((subject_uri, predicate, object_))
         # Node -> Property instance
-        resource.graph.add((subject, INTERCHANGE.property, resource.identifier))
+        resource.graph.add((subject_uri, INTERCHANGE.property, resource.identifier))
+
         return cls.Builder(resource)
 
     @property
