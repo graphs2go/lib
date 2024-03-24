@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
-    from rdflib.graph import _QuadType
     import rdflib.store
+    from rdflib.graph import _QuadType
 
 
 def _literal_to_ox(literal: Literal) -> ox.Literal:

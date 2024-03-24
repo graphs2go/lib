@@ -5,7 +5,6 @@ from pathlib import Path
 
 from dagster import ConfigurableResource, EnvVar
 
-
 _TRANSACTIONAL_DEFAULT = False
 
 
