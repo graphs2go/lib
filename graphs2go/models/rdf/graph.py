@@ -33,10 +33,17 @@ class Graph:
 
     def __init__(self, *, identifier: rdflib.URIRef, rdf_store: RdfStore):
         self.__identifier = identifier
-        self._rdflib_graph = rdflib.ConjunctiveGraph(
+        self.__rdflib_graph = rdflib.ConjunctiveGraph(
             identifier=identifier, store=rdf_store.rdflib_store
         )
         self.__rdf_store = rdf_store
+
+    def _add(self, model: Model) -> None:
+        self.__rdflib_graph += model.resource.graph
+
+    def add_all(self, models: Iterable[Model]) -> None:
+        for model in models:
+            self._add(model)
 
     @classmethod
     def create(
@@ -63,7 +70,7 @@ class Graph:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
-        self._rdflib_graph.close()
+        self.__rdflib_graph.close()
         self.__rdf_store.close()
 
     @property
@@ -81,7 +88,7 @@ class Graph:
             rdf_type = model_class.primary_rdf_type()
 
         yielded_model_uris: set[rdflib.URIRef] = set()
-        for model_uri in self._rdflib_graph.subjects(
+        for model_uri in self.__rdflib_graph.subjects(
             predicate=rdflib.RDF.type,
             object=rdf_type,
             unique=True,
@@ -91,7 +98,7 @@ class Graph:
             if model_uri in yielded_model_uris:
                 continue
 
-            yield model_class(resource=self._rdflib_graph.resource(model_uri))
+            yield model_class(resource=self.__rdflib_graph.resource(model_uri))
             yielded_model_uris.add(model_uri)
 
     @classmethod
@@ -103,5 +110,6 @@ class Graph:
             ),
         )
 
-    def to_rdflib_graph(self) -> rdflib.Graph:
-        return self._rdflib_graph
+    @property
+    def rdflib_graph(self) -> rdflib.Graph:
+        return self.__rdflib_graph

@@ -23,7 +23,7 @@ def build_interchange_file_asset(
             ) as loader, interchange.Graph.open(
                 interchange_graph
             ) as open_interchange_graph:
-                rdflib_graph = open_interchange_graph.to_rdflib_graph()
+                rdflib_graph = open_interchange_graph.rdflib_graph
                 rdflib_graph.bind("interchange", INTERCHANGE)
                 rdflib_graph.bind("skosxl", SKOSXL)
                 loader.load(rdflib_graph)

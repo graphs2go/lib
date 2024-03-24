@@ -23,11 +23,10 @@ class Graph(rdf.Graph):
     _LABEL_CLASS = Label
 
     def add(self, model: Model) -> None:
-        self._rdflib_graph += model.resource.graph
+        super().add(model)
 
     def add_all(self, models: Iterable[Model]) -> None:
-        for model in models:
-            self.add(model)
+        super().add_all(models)
 
     @property
     def concepts(self) -> Iterable[Concept]:

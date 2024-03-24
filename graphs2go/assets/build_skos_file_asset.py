@@ -20,7 +20,7 @@ def build_skos_file_asset(
                 directory_path=output_config.parse().directory_path / "skos",
                 rdf_format=rdf_format,
             ) as loader, skos.Graph.open(skos_graph) as open_skos_graph:
-                rdflib_graph = open_skos_graph.to_rdflib_graph()
+                rdflib_graph = open_skos_graph.rdflib_graph
                 rdflib_graph.bind("skosxl", SKOSXL)
                 loader.load(rdflib_graph)
 
