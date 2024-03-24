@@ -27,11 +27,15 @@ def build_skos_graph_asset(
             identifier=URIRef(f"urn:skos:{quote(interchange_graph.identifier)}"),
             rdf_store_config=rdf_store_config,
         ) as open_skos_graph:
+            if not open_skos_graph.is_empty:
+                logger.info("SKOS graph is not empty, skipping load")
+                return open_skos_graph.descriptor
+
             logger.info("loading SKOS graph")
             open_skos_graph.add_all(
                 tqdm(
                     transform_interchange_graph_to_skos_models(open_interchange_graph),
-                    desc="SKOS models",
+                    desc="SKOS graph models",
                 )
             )
             logger.info("loaded SKOS graph")
