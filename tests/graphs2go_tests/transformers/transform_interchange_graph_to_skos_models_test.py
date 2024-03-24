@@ -57,6 +57,10 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
                 and skos_lexical_label.literal_form == interchange_label.literal_form
             )
 
+        for interchange_property in interchange_node.properties:
+            assert interchange_property.predicate in skos.Concept.NOTE_PREDICATES
+            assert isinstance(interchange_property.object, Literal)
+
         for interchange_relationship in interchange_node.relationships:
             other_resource = skos_concept.resource.value(
                 p=interchange_relationship.predicate
@@ -64,4 +68,11 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
             assert isinstance(other_resource, Resource)
             other_uri = other_resource.identifier
             assert isinstance(other_uri, URIRef)
-            assert other_uri in skos_concepts_by_uri or other_uri == concept_scheme.uri
+            if interchange_relationship.predicate == SKOS.inScheme:
+                assert other_uri == concept_scheme.uri
+            else:
+                assert (
+                    interchange_relationship.predicate
+                    in skos.Concept.SEMANTIC_RELATION_PREDICATES
+                )
+                assert other_uri in skos_concepts_by_uri

@@ -45,8 +45,15 @@ def transform_interchange_graph_to_skos_models(
                     label=skos_label, type_=interchange_label.type
                 )
 
-            # Interchange relationships between concepts -> SKOS semantic relations
             if isinstance(skos_model_builder, skos.Concept.Builder):
+                # Interchange properties with predicates that are skos:note sub-properties
+                for interchange_property in interchange_node.properties:
+                    if interchange_property.predicate in skos.Concept.NOTE_PREDICATES:
+                        skos_model_builder.add_note(
+                            interchange_property.predicate, interchange_property.object
+                        )
+
+                # Interchange relationships between concepts -> SKOS semantic relations
                 for interchange_relationship in interchange_node.relationships:
                     if interchange_relationship.predicate == SKOS.inScheme:
                         skos_model_builder.add_in_scheme(
@@ -57,8 +64,8 @@ def transform_interchange_graph_to_skos_models(
                         in skos.Concept.SEMANTIC_RELATION_PREDICATES
                     ):
                         skos_model_builder.add_semantic_relation(
-                            object_=interchange_relationship.object,
-                            predicate=interchange_relationship.predicate,
+                            interchange_relationship.predicate,
+                            interchange_relationship.object,
                         )
 
             yield skos_model_builder.build()
