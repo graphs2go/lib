@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING
 
 import oxrdflib
 import pyoxigraph
+import pyoxigraph as ox
 from pathvalidate import sanitize_filename
+from rdflib.graph import DATASET_DEFAULT_GRAPH_ID, Graph
+from rdflib.term import BNode, Literal, URIRef
 
 from graphs2go.rdf_stores.rdf_store import RdfStore
-
-from oxrdflib import _to_ox
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -17,7 +18,54 @@ if TYPE_CHECKING:
 
     from rdflib.graph import _QuadType
     import rdflib.store
-    from rdflib import URIRef
+
+
+def _literal_to_ox(literal: Literal) -> ox.Literal:
+    return ox.Literal(
+        literal,
+        language=literal.language,
+        datatype=ox.NamedNode(literal.datatype) if literal.datatype else None,
+    )
+
+
+def _quad_to_ox(quad: _QuadType) -> ox.Quad:
+    s, p, o, c = quad
+
+    if isinstance(s, BNode):
+        s_ox = ox.BlankNode(s)
+    elif isinstance(s, URIRef):
+        s_ox = ox.NamedNode(s)
+    else:
+        raise TypeError(type(s))
+
+    assert isinstance(p, URIRef)
+    p_ox = ox.NamedNode(p)
+
+    if isinstance(o, BNode):
+        o_ox = ox.BlankNode(o)
+    elif isinstance(o, Literal):
+        o_ox = _literal_to_ox(o)
+    elif isinstance(o, URIRef):
+        o_ox = ox.NamedNode(o)
+    else:
+        raise TypeError(type(o))
+
+    if c is None:
+        c_ox = None
+    elif c == DATASET_DEFAULT_GRAPH_ID:
+        c_ox = ox.DefaultGraph()
+    elif isinstance(c, Graph):
+        if isinstance(c.identifier, BNode):
+            c_ox = ox.DefaultGraph()
+            # c_ox = ox.BlankNode(c.identifier)
+        elif isinstance(c.identifier, URIRef):
+            c_ox = ox.NamedNode(c.identifier)
+        else:
+            raise TypeError(c.identifier)
+    else:
+        raise TypeError(type(c))
+
+    return ox.Quad(s_ox, p_ox, o_ox, c_ox)
 
 
 class OxigraphRdfStore(RdfStore):
@@ -40,9 +88,9 @@ class OxigraphRdfStore(RdfStore):
 
     def add_all(self, quads: Iterable[_QuadType]) -> None:
         if self.__transactional:
-            self.__pyoxigraph_store.extend(_to_ox(q) for q in quads)  # type: ignore
+            self.__pyoxigraph_store.extend(_quad_to_ox(q) for q in quads)  # type: ignore
         else:
-            self.__pyoxigraph_store.bulk_extend(_to_ox(q) for q in quads)  # type: ignore
+            self.__pyoxigraph_store.bulk_extend(_quad_to_ox(q) for q in quads)  # type: ignore
 
     def load(self, *, mime_type: str, source: Path) -> None:
         if self.__transactional:

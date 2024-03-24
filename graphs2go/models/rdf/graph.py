@@ -12,9 +12,15 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
+    from rdflib.graph import _QuadType
 
 
 _ModelT = TypeVar("_ModelT", bound=Model)
+
+
+def _rdflib_graph_to_quads(rdflib_graph: rdflib.Graph) -> Iterable[_QuadType]:
+    for s, p, o in rdflib_graph:
+        yield s, p, o, rdflib_graph
 
 
 class Graph:
@@ -39,12 +45,14 @@ class Graph:
         self.__rdf_store = rdf_store
 
     def _add(self, model: Model) -> None:
-        model_graph = model.resource.graph
-        self.__rdf_store.add_all((s, p, o, model_graph) for s, p, o in model_graph)
+        self.__rdf_store.add_all(_rdflib_graph_to_quads(model.resource.graph))
 
     def _add_all(self, models: Iterable[Model]) -> None:
-        for model in models:
-            self._add(model)
+        def models_to_quads() -> Iterable[_QuadType]:
+            for model in models:
+                yield from _rdflib_graph_to_quads(model.resource.graph)
+
+        self.__rdf_store.add_all(models_to_quads())
 
     @classmethod
     def create(
