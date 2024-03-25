@@ -6,8 +6,14 @@ from shutil import rmtree
 from typing import TYPE_CHECKING, Any
 
 import pyoxigraph as ox
-from pathvalidate import sanitize_filename
-from rdflib.graph import DATASET_DEFAULT_GRAPH_ID, Graph, _TripleType, _QuadType
+from rdflib.graph import (
+    DATASET_DEFAULT_GRAPH_ID,
+    Graph,
+    _TripleType,
+    _QuadType,
+    _TriplePatternType,
+    _ContextType,
+)
 from rdflib.term import BNode, Literal, URIRef, Node, Identifier
 
 from graphs2go.rdf_stores.rdf_store import RdfStore
@@ -21,7 +27,6 @@ if TYPE_CHECKING:
 
 
 _NONE_SINGLETON_TUPLE = (None,)
-_TriplePattern = tuple[Node | None, Node | None, Node | None]
 
 
 def _graph_from_ox(
@@ -91,7 +96,9 @@ def _quad_to_ox(quad: _QuadType) -> ox.Quad:
     )
 
 
-def _quad_pattern_to_ox(triple: _TriplePattern, context: Graph | None = None) -> tuple[
+def _quad_pattern_to_ox(
+    triple: _TriplePatternType, context: Graph | None = None
+) -> tuple[
     ox.BlankNode | ox.NamedNode | None,
     ox.NamedNode | None,
     ox.BlankNode | ox.Literal | ox.NamedNode | None,
@@ -134,7 +141,7 @@ def _triple_to_ox(triple: _TripleType, context: Graph) -> ox.Quad:
 
 
 def _object_from_ox(
-    object_: ox.BlankNode | ox.Literal | ox.NamedNode,
+    object_: ox.BlankNode | ox.Literal | ox.NamedNode | ox.Triple,
 ) -> BNode | Literal | URIRef:
     if isinstance(object_, ox.BlankNode):
         return BNode(object_.value)
@@ -197,8 +204,11 @@ class OxigraphRdfStore(RdfStore):
             self.__delegate.bulk_extend(_quad_to_ox(q) for q in quads)  # type: ignore
 
     def bind(
-        self, prefix: str, namespace: URIRef, override: bool = True
-    ) -> None:  # noqa: FBT001, FBT001
+        self,
+        prefix: str,
+        namespace: URIRef,
+        override: bool = True,  # noqa: FBT001, FBT002
+    ) -> None:
         if not override and (
             prefix in self.__namespace_for_prefix
             or namespace in self.__prefix_for_namespace
@@ -209,7 +219,9 @@ class OxigraphRdfStore(RdfStore):
         self.__namespace_for_prefix[prefix] = namespace
         self.__prefix_for_namespace[namespace] = prefix
 
-    def close(self) -> None:
+    def close(
+        self, commit_pending_transaction: bool = False  # noqa: ARG002, FBT001, FBT002
+    ) -> None:
         # There's no explicit close on the pyoxigraph Store.
         # Delete all references to the pyoxigraph Store so it gets garbage collected and releases its lock.
         with contextlib.suppress(AttributeError):
@@ -227,20 +239,6 @@ class OxigraphRdfStore(RdfStore):
         return (
             _graph_from_ox(q.graph_name, self)
             for q in self.__delegate.quads_for_pattern(*_quad_pattern_to_ox(triple))
-        )
-
-    @staticmethod
-    def create(  # type: ignore
-        *, identifier: URIRef, oxigraph_directory_path: Path, transactional: bool
-    ) -> OxigraphRdfStore:
-        oxigraph_subdirectory_path = oxigraph_directory_path / sanitize_filename(
-            identifier
-        )
-        oxigraph_subdirectory_path.mkdir(parents=True, exist_ok=True)
-        return OxigraphRdfStore(
-            oxigraph_directory_path=oxigraph_subdirectory_path,
-            read_only=False,
-            transactional=transactional,
         )
 
     def __delete_from_prefix(self, prefix: str) -> None:
@@ -276,7 +274,7 @@ class OxigraphRdfStore(RdfStore):
             return False
         return True
 
-    def __len__(self, **_) -> int:  # noqa: ANN003
+    def __len__(self, context: _ContextType | None = None) -> int:
         raise NotImplementedError
 
     def load(self, *, mime_type: str, source: Path) -> None:
@@ -294,19 +292,7 @@ class OxigraphRdfStore(RdfStore):
     def open(
         self, configuration: str, create: bool = False  # noqa: ARG002, FBT001, FBT002
     ) -> int | None:
-        return rdflib.VALID_STORE
-
-    @staticmethod
-    def open_(  # type: ignore
-        descriptor: RdfStore.Descriptor, *, read_only: bool = False
-    ) -> OxigraphRdfStore:
-        assert isinstance(descriptor, OxigraphRdfStore.Descriptor)
-        descriptor_: OxigraphRdfStore.Descriptor = descriptor
-        return OxigraphRdfStore(
-            oxigraph_directory_path=descriptor_.oxigraph_directory_path,
-            read_only=read_only,
-            transactional=descriptor_.transactional,
-        )
+        return rdflib.store.VALID_STORE
 
     def prefix(self, namespace: URIRef) -> str | None:
         return self.__prefix_for_namespace.get(namespace)
@@ -327,7 +313,7 @@ class OxigraphRdfStore(RdfStore):
 
     def remove(
         self,
-        triple: _TriplePattern,
+        triple: _TriplePatternType,
         context: Graph | None = None,
     ) -> None:
         for q in self.__delegate.quads_for_pattern(
@@ -345,16 +331,17 @@ class OxigraphRdfStore(RdfStore):
 
     def triples(
         self,
-        triple_pattern: _TriplePattern,
+        triple_pattern: _TriplePatternType,
         context: Graph | None = None,
     ) -> Iterator[tuple[_TripleType, Iterator[Graph | None]]]:
         for quad in self.__delegate.quads_for_pattern(
             *_quad_pattern_to_ox(triple_pattern, context)
         ):
+            graphs: tuple[Graph | None, ...]
             if quad.graph_name == ox.DefaultGraph():
                 graphs = _NONE_SINGLETON_TUPLE
             else:
-                graphs = _graph_from_ox(quad.graph_name, store=self)
+                graphs = (_graph_from_ox(quad.graph_name, store=self),)
 
             yield (
                 _subject_from_ox(quad.subject),

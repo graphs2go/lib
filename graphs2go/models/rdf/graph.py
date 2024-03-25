@@ -61,7 +61,7 @@ class Graph:
     ) -> Self:
         return cls(
             identifier=identifier,
-            rdf_store=RdfStore.create(
+            rdf_store=RdfStore.create_(
                 identifier=identifier, rdf_store_config=rdf_store_config
             ),
         )

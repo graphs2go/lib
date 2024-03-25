@@ -1,7 +1,9 @@
 from collections.abc import Generator
 from dataclasses import dataclass
-from typing import Optional, Iterator
+from collections.abc import Iterator
 
+from rdflib import URIRef
+from rdflib.graph import Graph, _TripleType, _ContextType, _TriplePatternType
 from rdflib.plugins.stores.memory import Memory
 
 from graphs2go.rdf_stores.rdf_store import RdfStore
@@ -24,24 +26,26 @@ class MemoryRdfStore(RdfStore):
 
     def add(
         self,
-        triple: "_TripleType",
-        context: "_ContextType",
-        quoted: bool = False,
+        triple: _TripleType,
+        context: _ContextType,
+        quoted: bool = False,  # noqa: FBT001, FBT002
     ) -> None:
         self.__delegate.add(triple, context, quoted)
 
-    def add_graph(self, graph: "Graph") -> None:
+    def add_graph(self, graph: Graph) -> None:
         self.__delegate.add_graph(graph)
 
-    def bind(self, prefix: str, namespace: "URIRef", override: bool = True) -> None:
+    def bind(
+        self,
+        prefix: str,
+        namespace: URIRef,
+        override: bool = True,  # noqa: FBT001, FBT002
+    ) -> None:
         self.__delegate.bind(prefix, namespace, override)
 
-    def close(self) -> None:
-        pass
-
     def contexts(
-        self, triple: Optional["_TripleType"] = None
-    ) -> Generator["_ContextType", None, None]:
+        self, triple: _TripleType | None = None
+    ) -> Generator[_ContextType, None, None]:
         yield from self.__delegate.contexts(triple)
 
     @property
@@ -52,34 +56,34 @@ class MemoryRdfStore(RdfStore):
     def is_empty(self) -> bool:
         return len(self) == 0
 
-    def __len__(self, context: Optional["_ContextType"] = None) -> int:
+    def __len__(self, context: _ContextType | None = None) -> int:
         return len(self.__delegate)
 
-    def namespace(self, prefix: str) -> Optional["URIRef"]:
+    def namespace(self, prefix: str) -> URIRef | None:
         return self.__delegate.namespace(prefix)
 
-    def namespaces(self) -> Iterator[tuple[str, "URIRef"]]:
+    def namespaces(self) -> Iterator[tuple[str, URIRef]]:
         return self.__delegate.namespaces()
 
-    def prefix(self, namespace: "URIRef") -> Optional[str]:
+    def prefix(self, namespace: URIRef) -> str | None:
         return self.__delegate.prefix(namespace)
 
     def remove(
         self,
-        triple_pattern: "_TriplePatternType",
-        context: Optional["_ContextType"] = None,
+        triple_pattern: _TriplePatternType,
+        context: _ContextType | None = None,
     ) -> None:
         self.__delegate.remove(triple_pattern, context)
 
-    def remove_graph(self, graph: "Graph") -> None:
+    def remove_graph(self, graph: Graph) -> None:
         self.__delegate.remove_graph(graph)
 
     def triples(
         self,
-        triple_pattern: "_TriplePatternType",
-        context: Optional["_ContextType"] = None,
+        triple_pattern: _TriplePatternType,
+        context: _ContextType | None = None,
     ) -> Generator[
-        tuple["_TripleType", Generator[Optional["_ContextType"], None, None]],
+        tuple[_TripleType, Generator[_ContextType | None, None, None]],
         None,
         None,
     ]:

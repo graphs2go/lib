@@ -4,15 +4,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from rdflib import ConjunctiveGraph
 import rdflib.store
+from pathvalidate import sanitize_filename
+from rdflib import ConjunctiveGraph
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from pathlib import Path
 
     from rdflib import URIRef
-    from rdflib.graph import _QuadType
 
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
@@ -24,10 +23,6 @@ class RdfStore(rdflib.store.Store, ABC):
         A picklable dataclass identifying an RDF store. It can be used to open an RDF store.
         """
 
-    @abstractmethod
-    def close(self) -> None:
-        pass
-
     def __enter__(self):
         return self
 
@@ -35,14 +30,18 @@ class RdfStore(rdflib.store.Store, ABC):
         self.close()
 
     @staticmethod
-    def create(*, identifier: URIRef, rdf_store_config: RdfStoreConfig) -> RdfStore:
+    def create_(*, identifier: URIRef, rdf_store_config: RdfStoreConfig) -> RdfStore:
         rdf_store_config_parsed = rdf_store_config.parse()
 
         from .oxigraph_rdf_store import OxigraphRdfStore
 
-        return OxigraphRdfStore.create(
-            identifier=identifier,
-            oxigraph_directory_path=rdf_store_config_parsed.directory_path,
+        oxigraph_subdirectory_path = (
+            rdf_store_config_parsed.directory_path / sanitize_filename(identifier)
+        )
+        oxigraph_subdirectory_path.mkdir(parents=True, exist_ok=True)
+        return OxigraphRdfStore(
+            oxigraph_directory_path=oxigraph_subdirectory_path,
+            read_only=False,
             transactional=rdf_store_config_parsed.transactional,
         )
 
@@ -70,5 +69,10 @@ class RdfStore(rdflib.store.Store, ABC):
         if isinstance(descriptor, MemoryRdfStore.Descriptor):
             return MemoryRdfStore()
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
-            return OxigraphRdfStore.open_(descriptor, read_only=read_only)
+            descriptor_: OxigraphRdfStore.Descriptor = descriptor
+            return OxigraphRdfStore(
+                oxigraph_directory_path=descriptor_.oxigraph_directory_path,
+                read_only=read_only,
+                transactional=descriptor_.transactional,
+            )
         raise TypeError(type(descriptor))
