@@ -19,6 +19,16 @@ metrics = markus.get_metrics(__name__)
 
 
 class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
+    """
+    Loader that writes RDF graphs to files in a directory on the local file system.
+
+    Graphs with the same identifier are written to the same file.
+
+    The desired RDF format determines whether graphs will be appended/streamed to files as they arrive or buffered in memory
+    and written once when the loader is closed. Line-oriented formats such as n-quads and n-triples are preferred for
+    large volumes of data because they can be streamed.
+    """
+
     def __init__(self, *, directory_path: Path, rdf_format: rdf.Format):
         DirectoryLoader.__init__(self, directory_path=directory_path)
         self.__rdf_format = rdf_format

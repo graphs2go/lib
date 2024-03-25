@@ -5,6 +5,10 @@ from pyparsing import ABC
 
 
 class DirectoryLoader(ABC):
+    """
+    Abstract base class for loaders that write files to a directory on the local file system.
+    """
+
     def __init__(self, *, directory_path: Path):
         self.__directory_path = directory_path
         self.__directory_path.mkdir(parents=True, exist_ok=True)
