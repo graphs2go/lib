@@ -21,7 +21,9 @@ class CreateNodeStatement(Statement):
             return self
 
         def build(self) -> CreateNodeStatement:
-            return CreateNodeStatement(f"CREATE {self.__node_pattern_builder.build()};")
+            return CreateNodeStatement(
+                f"CREATE {self.__node_pattern_builder.build().value};"
+            )
 
     @classmethod
     def builder(cls, *, id_: str, label: str) -> Builder:

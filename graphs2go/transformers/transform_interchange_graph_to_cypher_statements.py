@@ -26,7 +26,7 @@ def transform_interchange_graph_to_cypher_statements(
 
     def uri_to_node_label(uri: URIRef) -> str:
         curie = uri_to_curie(uri)
-        return curie[0].capitalize() + stringcase.camelcase(curie[1])
+        return curie[0].capitalize() + stringcase.pascalcase(curie[1])
 
     def uri_to_property_name(uri: URIRef) -> str:
         curie = uri_to_curie(uri)

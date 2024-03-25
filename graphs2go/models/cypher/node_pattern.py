@@ -1,9 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, TYPE_CHECKING
 
-from graphs2go.models.cypher import Properties
-from graphs2go.models.cypher.property_value import PropertyValue
+from graphs2go.models.cypher.properties import Properties
+
+if TYPE_CHECKING:
+    from graphs2go.models.cypher.property_value import PropertyValue
 
 
 @dataclass(frozen=True)
@@ -34,4 +36,4 @@ class NodePattern:
 
     @classmethod
     def builder(cls) -> Builder:
-        return cls.builder()
+        return cls.Builder()
