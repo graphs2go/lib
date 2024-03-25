@@ -48,7 +48,7 @@ def _graph_identifier_to_ox(
     if graph_identifier == DATASET_DEFAULT_GRAPH_ID:
         return ox.DefaultGraph()
     if isinstance(graph_identifier, BNode):
-        return ox.BlankNode(graph_identifier.value)
+        return ox.BlankNode(graph_identifier)
     if isinstance(graph_identifier, URIRef):
         return ox.NamedNode(graph_identifier)
     raise TypeError(graph_identifier)
