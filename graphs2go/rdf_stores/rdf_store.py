@@ -63,7 +63,7 @@ class RdfStore(rdflib.store.Store, ABC):
         )
 
     @staticmethod
-    def open(descriptor: Descriptor, *, read_only: bool = False) -> RdfStore:
+    def open_(descriptor: Descriptor, *, read_only: bool = False) -> RdfStore:
         from .memory_rdf_store import MemoryRdfStore
         from .oxigraph_rdf_store import OxigraphRdfStore
 

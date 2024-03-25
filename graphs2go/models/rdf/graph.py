@@ -41,19 +41,19 @@ class Graph:
     def __init__(self, *, identifier: rdflib.URIRef, rdf_store: RdfStore):
         self.__identifier = identifier
         self.__rdflib_graph = rdflib.ConjunctiveGraph(
-            identifier=identifier, store=rdf_store.rdflib_store
+            identifier=identifier, store=rdf_store
         )
         self.__rdf_store = rdf_store
 
     def _add(self, model: Model) -> None:
-        self.__rdf_store.add_all(_rdflib_graph_to_quads(model.resource.graph))
+        self.__rdf_store.addN(_rdflib_graph_to_quads(model.resource.graph))
 
     def _add_all(self, models: Iterable[Model]) -> None:
         def models_to_quads() -> Iterable[_QuadType]:
             for model in models:
                 yield from _rdflib_graph_to_quads(model.resource.graph)
 
-        self.__rdf_store.add_all(models_to_quads())
+        self.__rdf_store.addN(models_to_quads())
 
     @classmethod
     def create(
@@ -112,7 +112,7 @@ class Graph:
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
             identifier=descriptor.identifier,
-            rdf_store=RdfStore.open(
+            rdf_store=RdfStore.open_(
                 descriptor.rdf_store_descriptor, read_only=read_only
             ),
         )
