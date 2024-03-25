@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 
 import stringcase
-from dagster import get_dagster_logger
 from rdflib import URIRef
 
 from graphs2go.models import cypher, interchange
@@ -13,14 +12,12 @@ _PRIMARY_NODE_LABEL = "NODE"
 def transform_interchange_graph_to_cypher_statements(
     interchange_graph: interchange.Graph,
 ) -> Iterable[cypher.Statement]:
-    logger = get_dagster_logger()
-
     def uri_to_curie(uri: URIRef) -> tuple[str, str]:
         curie_parts = interchange_graph.rdflib_graph.namespace_manager.curie(uri).split(
             ":", 1
         )
         assert len(curie_parts) == 2
-        return tuple(curie_parts)
+        return curie_parts[0], curie_parts[1]
 
     def uri_to_node_id(uri: URIRef) -> str:
         return str(uri)
@@ -60,17 +57,8 @@ def transform_interchange_graph_to_cypher_statements(
 
         property_names: set[str] = set()
         for interchange_property in interchange_node.properties:
-            property_value = interchange_property.object.toPython()
-            if not isinstance(property_value, cypher.PropertyValue):
-                logger.warning(
-                    "interchange node %s property %s has an incompatible value type: %s",
-                    interchange_node.uri,
-                    interchange_property.predicate,
-                    type(property_value),
-                )
-                continue
-
             property_name = uri_to_property_name(interchange_property.predicate)
+            property_value = interchange_property.object.toPython()
             create_node_statement_builder.add_property(property_name, property_value)
             property_names.add(property_name)
 
@@ -80,7 +68,6 @@ def transform_interchange_graph_to_cypher_statements(
             property_value = getattr(interchange_node, interchange_node_property_name)
             if property_value is None:
                 continue
-            assert isinstance(property_value, cypher.PropertyValue)
             create_node_statement_builder.add_property(
                 interchange_node_property_name, property_value
             )
@@ -120,7 +107,6 @@ def transform_interchange_graph_to_cypher_statements(
                 )
                 if property_value is None:
                     continue
-                assert isinstance(property_value, cypher.PropertyValue)
                 create_relationship_statement_builder.add_property(
                     interchange_node_property_name, property_value
                 )

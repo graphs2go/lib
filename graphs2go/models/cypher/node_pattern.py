@@ -15,7 +15,7 @@ class NodePattern:
     variable: str
 
     class Builder:
-        def __init__(self):
+        def __init__(self) -> None:
             self.__labels: list[str] = []
             self.__properties = Properties()
             self.__variable = ""
@@ -38,7 +38,7 @@ class NodePattern:
                 cypher_str="(" + " ".join(parts) + ")", variable=self.__variable
             )
 
-        def set_variable(self, variable: "") -> Self:
+        def set_variable(self, variable: str) -> Self:
             self.__variable = variable
             return self
 

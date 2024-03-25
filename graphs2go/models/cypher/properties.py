@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from graphs2go.models.cypher.property_value import PropertyValue
 
 
@@ -19,37 +20,48 @@ class Properties(dict[str, PropertyValue]):
             return
 
         if isinstance(existing_value, tuple):
-            self[key] = tuple(list(existing_value) + [value])
+            self[key] = (*existing_value, value)
         else:
             self[key] = (existing_value, value)
 
     @staticmethod
     def __escape_value(string: str) -> str:
-        res = (
+        return (
             string.replace("\\", "\\\\")
             .replace('"', '\\"')
             .replace("'", "\\'")
             .replace("\r", "\\r")
             .replace("\n", "\\n")
         )
-        return res
 
     @staticmethod
-    def __format_value(value: PropertyValue, *, escape: bool) -> PropertyValue:
+    def __format_value(key: str, value: PropertyValue) -> str:
         # Assigning a dict to a property is not supported by a neo4j graph
         # if isinstance(value, dict):
         #     return str({sub_key: self._format_value(sub_value) for sub_key, sub_value in value.items()})
 
-        if escape and isinstance(value, str):
-            return f'"{Properties.__escape_value(value)}"'
-
         if value is None:
             return "null"
-
-        return value
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, date | datetime):
+            return value.isoformat()
+        if isinstance(value, float | int):
+            return str(value)
+        if isinstance(value, str):
+            return Properties.__escape_value(value)
+        if isinstance(value, tuple):
+            return (
+                "["
+                + ", ".join(
+                    Properties.__format_value(key, sub_value) for sub_value in value
+                )
+                + "]"
+            )
+        raise TypeError(f"{key}: invalid property value type {type(value)}")
 
     def __str__(self) -> str:
         return ", ".join(
-            f"{key}: {Properties.__format_value(value, escape=True)}"
+            f"{key}: {Properties.__format_value(key, value)}"
             for key, value in self.items()
         )

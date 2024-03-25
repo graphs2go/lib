@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import Self, TYPE_CHECKING
 
 from graphs2go.models.cypher.node_pattern import NodePattern
-from graphs2go.models.cypher.property_value import PropertyValue
 from graphs2go.models.cypher.statement import Statement
+
+if TYPE_CHECKING:
+    from graphs2go.models.cypher.property_value import PropertyValue
 
 
 class CreateNodeStatement(Statement):
