@@ -32,21 +32,22 @@ _NONE_SINGLETON_TUPLE = (None,)
 def _graph_from_ox(
     graph_name: ox.NamedNode | ox.BlankNode | ox.DefaultGraph, store: rdflib.store.Store
 ) -> Graph:
+    if isinstance(graph_name, ox.DefaultGraph):
+        return Graph(identifier=DATASET_DEFAULT_GRAPH_ID, store=store)
     if isinstance(graph_name, ox.NamedNode):
         return Graph(identifier=URIRef(graph_name.value), store=store)
     if isinstance(graph_name, ox.BlankNode):
         return Graph(identifier=BNode(graph_name.value), store=store)
-    if isinstance(graph_name, ox.DefaultGraph):
-        return Graph(identifier=DATASET_DEFAULT_GRAPH_ID, store=store)
-    raise ValueError(f"Unexpected Oxigraph graph name: {graph_name!r}")
+    raise ValueError(f"unexpected Oxigraph graph name: {graph_name!r}")
 
 
-def _graph_identifier_to_ox(graph_identifier: Node) -> ox.DefaultGraph | ox.NamedNode:
+def _graph_identifier_to_ox(
+    graph_identifier: Node,
+) -> ox.BlankNode | ox.DefaultGraph | ox.NamedNode:
     if graph_identifier == DATASET_DEFAULT_GRAPH_ID:
         return ox.DefaultGraph()
     if isinstance(graph_identifier, BNode):
-        return ox.DefaultGraph()
-        # return ox.BlankNode(context.identifier)
+        return ox.BlankNode(graph_identifier.value)
     if isinstance(graph_identifier, URIRef):
         return ox.NamedNode(graph_identifier)
     raise TypeError(graph_identifier)

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib
+from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
 
 from graphs2go.models.rdf.model import Model
 from graphs2go.rdf_stores.rdf_store import RdfStore
@@ -17,11 +18,16 @@ if TYPE_CHECKING:
 
 
 _ModelT = TypeVar("_ModelT", bound=Model)
+_DEFAULT_GRAPH = rdflib.Graph(identifier=DATASET_DEFAULT_GRAPH_ID)
 
 
-def _rdflib_graph_to_quads(rdflib_graph: rdflib.Graph) -> Iterable[_QuadType]:
-    for s, p, o in rdflib_graph:
-        yield s, p, o, rdflib_graph
+def _model_to_quads(model: Model) -> Iterable[_QuadType]:
+    for s, p, o in model.resource.graph:
+        yield s, p, o, (
+            _DEFAULT_GRAPH
+            if isinstance(model.resource.graph.identifier, rdflib.BNode)
+            else model.resource.graph
+        )
 
 
 class Graph:
@@ -46,12 +52,12 @@ class Graph:
         self.__rdf_store = rdf_store
 
     def _add(self, model: Model) -> None:
-        self.__rdf_store.addN(_rdflib_graph_to_quads(model.resource.graph))
+        self.__rdf_store.addN(_model_to_quads(model))
 
     def _add_all(self, models: Iterable[Model]) -> None:
         def models_to_quads() -> Iterable[_QuadType]:
             for model in models:
-                yield from _rdflib_graph_to_quads(model.resource.graph)
+                yield from _model_to_quads(model)
 
         self.__rdf_store.addN(models_to_quads())
 
