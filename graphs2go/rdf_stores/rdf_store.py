@@ -70,5 +70,5 @@ class RdfStore(rdflib.store.Store, ABC):
         if isinstance(descriptor, MemoryRdfStore.Descriptor):
             return MemoryRdfStore()
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
-            return OxigraphRdfStore.open(descriptor, read_only=read_only)
+            return OxigraphRdfStore.open_(descriptor, read_only=read_only)
         raise TypeError(type(descriptor))
