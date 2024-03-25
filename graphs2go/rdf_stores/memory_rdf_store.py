@@ -1,9 +1,8 @@
-from collections.abc import Generator
+from collections.abc import Generator, Iterator
 from dataclasses import dataclass
-from collections.abc import Iterator
 
 from rdflib import URIRef
-from rdflib.graph import Graph, _TripleType, _ContextType, _TriplePatternType
+from rdflib.graph import Graph, _ContextType, _TriplePatternType, _TripleType
 from rdflib.plugins.stores.memory import Memory
 
 from graphs2go.rdf_stores.rdf_store import RdfStore

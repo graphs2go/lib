@@ -6,24 +6,25 @@ from shutil import rmtree
 from typing import TYPE_CHECKING, Any
 
 import pyoxigraph as ox
+import rdflib.store
 from rdflib.graph import (
     DATASET_DEFAULT_GRAPH_ID,
     Graph,
-    _TripleType,
+    _ContextType,
     _QuadType,
     _TriplePatternType,
-    _ContextType,
+    _TripleType,
 )
-from rdflib.term import BNode, Literal, URIRef, Node, Identifier
+from rdflib.term import BNode, Identifier, Literal, Node, URIRef
 
 from graphs2go.rdf_stores.rdf_store import RdfStore
-import rdflib.store
 
 if TYPE_CHECKING:
-    from rdflib.query import Result
-    from rdflib.plugins.sparql.sparql import Query, Update
-    from collections.abc import Iterable, Iterator, Generator, Mapping
+    from collections.abc import Generator, Iterable, Iterator, Mapping
     from pathlib import Path
+
+    from rdflib.plugins.sparql.sparql import Query, Update
+    from rdflib.query import Result
 
 
 _NONE_SINGLETON_TUPLE = (None,)
@@ -32,21 +33,22 @@ _NONE_SINGLETON_TUPLE = (None,)
 def _graph_from_ox(
     graph_name: ox.NamedNode | ox.BlankNode | ox.DefaultGraph, store: rdflib.store.Store
 ) -> Graph:
+    if isinstance(graph_name, ox.DefaultGraph):
+        return Graph(identifier=DATASET_DEFAULT_GRAPH_ID, store=store)
     if isinstance(graph_name, ox.NamedNode):
         return Graph(identifier=URIRef(graph_name.value), store=store)
     if isinstance(graph_name, ox.BlankNode):
         return Graph(identifier=BNode(graph_name.value), store=store)
-    if isinstance(graph_name, ox.DefaultGraph):
-        return Graph(identifier=DATASET_DEFAULT_GRAPH_ID, store=store)
-    raise ValueError(f"Unexpected Oxigraph graph name: {graph_name!r}")
+    raise ValueError(f"unexpected Oxigraph graph name: {graph_name!r}")
 
 
-def _graph_identifier_to_ox(graph_identifier: Node) -> ox.DefaultGraph | ox.NamedNode:
+def _graph_identifier_to_ox(
+    graph_identifier: Node,
+) -> ox.BlankNode | ox.DefaultGraph | ox.NamedNode:
     if graph_identifier == DATASET_DEFAULT_GRAPH_ID:
         return ox.DefaultGraph()
     if isinstance(graph_identifier, BNode):
-        return ox.DefaultGraph()
-        # return ox.BlankNode(context.identifier)
+        return ox.BlankNode(graph_identifier)
     if isinstance(graph_identifier, URIRef):
         return ox.NamedNode(graph_identifier)
     raise TypeError(graph_identifier)
