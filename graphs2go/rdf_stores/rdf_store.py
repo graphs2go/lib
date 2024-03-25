@@ -4,39 +4,24 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import rdflib.store
+from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from rdflib import URIRef
-    from rdflib.store import Store
 
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-class RdfStore(ABC):
+class RdfStore(rdflib.store.Store, ABC):
     @dataclass(frozen=True)
     class Descriptor:
         """
         A picklable dataclass identifying an RDF store. It can be used to open an RDF store.
         """
-
-    def bulk_load(self, *, mime_type: str, source: Path) -> None:
-        """
-        Bulk load the contents of the input into the store.
-
-        No transactional guarantee.
-        """
-
-        ConjunctiveGraph(store=self.rdflib_store).parse(
-            format=mime_type,
-            source=source,
-        )
-
-    @abstractmethod
-    def close(self) -> None:
-        pass
 
     def __enter__(self):
         return self
@@ -45,16 +30,19 @@ class RdfStore(ABC):
         self.close()
 
     @staticmethod
-    def create(
-        *,
-        identifier: URIRef,
-        rdf_store_config: RdfStoreConfig,
-    ) -> RdfStore:
+    def create_(*, identifier: URIRef, rdf_store_config: RdfStoreConfig) -> RdfStore:
+        rdf_store_config_parsed = rdf_store_config.parse()
+
         from .oxigraph_rdf_store import OxigraphRdfStore
 
-        return OxigraphRdfStore.create(
-            identifier=identifier,
-            rdf_store_config=rdf_store_config,
+        oxigraph_subdirectory_path = (
+            rdf_store_config_parsed.directory_path / sanitize_filename(identifier)
+        )
+        oxigraph_subdirectory_path.mkdir(parents=True, exist_ok=True)
+        return OxigraphRdfStore(
+            oxigraph_directory_path=oxigraph_subdirectory_path,
+            read_only=False,
+            transactional=rdf_store_config_parsed.transactional,
         )
 
     @property
@@ -63,23 +51,28 @@ class RdfStore(ABC):
         pass
 
     @property
+    @abstractmethod
     def is_empty(self) -> bool:
-        for _ in self.rdflib_store.triples((None, None, None)):
-            return False
-        return True
+        pass
+
+    def load(self, *, mime_type: str, source: Path) -> None:
+        ConjunctiveGraph(store=self).parse(
+            format=mime_type,
+            source=source,
+        )
 
     @staticmethod
-    def open(descriptor: Descriptor, *, read_only: bool = False) -> RdfStore:
+    def open_(descriptor: Descriptor, *, read_only: bool = False) -> RdfStore:
         from .memory_rdf_store import MemoryRdfStore
         from .oxigraph_rdf_store import OxigraphRdfStore
 
         if isinstance(descriptor, MemoryRdfStore.Descriptor):
             return MemoryRdfStore()
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
-            return OxigraphRdfStore.open(descriptor, read_only=read_only)
+            descriptor_: OxigraphRdfStore.Descriptor = descriptor
+            return OxigraphRdfStore(
+                oxigraph_directory_path=descriptor_.oxigraph_directory_path,
+                read_only=read_only,
+                transactional=descriptor_.transactional,
+            )
         raise TypeError(type(descriptor))
-
-    @property
-    @abstractmethod
-    def rdflib_store(self) -> Store:
-        pass

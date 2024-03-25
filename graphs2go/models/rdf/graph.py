@@ -11,10 +11,17 @@ from graphs2go.rdf_stores.rdf_store import RdfStore
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from rdflib.graph import _QuadType
+
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
 _ModelT = TypeVar("_ModelT", bound=Model)
+
+
+def _rdflib_graph_to_quads(rdflib_graph: rdflib.Graph) -> Iterable[_QuadType]:
+    for s, p, o in rdflib_graph:
+        yield s, p, o, rdflib_graph
 
 
 class Graph:
@@ -34,27 +41,27 @@ class Graph:
     def __init__(self, *, identifier: rdflib.URIRef, rdf_store: RdfStore):
         self.__identifier = identifier
         self.__rdflib_graph = rdflib.ConjunctiveGraph(
-            identifier=identifier, store=rdf_store.rdflib_store
+            identifier=identifier, store=rdf_store
         )
         self.__rdf_store = rdf_store
 
     def _add(self, model: Model) -> None:
-        self.__rdflib_graph += model.resource.graph
+        self.__rdf_store.addN(_rdflib_graph_to_quads(model.resource.graph))
 
     def _add_all(self, models: Iterable[Model]) -> None:
-        for model in models:
-            self._add(model)
+        def models_to_quads() -> Iterable[_QuadType]:
+            for model in models:
+                yield from _rdflib_graph_to_quads(model.resource.graph)
+
+        self.__rdf_store.addN(models_to_quads())
 
     @classmethod
     def create(
-        cls,
-        *,
-        identifier: rdflib.URIRef,
-        rdf_store_config: RdfStoreConfig,
+        cls, *, identifier: rdflib.URIRef, rdf_store_config: RdfStoreConfig
     ) -> Self:
         return cls(
             identifier=identifier,
-            rdf_store=RdfStore.create(
+            rdf_store=RdfStore.create_(
                 identifier=identifier, rdf_store_config=rdf_store_config
             ),
         )
@@ -105,7 +112,7 @@ class Graph:
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
             identifier=descriptor.identifier,
-            rdf_store=RdfStore.open(
+            rdf_store=RdfStore.open_(
                 descriptor.rdf_store_descriptor, read_only=read_only
             ),
         )
