@@ -1,4 +1,5 @@
 from datetime import date, datetime
+
 from graphs2go.models.cypher.property_value import PropertyValue
 
 

@@ -1,6 +1,4 @@
-from .create_node_statement import (
-    CreateNodeStatement as CreateNodeStatement,
-)
+from .create_node_statement import CreateNodeStatement as CreateNodeStatement
 from .create_relationship_statement import (
     CreateRelationshipStatement as CreateRelationshipStatement,
 )
