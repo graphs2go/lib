@@ -41,7 +41,7 @@ class RdfStoreTest:
         assert isinstance(descriptor, RdfStore.Descriptor)
         rdf_store.close()
 
-        with rdf_store.__class__.open(
+        with rdf_store.__class__.open_(
             descriptor, read_only=read_only
         ) as open_rdf_store:
             assert not open_rdf_store.is_empty

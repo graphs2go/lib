@@ -276,6 +276,12 @@ class OxigraphRdfStore(RdfStore):
     def gc(self) -> None:
         pass
 
+    @property
+    def is_empty(self) -> bool:
+        for _ in self.triples((None, None, None)):
+            return False
+        return True
+
     def __len__(self, **_) -> int:  # noqa: ANN003
         raise NotImplementedError
 
