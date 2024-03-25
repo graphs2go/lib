@@ -4,9 +4,8 @@ import stringcase
 from dagster import get_dagster_logger
 from rdflib import URIRef
 
-from graphs2go.models import interchange, cypher
+from graphs2go.models import cypher, interchange
 from graphs2go.models.cypher.node_pattern import NodePattern
-
 
 _PRIMARY_NODE_LABEL = "NODE"
 

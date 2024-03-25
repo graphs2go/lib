@@ -1,10 +1,10 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import stringcase
 
 from graphs2go.loaders.directory_loader import DirectoryLoader
 from graphs2go.models import cypher
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from io import TextIOWrapper

@@ -1,6 +1,7 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from graphs2go.models.cypher.properties import Properties
 

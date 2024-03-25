@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 from typing import Self
 
-from graphs2go.models.cypher.property_value import PropertyValue
-from graphs2go.models.cypher.properties import Properties
 from graphs2go.models.cypher.node_pattern import NodePattern
+from graphs2go.models.cypher.properties import Properties
+from graphs2go.models.cypher.property_value import PropertyValue
 from graphs2go.models.cypher.statement import Statement
 
 
