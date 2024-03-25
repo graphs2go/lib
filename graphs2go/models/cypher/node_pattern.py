@@ -10,11 +10,12 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class NodePattern:
-    value: str
+    cypher_str: str
+    variable: str
 
     class Builder:
         def __init__(self):
-            self.__labels = []
+            self.__labels: list[str] = []
             self.__properties = Properties()
             self.__variable = ""
 
@@ -32,7 +33,13 @@ class NodePattern:
             parts = [f"{self.__variable}:{':'.join(self.__labels)}"]
             if self.__properties:
                 parts.append("{" + str(self.__properties) + "}")
-            return NodePattern("(" + " ".join(parts) + ")")
+            return NodePattern(
+                cypher_str="(" + " ".join(parts) + ")", variable=self.__variable
+            )
+
+        def set_variable(self, variable: "") -> Self:
+            self.__variable = variable
+            return self
 
     @classmethod
     def builder(cls) -> Builder:

@@ -15,13 +15,13 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
         tuple(s for s in cypher_statements if isinstance(s, cypher.CreateNodeStatement))
     ) == len(tuple(interchange_graph.nodes()))
 
-    # assert len(
-    #     tuple(
-    #         s
-    #         for s in cypher_statements
-    #         if isinstance(s, cypher.CreateRelationshipStatement)
-    #     )
-    # ) == sum(
-    #     len(tuple(interchange_node.relationships))
-    #     for interchange_node in interchange_graph.nodes()
-    # )
+    assert len(
+        tuple(
+            s
+            for s in cypher_statements
+            if isinstance(s, cypher.CreateRelationshipStatement)
+        )
+    ) == sum(
+        len(tuple(interchange_node.relationships))
+        for interchange_node in interchange_graph.nodes()
+    )

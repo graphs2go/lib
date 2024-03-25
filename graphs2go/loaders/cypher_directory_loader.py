@@ -32,4 +32,4 @@ class CypherDirectoryLoader(DirectoryLoader):
             self.__open_files_by_name[file_name] = open_file = Path.open(
                 self._directory_path / file_name, "w+"
             )
-        open_file.write(cypher_statement.value + "\n\n")
+        open_file.write(cypher_statement.cypher_str + "\n\n")

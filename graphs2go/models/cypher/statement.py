@@ -9,7 +9,7 @@ class Statement:
     Abstract base class for Cypher statements.
     """
 
-    value: str
+    cypher_str: str
 
     class Builder(ABC):
         @abstractmethod

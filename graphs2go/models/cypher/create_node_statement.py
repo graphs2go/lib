@@ -22,7 +22,7 @@ class CreateNodeStatement(Statement):
 
         def build(self) -> CreateNodeStatement:
             return CreateNodeStatement(
-                f"CREATE {self.__node_pattern_builder.build().value};"
+                cypher_str=f"CREATE {self.__node_pattern_builder.build().cypher_str};"
             )
 
     @classmethod
