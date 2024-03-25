@@ -6,7 +6,7 @@ from rdflib import URIRef
 from graphs2go.models import cypher, interchange
 from graphs2go.models.cypher.node_pattern import NodePattern
 
-_PRIMARY_NODE_LABEL = "NODE"
+_PRIMARY_NODE_LABEL = "Node"
 
 
 def transform_interchange_graph_to_cypher_statements(
@@ -112,3 +112,12 @@ def transform_interchange_graph_to_cypher_statements(
                 )
 
             yield create_relationship_statement_builder.build()
+
+    # Interchange relationship objects that don't refer to interchange nodes should also be represented in the graph.
+    for external_interchange_relation_object in (
+        interchange_relationship_objects - interchange_node_uris
+    ):
+        yield cypher.CreateNodeStatement.builder(
+            id_=uri_to_node_id(external_interchange_relation_object),
+            label=_PRIMARY_NODE_LABEL,
+        ).build()
