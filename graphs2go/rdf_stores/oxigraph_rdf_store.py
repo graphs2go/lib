@@ -6,24 +6,25 @@ from shutil import rmtree
 from typing import TYPE_CHECKING, Any
 
 import pyoxigraph as ox
+import rdflib.store
 from rdflib.graph import (
     DATASET_DEFAULT_GRAPH_ID,
     Graph,
-    _TripleType,
+    _ContextType,
     _QuadType,
     _TriplePatternType,
-    _ContextType,
+    _TripleType,
 )
-from rdflib.term import BNode, Literal, URIRef, Node, Identifier
+from rdflib.term import BNode, Identifier, Literal, Node, URIRef
 
 from graphs2go.rdf_stores.rdf_store import RdfStore
-import rdflib.store
 
 if TYPE_CHECKING:
-    from rdflib.query import Result
-    from rdflib.plugins.sparql.sparql import Query, Update
-    from collections.abc import Iterable, Iterator, Generator, Mapping
+    from collections.abc import Generator, Iterable, Iterator, Mapping
     from pathlib import Path
+
+    from rdflib.plugins.sparql.sparql import Query, Update
+    from rdflib.query import Result
 
 
 _NONE_SINGLETON_TUPLE = (None,)
