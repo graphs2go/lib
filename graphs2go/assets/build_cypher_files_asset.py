@@ -24,7 +24,7 @@ def build_cypher_files_asset(
         ) as open_interchange_graph, CypherDirectoryLoader(
             directory_path=cypher_directory_path
         ) as loader:
-            logger.info("loading Cypher files", cypher_directory_path)
+            logger.info("loading Cypher files to %s", cypher_directory_path)
             for cypher_statement in tqdm(
                 transform_interchange_graph_to_cypher_statements(
                     open_interchange_graph.rdflib_graph
