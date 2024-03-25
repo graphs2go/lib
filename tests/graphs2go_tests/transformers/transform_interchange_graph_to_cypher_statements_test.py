@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from graphs2go.models import interchange, cypher
 from graphs2go.transformers.transform_interchange_graph_to_cypher_statements import (
     transform_interchange_graph_to_cypher_statements,
