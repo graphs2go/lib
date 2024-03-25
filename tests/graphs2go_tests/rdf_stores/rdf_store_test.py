@@ -13,11 +13,11 @@ class RdfStoreTest:
     def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:  # noqa: PT004
         raise NotImplementedError
 
-    def test_add_all(self, rdf_store: RdfStore) -> None:
+    def test_addN(self, rdf_store: RdfStore) -> None:
         assert rdf_store.is_empty
         graph = Graph()
         graph.parse(source=Path(__file__).parent / "example.ttl")
-        rdf_store.add_all((s, p, o, graph) for s, p, o in graph)
+        rdf_store.addN((s, p, o, graph) for s, p, o in graph)
         assert not rdf_store.is_empty
 
     def test_load(self, rdf_store: RdfStore) -> None:
@@ -51,6 +51,3 @@ class RdfStoreTest:
 
     def test_open_read_write(self, rdf_store: RdfStore) -> None:
         self.__test_open(rdf_store=rdf_store, read_only=False)
-
-    def test_rdflib_store(self, rdf_store: RdfStore) -> None:
-        assert isinstance(rdf_store.rdflib_store, rdflib.store.Store)

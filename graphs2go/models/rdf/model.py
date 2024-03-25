@@ -70,7 +70,7 @@ class Model(ABC):
 
     @classmethod
     def _create_resource(cls, uri: URIRef) -> Resource:
-        resource = Graph().resource(uri)
+        resource = Graph(identifier=uri).resource(uri)
         resource.add(RDF.type, cls.primary_rdf_type())
         return resource
 

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from rdflib import ConjunctiveGraph
+import rdflib.store
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -12,12 +13,11 @@ if TYPE_CHECKING:
 
     from rdflib import URIRef
     from rdflib.graph import _QuadType
-    from rdflib.store import Store
 
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-class RdfStore(ABC):
+class RdfStore(rdflib.store.Store, ABC):
     @dataclass(frozen=True)
     class Descriptor:
         """
@@ -52,16 +52,12 @@ class RdfStore(ABC):
         pass
 
     @property
+    @abstractmethod
     def is_empty(self) -> bool:
-        for _ in self.rdflib_store.triples((None, None, None)):
-            return False
-        return True
-
-    def add_all(self, quads: Iterable[_QuadType]) -> None:
-        self.rdflib_store.addN(quads)
+        pass
 
     def load(self, *, mime_type: str, source: Path) -> None:
-        ConjunctiveGraph(store=self.rdflib_store).parse(
+        ConjunctiveGraph(store=self).parse(
             format=mime_type,
             source=source,
         )
@@ -76,8 +72,3 @@ class RdfStore(ABC):
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
             return OxigraphRdfStore.open(descriptor, read_only=read_only)
         raise TypeError(type(descriptor))
-
-    @property
-    @abstractmethod
-    def rdflib_store(self) -> Store:
-        pass

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Iterator, Tuple
 
 import oxrdflib
 import pyoxigraph
@@ -69,6 +69,34 @@ def _quad_to_ox(quad: _QuadType) -> ox.Quad:
         raise TypeError(type(c))
 
     return ox.Quad(s_ox, p_ox, o_ox, c_ox)
+
+
+class _OxigraphRdflibStore(oxrdflib.OxigraphStore):
+    def triples(
+        self,
+        triple_pattern: _TriplePattern,
+        context: Optional[Graph] = None,
+    ) -> Iterator[Tuple[_Triple, Iterator[Optional[Graph]]]]:
+        for ox_quad in self._inner.quads_for_pattern(
+            *_to_ox_quad_pattern(triple_pattern, context)
+        ):
+            pass
+
+        # return (
+        #     (
+        #         (_from_ox(q.subject), _from_ox(q.predicate), _from_ox(q.object)),
+        #         iter(
+        #             (
+        #                 (
+        #                     _from_ox_graph_name(q.graph_name, self)
+        #                     if q.graph_name != ox.DefaultGraph()
+        #                     else None
+        #                 ),
+        #             )
+        #         ),
+        #     )
+        #     for q in
+        # )
 
 
 class OxigraphRdfStore(RdfStore):
