@@ -24,12 +24,6 @@ _NONE_SINGLETON_TUPLE = (None,)
 _TriplePattern = tuple[Node | None, Node | None, Node | None]
 
 
-def _context_to_ox(context: Graph):
-    if context is None:
-        return None
-    return _graph_identifier_to_ox(context.identifier)
-
-
 def _graph_from_ox(
     graph_name: ox.NamedNode | ox.BlankNode | ox.DefaultGraph, store: rdflib.store.Store
 ) -> Graph:
@@ -93,7 +87,7 @@ def _quad_to_ox(quad: _QuadType) -> ox.Quad:
         _subject_to_ox(quad[0]),
         _predicate_to_ox(quad[1]),
         _object_to_ox(quad[2]),
-        _context_to_ox(quad[3]),
+        _graph_identifier_to_ox(quad[3].identifier),
     )
 
 
@@ -135,7 +129,7 @@ def _triple_to_ox(triple: _TripleType, context: Graph) -> ox.Quad:
         _subject_to_ox(triple[0]),
         _predicate_to_ox(triple[1]),
         _object_to_ox(triple[2]),
-        _context_to_ox(context),
+        _graph_identifier_to_ox(context.identifier),
     )
 
 
