@@ -44,12 +44,16 @@ class Properties(dict[str, PropertyValue]):
             return "null"
         if isinstance(value, bool):
             return "true" if value else "false"
-        if isinstance(value, date | datetime):
-            return value.isoformat()
+        if isinstance(
+            value, datetime
+        ):  # datetime inherits from date, so check it first
+            return f'datetime("{value.isoformat()}")'
+        if isinstance(value, date):
+            return f'date("{value.isoformat()}")'
         if isinstance(value, float | int):
             return str(value)
         if isinstance(value, str):
-            return Properties.__escape_value(value)
+            return '"' + Properties.__escape_value(value) + '"'
         if isinstance(value, tuple):
             return (
                 "["
