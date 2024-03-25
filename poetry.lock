@@ -1573,6 +1573,16 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
+name = "stringcase"
+version = "1.2.0"
+description = "String case converter."
+optional = false
+python-versions = "*"
+files = [
+    {file = "stringcase-1.2.0.tar.gz", hash = "sha256:48a06980661908efe8d9d34eab2b6c13aefa2163b3ced26972902e3bdfd87008"},
+]
+
+[[package]]
 name = "structlog"
 version = "24.1.0"
 description = "Structured Logging for Python"
@@ -1768,4 +1778,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "64d02cab88190ebf201dbbc3d3c48d085b84c42fe58f14ef11486f4d62c494f7"
+content-hash = "fb9f40495f85baec20d09a96cee8a89d0e0c231889fe15196a936c7e7dac42e9"

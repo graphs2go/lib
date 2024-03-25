@@ -10,7 +10,7 @@ from rdflib import RDF, Graph, Literal, URIRef
 from rdflib.resource import Resource
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Generator, Iterable
 
     from rdflib.term import Node
 
@@ -255,12 +255,18 @@ class Model(ABC):
         raise KeyError(f"{self.uri} missing required {predicate}")
 
     @property
-    def rdf_types(self) -> tuple[URIRef, ...]:
-        return tuple(self._values(RDF.type, self._map_term_to_uri))
+    def rdf_types(self) -> Iterable[URIRef]:
+        return self._values(RDF.type, self._map_term_to_uri)
 
     @property
     def resource(self) -> Resource:
         return self.__resource
+
+    @property
+    def secondary_rdf_types(self) -> Iterable[URIRef]:
+        for rdf_type in self.rdf_types:
+            if rdf_type != self.primary_rdf_type():
+                yield rdf_type
 
     @property
     def uri(self) -> URIRef:
