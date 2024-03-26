@@ -61,6 +61,10 @@ class Graph:
 
         self.__rdf_store.addN(models_to_quads())
 
+    def close(self) -> None:
+        self.__rdflib_graph.close()
+        self.__rdf_store.close()
+
     @classmethod
     def create(
         cls, *, identifier: rdflib.URIRef, rdf_store_config: RdfStoreConfig
@@ -83,8 +87,7 @@ class Graph:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
-        self.__rdflib_graph.close()
-        self.__rdf_store.close()
+        self.close()
 
     @property
     def identifier(self) -> rdflib.URIRef:
