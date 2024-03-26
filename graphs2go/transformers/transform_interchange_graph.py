@@ -9,17 +9,18 @@ from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.transformers.parallel_transform import parallel_transform
 
 _INTERCHANGE_NODE_BATCH_SIZE = 100
-_OutputModelT = TypeVar("_OutputModelT")
-_TransformInterchangeNode = Callable[[interchange.Node], Iterable[_OutputModelT]]
-_InputT = tuple[interchange.Graph.Descriptor, URIRef, _TransformInterchangeNode]
+_OutputT = TypeVar("_OutputT")
+_TransformInterchangeNode = Callable[[interchange.Node], Iterable[_OutputT]]
+_ConsumerInputT = tuple[interchange.Graph.Descriptor, _TransformInterchangeNode]
+_ProducerInputT = tuple[interchange.Graph.Descriptor, URIRef]
 
 
 def _consumer(
-    input_: _InputT,
+    input_: _ConsumerInputT,
     output_queue: Queue,
     work_queue: JoinableQueue,
 ) -> None:
-    (interchange_graph_descriptor, _, transform_interchange_node) = input_
+    (interchange_graph_descriptor, transform_interchange_node) = input_
 
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
@@ -31,7 +32,7 @@ def _consumer(
                 work_queue.task_done()
                 break  # Signal from the producer there's no more work
 
-            outputs: list[_OutputModelT] = []  # type: ignore
+            outputs: list[_OutputT] = []  # type: ignore
             for interchange_node_uri in interchange_node_uris:
                 interchange_node = interchange_graph.node_by_uri(interchange_node_uri)
                 outputs.extend(transform_interchange_node(interchange_node))
@@ -40,10 +41,10 @@ def _consumer(
 
 
 def _producer(
-    input_: _InputT,
+    input_: _ProducerInputT,
     work_queue: JoinableQueue,
 ) -> None:
-    interchange_graph_descriptor, interchange_node_rdf_type, _ = input_
+    interchange_graph_descriptor, interchange_node_rdf_type = input_
 
     interchange_node_uris_batch: list[URIRef] = []
     with interchange.Graph.open(
@@ -67,7 +68,7 @@ def transform_interchange_graph(
     transform_interchange_node: _TransformInterchangeNode,
     interchange_node_rdf_type: URIRef = INTERCHANGE.Node,
     in_process: bool = False
-) -> Iterable[_OutputModelT]:
+) -> Iterable[_OutputT]:
     if in_process:
         with interchange.Graph.open(
             interchange_graph_descriptor, read_only=True
@@ -80,10 +81,13 @@ def transform_interchange_graph(
 
     yield from parallel_transform(
         consumer=_consumer,
-        input_=(
+        consumer_input=(
             interchange_graph_descriptor,
-            interchange_node_rdf_type,
             transform_interchange_node,
         ),
         producer=_producer,
+        producer_input=(
+            interchange_graph_descriptor,
+            interchange_node_rdf_type,
+        ),
     )

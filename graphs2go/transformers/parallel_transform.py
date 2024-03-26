@@ -4,18 +4,19 @@ from typing import TypeVar
 
 from dagster import get_dagster_logger
 
-_InputT = TypeVar("_InputT")
+_ConsumerInputT = TypeVar("_ConsumerInputT")
 _OutputT = TypeVar("_OutputT")
 _OutputQueue = Queue
+_ProducerInputT = TypeVar("_ProducerInputT")
 _WorkQueue = JoinableQueue
 
-_Consumer = Callable[[_InputT, _OutputQueue, _WorkQueue], None]
-_Producer = Callable[[_InputT, _WorkQueue], None]
+_Consumer = Callable[[_ConsumerInputT, _OutputQueue, _WorkQueue], None]
+_Producer = Callable[[_ProducerInputT, _WorkQueue], None]
 
 
 def _consumer_wrapper(
     consumer: _Consumer,
-    input_: _InputT,
+    input_: _ConsumerInputT,
     output_queue: _OutputQueue,
     work_queue: _WorkQueue,
 ) -> None:
@@ -26,7 +27,7 @@ def _consumer_wrapper(
 
 def _producer_wrapper(
     consumer_count: int,
-    input_: _InputT,
+    input_: _ProducerInputT,
     producer: _Producer,
     work_queue: _WorkQueue,
 ) -> None:
@@ -41,8 +42,9 @@ def _producer_wrapper(
 def parallel_transform(
     *,
     consumer: _Consumer,
-    input_: _InputT,
+    consumer_input: _ConsumerInputT,
     producer: _Producer,
+    producer_input: _ProducerInputT
 ) -> Iterable[_OutputT]:
     """
     Generic function for performing parallel transformation of an input to zero or more outputs.
@@ -62,7 +64,7 @@ def parallel_transform(
             target=_consumer_wrapper,
             args=(
                 consumer,
-                input_,
+                consumer_input,
                 output_queue,
                 work_queue,
             ),
@@ -81,7 +83,7 @@ def parallel_transform(
         target=_producer_wrapper,
         args=(
             consumer_count,
-            input_,
+            producer_input,
             producer,
             work_queue,
         ),
