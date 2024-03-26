@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable, Iterable
 from multiprocessing import JoinableQueue, Queue, Process
 from typing import TypeVar
@@ -44,17 +45,20 @@ def parallel_transform(
     consumer: _Consumer,
     consumer_input: _ConsumerInputT,
     producer: _Producer,
-    producer_input: _ProducerInputT
+    producer_input: _ProducerInputT,
+    consumer_count: int | None = None
 ) -> Iterable[_OutputT]:
     """
     Generic function for performing parallel transformation of an input to zero or more outputs.
     """
 
+    if consumer_count is None:
+        consumer_count = 2  # os.cpu_count()
+
     logger = get_dagster_logger()
     output_queue: _OutputQueue = Queue()
     work_queue: _WorkQueue = JoinableQueue()
 
-    consumer_count = 2  # os.cpu_count()
     logger.info(
         "starting %d transformation consumer processes",
         consumer_count,
