@@ -14,7 +14,19 @@ from graphs2go.utils.uuid_urn import uuid_urn
 
 
 @pytest.fixture()
-def interchange_graph(tmp_path: Path) -> Iterable[interchange.Graph]:
+def interchange_graph(
+    interchange_graph_descriptor: interchange.Graph.Descriptor,
+) -> Iterable[interchange.Graph]:
+    with interchange.Graph.open(
+        interchange_graph_descriptor, read_only=True
+    ) as interchange_graph:
+        yield interchange_graph
+
+
+@pytest.fixture()
+def interchange_graph_descriptor(
+    tmp_path: Path,
+) -> interchange.Graph.Descriptor:
     interchange_graph_identifier = uuid_urn()
     with interchange.Graph(
         identifier=interchange_graph_identifier,
@@ -75,14 +87,7 @@ def interchange_graph(tmp_path: Path) -> Iterable[interchange.Graph]:
                 ).build()
             )
 
-        yield graph
-
-
-@pytest.fixture()
-def interchange_graph_descriptor(
-    interchange_graph: interchange.Graph,
-) -> interchange.Graph.Descriptor:
-    return interchange_graph.descriptor
+        return graph.descriptor
 
 
 @pytest.fixture()
