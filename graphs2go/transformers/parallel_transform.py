@@ -45,7 +45,7 @@ def parallel_transform(
     producer: _Producer,
 ) -> Iterable[_OutputT]:
     """
-    Generic function for performing parallel transformation of an input to an output.
+    Generic function for performing parallel transformation of an input to zero or more outputs.
     """
 
     logger = get_dagster_logger()

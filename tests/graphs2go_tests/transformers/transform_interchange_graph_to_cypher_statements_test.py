@@ -4,22 +4,29 @@ from graphs2go.transformers.transform_interchange_graph_to_cypher_statements imp
 )
 
 
-def test_transform(interchange_graph: interchange.Graph) -> None:
+def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -> None:
     cypher_statements = tuple(
-        transform_interchange_graph_to_cypher_statements(interchange_graph)
+        transform_interchange_graph_to_cypher_statements(interchange_graph_descriptor)
     )
 
-    assert len(
-        tuple(s for s in cypher_statements if isinstance(s, cypher.CreateNodeStatement))
-    ) == len(tuple(interchange_graph.nodes()))
+    with interchange.Graph.open(
+        interchange_graph_descriptor, read_only=True
+    ) as interchange_graph:
+        assert len(
+            tuple(
+                s
+                for s in cypher_statements
+                if isinstance(s, cypher.CreateNodeStatement)
+            )
+        ) == len(tuple(interchange_graph.nodes()))
 
-    assert len(
-        tuple(
-            s
-            for s in cypher_statements
-            if isinstance(s, cypher.CreateRelationshipStatement)
+        assert len(
+            tuple(
+                s
+                for s in cypher_statements
+                if isinstance(s, cypher.CreateRelationshipStatement)
+            )
+        ) == sum(
+            len(tuple(interchange_node.relationships))
+            for interchange_node in interchange_graph.nodes()
         )
-    ) == sum(
-        len(tuple(interchange_node.relationships))
-        for interchange_node in interchange_graph.nodes()
-    )
