@@ -21,7 +21,7 @@ def build_interchange_file_asset(
                 directory_path=output_config.parse().directory_path / "interchange",
                 rdf_format=rdf_format,
             ) as loader, interchange.Graph.open(
-                interchange_graph
+                interchange_graph, read_only=True
             ) as open_interchange_graph:
                 rdflib_graph = open_interchange_graph.rdflib_graph
                 rdflib_graph.bind("interchange", INTERCHANGE)
