@@ -53,7 +53,9 @@ def parallel_transform(
     """
 
     if consumer_count is None:
-        consumer_count = 2  # os.cpu_count()
+        consumer_count = os.cpu_count()
+        if consumer_count > 4:
+            consumer_count = 4
 
     logger = get_dagster_logger()
     output_queue: _OutputQueue = Queue()
@@ -102,7 +104,7 @@ def parallel_transform(
         if output_model_batch is None:
             exited_consumer_count += 1
             logger.info(
-                "%d interchange graph transformation consumers exited",
+                "%d transformation consumers exited",
                 exited_consumer_count,
             )
             if exited_consumer_count == consumer_count:
