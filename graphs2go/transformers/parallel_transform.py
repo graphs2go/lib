@@ -54,7 +54,7 @@ def parallel_transform(
 
     if consumer_count is None:
         consumer_count = os.cpu_count()
-        if consumer_count > 4:
+        if consumer_count is None or consumer_count > 4:
             consumer_count = 4
 
     logger = get_dagster_logger()
