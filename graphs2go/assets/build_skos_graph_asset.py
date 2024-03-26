@@ -21,9 +21,7 @@ def build_skos_graph_asset(
     ) -> skos.Graph.Descriptor:
         logger = get_dagster_logger()
 
-        with interchange.Graph.open(
-            interchange_graph, read_only=True
-        ) as open_interchange_graph, skos.Graph.create(
+        with skos.Graph.create(
             identifier=URIRef(f"urn:skos:{quote(interchange_graph.identifier)}"),
             rdf_store_config=rdf_store_config,
         ) as open_skos_graph:
@@ -34,7 +32,7 @@ def build_skos_graph_asset(
             logger.info("loading SKOS graph")
             open_skos_graph.add_all(
                 tqdm(
-                    transform_interchange_graph_to_skos_models(open_interchange_graph),
+                    transform_interchange_graph_to_skos_models(interchange_graph),
                     desc="SKOS graph models",
                 )
             )

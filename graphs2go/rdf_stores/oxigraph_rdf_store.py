@@ -178,11 +178,16 @@ class OxigraphRdfStore(RdfStore):
         self.__namespace_for_prefix: dict[str, URIRef] = {}
         self.__prefix_for_namespace: dict[URIRef, str] = {}
         self.__oxigraph_directory_path = oxigraph_directory_path
-        self.__delegate = (
-            ox.Store.secondary(str(oxigraph_directory_path))
-            if read_only
-            else ox.Store(oxigraph_directory_path)
-        )
+        if read_only:
+            if not oxigraph_directory_path.is_dir():
+                raise ValueError(
+                    "store opened read-only but directory %s does not exist or is not a directory",
+                    oxigraph_directory_path,
+                )
+            self.__delegate = ox.Store.read_only(str(oxigraph_directory_path))
+        else:
+            oxigraph_directory_path.mkdir(exist_ok=True, parents=True)
+            self.__delegate = ox.Store(oxigraph_directory_path)
         self.__transactional = transactional
 
     def add(

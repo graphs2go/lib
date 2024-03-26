@@ -19,16 +19,10 @@ def build_cypher_files_asset(
         logger = get_dagster_logger()
         cypher_directory_path = output_config.parse().directory_path / "cypher"
 
-        with interchange.Graph.open(
-            interchange_graph, read_only=True
-        ) as open_interchange_graph, CypherDirectoryLoader(
-            directory_path=cypher_directory_path
-        ) as loader:
+        with CypherDirectoryLoader(directory_path=cypher_directory_path) as loader:
             logger.info("loading Cypher files to %s", cypher_directory_path)
             for cypher_statement in tqdm(
-                transform_interchange_graph_to_cypher_statements(
-                    open_interchange_graph
-                ),
+                transform_interchange_graph_to_cypher_statements(interchange_graph),
                 desc="Cypher statements",
             ):
                 loader.load(cypher_statement)
