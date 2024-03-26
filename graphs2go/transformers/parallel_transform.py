@@ -1,6 +1,6 @@
 import os
 from collections.abc import Callable, Iterable
-from multiprocessing import JoinableQueue, Queue, Process
+from multiprocessing import JoinableQueue, Process, Queue
 from typing import TypeVar
 
 from dagster import get_dagster_logger
