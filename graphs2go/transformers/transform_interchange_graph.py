@@ -31,7 +31,7 @@ def _consumer(
                 work_queue.task_done()
                 break  # Signal from the producer there's no more work
 
-            outputs: list[_OutputModelT] = []
+            outputs: list[_OutputModelT] = []  # type: ignore
             for interchange_node_uri in interchange_node_uris:
                 interchange_node = interchange_graph.node_by_uri(interchange_node_uri)
                 outputs.extend(transform_interchange_node(interchange_node))

@@ -9,7 +9,7 @@ _OutputT = TypeVar("_OutputT")
 _OutputQueue = Queue
 _WorkQueue = JoinableQueue
 
-_Consumer = [[_InputT, _OutputQueue, _WorkQueue], None]
+_Consumer = Callable[[_InputT, _OutputQueue, _WorkQueue], None]
 _Producer = Callable[[_InputT, _WorkQueue], None]
 
 
@@ -49,8 +49,8 @@ def parallel_transform(
     """
 
     logger = get_dagster_logger()
-    output_queue = Queue()
-    work_queue = JoinableQueue()
+    output_queue: _OutputQueue = Queue()
+    work_queue: _WorkQueue = JoinableQueue()
 
     consumer_count = 2  # os.cpu_count()
     logger.info(

@@ -13,7 +13,7 @@ from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.utils.uuid_urn import uuid_urn
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def interchange_graph(tmp_path: Path) -> Iterable[interchange.Graph]:
     interchange_graph_identifier = uuid_urn()
     with interchange.Graph(
@@ -78,26 +78,26 @@ def interchange_graph(tmp_path: Path) -> Iterable[interchange.Graph]:
         yield graph
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def interchange_graph_descriptor(
     interchange_graph: interchange.Graph,
 ) -> interchange.Graph.Descriptor:
     return interchange_graph.descriptor
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def interchange_label(interchange_node: interchange.Node) -> interchange.Label:
     return next(iter(interchange_node.labels))
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def interchange_node(interchange_graph: interchange.Graph) -> interchange.Node:
     for node in interchange_graph.nodes():
         return node
     pytest.fail("no nodes")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def interchange_property(interchange_graph: interchange.Graph) -> interchange.Property:
     for node in interchange_graph.nodes():
         for property_ in node.properties:
@@ -105,7 +105,7 @@ def interchange_property(interchange_graph: interchange.Graph) -> interchange.Pr
     pytest.fail("no properties")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def interchange_relationship(
     interchange_graph: interchange.Graph,
 ) -> interchange.Relationship:

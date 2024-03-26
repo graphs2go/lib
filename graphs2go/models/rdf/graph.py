@@ -104,7 +104,9 @@ class Graph:
         ):
             yield model_class(resource=self.__rdflib_graph.resource(model_uri))
 
-    def _model_uris_by_rdf_type(self, rdf_type: rdflib.URIRef) -> Iterable[_ModelT]:
+    def _model_uris_by_rdf_type(
+        self, rdf_type: rdflib.URIRef
+    ) -> Iterable[rdflib.URIRef]:
         yielded_model_uris: set[rdflib.URIRef] = set()
         for model_uri in self.__rdflib_graph.subjects(
             predicate=rdflib.RDF.type,

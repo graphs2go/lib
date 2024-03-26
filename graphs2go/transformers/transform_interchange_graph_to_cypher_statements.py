@@ -145,18 +145,19 @@ def transform_interchange_graph_to_cypher_statements(
     interchange_node_uris: set[URIRef] = set()
     interchange_relationship_objects: set[URIRef] = set()
 
+    output_model: _OutputModel
     for output_model in transform_interchange_graph(
         interchange_graph_descriptor=interchange_graph_descriptor,
         transform_interchange_node=_transform_interchange_node,
         # in_process=True,
     ):
-        interchange_node_uris.add(output_model.interchange_node_uri)
+        interchange_node_uris.add(output_model.interchange_node_uri)  # type: ignore
         for (
             interchange_relationship_object
-        ) in output_model.interchange_relationship_objects:
+        ) in output_model.interchange_relationship_objects:  # type: ignore
             interchange_relationship_objects.add(interchange_relationship_object)
 
-        yield from output_model.cypher_statements
+        yield from output_model.cypher_statements  # type: ignore
 
     # Interchange relationship objects that don't refer to interchange nodes should also be represented in the graph.
     with interchange.Graph.open(
