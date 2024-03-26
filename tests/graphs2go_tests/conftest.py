@@ -1,4 +1,6 @@
 import itertools
+from collections.abc import Iterable
+from pathlib import Path
 
 import pytest
 from rdflib import SKOS, Literal
@@ -6,66 +8,81 @@ from rdflib import SKOS, Literal
 from graphs2go.models import interchange, skos
 from graphs2go.models.label_type import LabelType
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
+from graphs2go.rdf_stores.oxigraph_rdf_store import OxigraphRdfStore
+from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.utils.uuid_urn import uuid_urn
 
 
-@pytest.fixture(scope="session")
-def interchange_graph() -> interchange.Graph:
-    graph = interchange.Graph(identifier=uuid_urn(), rdf_store=MemoryRdfStore())
-
-    concept_scheme = (
-        interchange.Node.builder(uri=uuid_urn())
-        .add_rdf_type(SKOS.ConceptScheme)
-        .build()
-    )
-    graph.add(concept_scheme)
-    graph.add(
-        interchange.Label.builder(
-            literal_form=Literal("label"),
-            subject=concept_scheme,
-            type_=LabelType.PREFERRED,
-        ).build()
-    )
-
-    concepts = tuple(
-        interchange.Node.builder(uri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
-        for _ in range(2)
-    )
-    for concept_i, concept in enumerate(concepts):
-        graph.add(concept)
-
+@pytest.fixture(scope="function")
+def interchange_graph(tmp_path: Path) -> Iterable[interchange.Graph]:
+    interchange_graph_identifier = uuid_urn()
+    with interchange.Graph(
+        identifier=interchange_graph_identifier,
+        rdf_store=OxigraphRdfStore.create_(
+            identifier=interchange_graph_identifier,
+            rdf_store_config=RdfStoreConfig.default(directory_path_default=tmp_path),
+        ),
+    ) as graph:
+        concept_scheme = (
+            interchange.Node.builder(uri=uuid_urn())
+            .add_rdf_type(SKOS.ConceptScheme)
+            .build()
+        )
+        graph.add(concept_scheme)
         graph.add(
             interchange.Label.builder(
-                literal_form=Literal("label" + str(concept_i + 1)),
-                subject=concept,
+                literal_form=Literal("label"),
+                subject=concept_scheme,
                 type_=LabelType.PREFERRED,
             ).build()
         )
 
-        graph.add(
-            interchange.Property.builder(
-                subject=concept,
-                predicate=SKOS.definition,
-                object_=Literal("definition" + str(concept_i + 1)),
-            ).build()
+        concepts = tuple(
+            interchange.Node.builder(uri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
+            for _ in range(2)
         )
+        for concept_i, concept in enumerate(concepts):
+            graph.add(concept)
 
-        graph.add(
-            interchange.Relationship.builder(
-                object_=concept_scheme,
-                predicate=SKOS.inScheme,
-                subject=concept,
-            ).build()
-        )
+            graph.add(
+                interchange.Label.builder(
+                    literal_form=Literal("label" + str(concept_i + 1)),
+                    subject=concept,
+                    type_=LabelType.PREFERRED,
+                ).build()
+            )
 
-    for concept1, concept2 in itertools.combinations(concepts, 2):
-        graph.add(
-            interchange.Relationship.builder(
-                subject=concept1.uri, predicate=SKOS.broader, object_=concept2.uri
-            ).build()
-        )
+            graph.add(
+                interchange.Property.builder(
+                    subject=concept,
+                    predicate=SKOS.definition,
+                    object_=Literal("definition" + str(concept_i + 1)),
+                ).build()
+            )
 
-    return graph
+            graph.add(
+                interchange.Relationship.builder(
+                    object_=concept_scheme,
+                    predicate=SKOS.inScheme,
+                    subject=concept,
+                ).build()
+            )
+
+        for concept1, concept2 in itertools.combinations(concepts, 2):
+            graph.add(
+                interchange.Relationship.builder(
+                    subject=concept1.uri, predicate=SKOS.broader, object_=concept2.uri
+                ).build()
+            )
+
+        yield graph
+
+
+@pytest.fixture(scope="function")
+def interchange_graph_descriptor(
+    interchange_graph: interchange.Graph,
+) -> interchange.Graph.Descriptor:
+    return interchange_graph.descriptor
 
 
 @pytest.fixture(scope="session")

@@ -13,11 +13,13 @@ if TYPE_CHECKING:
     from graphs2go.models.label_type import LabelType
 
 
-def test_transform(interchange_graph: interchange.Graph) -> None:
+def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -> None:
     skos_graph = skos.Graph(
-        identifier=interchange_graph.identifier, rdf_store=MemoryRdfStore()
+        identifier=interchange_graph_descriptor.identifier, rdf_store=MemoryRdfStore()
     )
-    skos_graph.add_all(transform_interchange_graph_to_skos_models(interchange_graph))
+    skos_graph.add_all(
+        transform_interchange_graph_to_skos_models(interchange_graph_descriptor)
+    )
 
     skos_concept_schemes_by_uri = {
         concept_scheme.uri: concept_scheme
@@ -28,54 +30,58 @@ def test_transform(interchange_graph: interchange.Graph) -> None:
 
     skos_concepts_by_uri = {concept.uri: concept for concept in skos_graph.concepts}
 
-    for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
-        skos_concept = skos_concepts_by_uri[interchange_node.uri]
+    with interchange.Graph.open(
+        interchange_graph_descriptor, read_only=True
+    ) as interchange_graph:
+        for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
+            skos_concept = skos_concepts_by_uri[interchange_node.uri]
 
-        skos_lexical_labels_by_type: dict[
-            LabelType | None, list[Literal | skos.Label | URIRef]
-        ] = {}
-        for label_type, skos_lexical_label in skos_concept.lexical_labels:
-            skos_lexical_labels_by_type.setdefault(label_type, []).append(
-                skos_lexical_label
-            )
-
-        for interchange_label in interchange_node.labels:
-            assert any(
-                True
-                for skos_lexical_label in skos_lexical_labels_by_type[
-                    interchange_label.type
-                ]
-                if isinstance(skos_lexical_label, Literal)
-                and skos_lexical_label == interchange_label.literal_form
-            )
-            assert any(
-                True
-                for skos_lexical_label in skos_lexical_labels_by_type[
-                    interchange_label.type
-                ]
-                if isinstance(skos_lexical_label, skos.Label)
-                and skos_lexical_label.literal_form == interchange_label.literal_form
-            )
-
-        for interchange_property in interchange_node.properties:
-            assert (
-                interchange_property.predicate == SKOS.notation
-                or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
-            )
-            assert isinstance(interchange_property.object, Literal)
-
-        for interchange_relationship in interchange_node.relationships:
-            other_resource = skos_concept.resource.value(
-                p=interchange_relationship.predicate
-            )
-            assert isinstance(other_resource, Resource)
-            other_uri = other_resource.identifier
-            assert isinstance(other_uri, URIRef)
-            if interchange_relationship.predicate == SKOS.inScheme:
-                assert other_uri == concept_scheme.uri
-            else:
-                assert (
-                    interchange_relationship.predicate
-                    in skos.Concept.SEMANTIC_RELATION_PREDICATES
+            skos_lexical_labels_by_type: dict[
+                LabelType | None, list[Literal | skos.Label | URIRef]
+            ] = {}
+            for label_type, skos_lexical_label in skos_concept.lexical_labels:
+                skos_lexical_labels_by_type.setdefault(label_type, []).append(
+                    skos_lexical_label
                 )
-                assert other_uri in skos_concepts_by_uri
+
+            for interchange_label in interchange_node.labels:
+                assert any(
+                    True
+                    for skos_lexical_label in skos_lexical_labels_by_type[
+                        interchange_label.type
+                    ]
+                    if isinstance(skos_lexical_label, Literal)
+                    and skos_lexical_label == interchange_label.literal_form
+                )
+                assert any(
+                    True
+                    for skos_lexical_label in skos_lexical_labels_by_type[
+                        interchange_label.type
+                    ]
+                    if isinstance(skos_lexical_label, skos.Label)
+                    and skos_lexical_label.literal_form
+                    == interchange_label.literal_form
+                )
+
+            for interchange_property in interchange_node.properties:
+                assert (
+                    interchange_property.predicate == SKOS.notation
+                    or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
+                )
+                assert isinstance(interchange_property.object, Literal)
+
+            for interchange_relationship in interchange_node.relationships:
+                other_resource = skos_concept.resource.value(
+                    p=interchange_relationship.predicate
+                )
+                assert isinstance(other_resource, Resource)
+                other_uri = other_resource.identifier
+                assert isinstance(other_uri, URIRef)
+                if interchange_relationship.predicate == SKOS.inScheme:
+                    assert other_uri == concept_scheme.uri
+                else:
+                    assert (
+                        interchange_relationship.predicate
+                        in skos.Concept.SEMANTIC_RELATION_PREDICATES
+                    )
+                    assert other_uri in skos_concepts_by_uri

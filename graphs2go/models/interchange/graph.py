@@ -25,5 +25,12 @@ class Graph(rdf.Graph):
     def add_all(self, models: Iterable[Model]) -> None:
         super()._add_all(models)
 
+    def node_by_uri(self, uri: URIRef) -> Node:
+        # For performance reasons, don't check if it's actually a Node
+        return Node(resource=self.rdflib_graph.resource(uri))
+
     def nodes(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[Node]:
         return self._models_by_rdf_type(Node, rdf_type=rdf_type)
+
+    def node_uris(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[URIRef]:
+        return self._model_uris_by_rdf_type(rdf_type=rdf_type)
