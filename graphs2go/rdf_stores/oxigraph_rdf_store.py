@@ -179,7 +179,7 @@ class OxigraphRdfStore(RdfStore):
         self.__prefix_for_namespace: dict[URIRef, str] = {}
         self.__oxigraph_directory_path = oxigraph_directory_path
         self.__delegate = (
-            ox.Store.secondary(str(oxigraph_directory_path))
+            ox.Store.read_only(str(oxigraph_directory_path))
             if read_only
             else ox.Store(oxigraph_directory_path)
         )
