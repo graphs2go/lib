@@ -2,6 +2,7 @@ from dagster import AssetsDefinition, PartitionsDefinition, asset
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import interchange, rdf
+from graphs2go.namespaces.bind_namespaces import bind_namespaces
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.resources.output_config import OutputConfig
@@ -24,8 +25,7 @@ def build_interchange_file_asset(
                 interchange_graph, read_only=True
             ) as open_interchange_graph:
                 rdflib_graph = open_interchange_graph.rdflib_graph
-                rdflib_graph.bind("interchange", INTERCHANGE)
-                rdflib_graph.bind("skosxl", SKOSXL)
+                bind_namespaces(rdflib_graph)
                 loader.load(rdflib_graph)
 
     return interchange_file
