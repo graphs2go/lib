@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 
 from graphs2go.models.cypher.property_value import PropertyValue
 
@@ -51,7 +52,7 @@ class Properties(dict[str, PropertyValue]):
             return f'datetime("{value.isoformat()}")'
         if isinstance(value, date):
             return f'date("{value.isoformat()}")'
-        if isinstance(value, float | int):
+        if isinstance(value, Decimal | float | int):
             return str(value)
         if isinstance(value, str):
             return '"' + Properties.__escape_value(value) + '"'
