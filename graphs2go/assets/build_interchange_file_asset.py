@@ -3,8 +3,6 @@ from dagster import AssetsDefinition, PartitionsDefinition, asset
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import interchange, rdf
 from graphs2go.namespaces.bind_namespaces import bind_namespaces
-from graphs2go.namespaces.interchange import INTERCHANGE
-from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.resources.output_config import OutputConfig
 
 
