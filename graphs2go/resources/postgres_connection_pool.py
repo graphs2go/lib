@@ -34,7 +34,7 @@ class PostgresConnectionPool(ConfigurableResource):  # type: ignore
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):  # noqa: ANN001
         self.close()
 
     @classmethod
