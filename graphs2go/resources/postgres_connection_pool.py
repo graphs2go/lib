@@ -26,6 +26,17 @@ class PostgresConnectionPool(ConfigurableResource):  # type: ignore
         ConfigurableResource.__init__(self, *args, **kwds)
         self.__connection_pools: dict[str | None, dict[str | None, ConnectionPool]] = {}
 
+    def close(self) -> None:
+        for database_connection_pools in self.__connection_pools.values():
+            for schema_connection_pool in database_connection_pools.values():
+                schema_connection_pool.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):  # noqa: ANN001
+        self.close()
+
     @classmethod
     def from_env_vars(cls) -> PostgresConnectionPool:
         return cls(conninfo=EnvVar("POSTGRES_CONNINFO").get_value())

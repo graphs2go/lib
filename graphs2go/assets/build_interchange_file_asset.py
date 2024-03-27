@@ -1,9 +1,8 @@
-from dagster import AssetsDefinition, PartitionsDefinition, asset
+from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import interchange, rdf
-from graphs2go.namespaces.interchange import INTERCHANGE
-from graphs2go.namespaces.skosxl import SKOSXL
+from graphs2go.namespaces.bind_namespaces import bind_namespaces
 from graphs2go.resources.output_config import OutputConfig
 
 
@@ -16,16 +15,27 @@ def build_interchange_file_asset(
     def interchange_file(
         output_config: OutputConfig, interchange_graph: interchange.Graph.Descriptor
     ) -> None:
+        logger = get_dagster_logger()
+        output_directory_path = output_config.parse().directory_path / "interchange"
         for rdf_format in rdf_formats:
+            logger.info(
+                "loading interchange graph to %s files in %s",
+                rdf_format.file_extension,
+                output_directory_path,
+            )
             with RdfDirectoryLoader.create(
-                directory_path=output_config.parse().directory_path / "interchange",
+                directory_path=output_directory_path,
                 rdf_format=rdf_format,
             ) as loader, interchange.Graph.open(
                 interchange_graph, read_only=True
             ) as open_interchange_graph:
                 rdflib_graph = open_interchange_graph.rdflib_graph
-                rdflib_graph.bind("interchange", INTERCHANGE)
-                rdflib_graph.bind("skosxl", SKOSXL)
+                bind_namespaces(rdflib_graph)
                 loader.load(rdflib_graph)
+            logger.info(
+                "loaded interchange graph to %s files in %s",
+                rdf_format.file_extension,
+                output_directory_path,
+            )
 
     return interchange_file
