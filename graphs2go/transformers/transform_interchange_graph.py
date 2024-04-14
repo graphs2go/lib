@@ -5,7 +5,6 @@ from typing import TypeVar
 from rdflib import URIRef
 
 from graphs2go.models import interchange
-from graphs2go.namespaces.bind_namespaces import bind_namespaces
 from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.transformers.parallel_transform import parallel_transform
 
@@ -26,8 +25,6 @@ def _consumer(
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
-        bind_namespaces(interchange_graph.rdflib_graph)
-
         while True:
             interchange_node_uris: tuple[URIRef, ...] | None = work_queue.get()
 
@@ -76,8 +73,6 @@ def transform_interchange_graph(
         with interchange.Graph.open(
             interchange_graph_descriptor, read_only=True
         ) as interchange_graph:
-            bind_namespaces(interchange_graph.rdflib_graph)
-
             for interchange_node in interchange_graph.nodes(
                 rdf_type=interchange_node_rdf_type
             ):
