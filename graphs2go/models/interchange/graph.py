@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
+
+import rdflib
+from dagster import get_dagster_logger
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.node import Node
 from graphs2go.namespaces.interchange import INTERCHANGE
+from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Callable
 
     from rdflib import URIRef
 
@@ -22,8 +26,14 @@ class Graph(rdf.Graph):
     def add(self, model: Model) -> None:
         super()._add(model)
 
-    def add_all(self, models: Iterable[Model]) -> None:
+    def add_all(self, models: Iterable[Model]) -> Self:
         super()._add_all(models)
+        return self
+
+    def add_all_if_empty(self, lazy_models: Callable[[], Iterable[Model]]) -> Self:
+        if self.is_empty:
+            self.add_all(lazy_models())
+        return self
 
     def node_by_uri(self, uri: URIRef) -> Node:
         # For performance reasons, don't check if it's actually a Node
