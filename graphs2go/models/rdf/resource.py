@@ -172,8 +172,12 @@ class Resource:
         self.__identifier = identifier
 
     @classmethod
-    def builder(cls, *, graph: Graph, identifier: Identifier) -> Builder:
-        return cls.Builder(graph=graph, identifier=identifier)
+    def builder(
+        cls, *, identifier: Identifier, graph: Maybe[Graph] = Nothing
+    ) -> Builder:
+        return cls.Builder(
+            graph=graph.or_else_call(lambda: Graph()), identifier=identifier
+        )
 
     @property
     def graph(self) -> Graph:
@@ -219,8 +223,11 @@ class Resource:
         self,
         predicate: URIRef,
         mapper: _ValueMapper = ValueMappers.identity,
+        unique: bool = False,
     ) -> Iterable[_ValueT]:  # type: ignore
-        for value in self.__graph.objects(subject=self.identifier, predicate=predicate):
+        for value in self.__graph.objects(
+            subject=self.identifier, predicate=predicate, unique=unique
+        ):
             mapped_value = mapper(self.identifier, predicate, value, self.__graph)
             if is_successful(mapped_value):
                 yield mapped_value.unwrap()

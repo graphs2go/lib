@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from graphs2go.models import rdf
 from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
@@ -15,13 +16,13 @@ class Label(Model):
 
     class Builder(Model.Builder):
         def build(self) -> Label:
-            return Label(resource=self._resource)
+            return Label(self._resource_builder.build())
 
     @classmethod
     def builder(cls, *, literal_form: Literal, iri: URIRef) -> Builder:
-        resource = cls._create_resource(iri=iri)
-        resource.add(SKOSXL.literalForm, literal_form)
-        return cls.Builder(resource)
+        resource_builder = rdf.NamedResource.builder(iri=iri)
+        resource_builder.add(SKOSXL.literalForm, literal_form)
+        return cls.Builder(resource_builder)
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:
@@ -29,4 +30,6 @@ class Label(Model):
 
     @property
     def literal_form(self) -> Literal:
-        return self._required_value(SKOSXL.literalForm, self._map_term_to_literal)
+        return self.resource.required_value(
+            SKOSXL.literalForm, rdf.Resource.ValueMappers.literal
+        )

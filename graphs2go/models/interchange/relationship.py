@@ -21,42 +21,46 @@ class Relationship(Model):
 
     class Builder(Model.Builder):
         def build(self) -> Relationship:
-            return Relationship(resource=self._resource)
+            return Relationship(self._resource_builder.build())
 
     @classmethod
     def builder(
         cls,
         *,
-        object_: rdf.Model | URIRef,
+        object_: rdf.NamedModel | URIRef,
         predicate: URIRef,
-        subject: rdf.Model | URIRef,
+        subject: rdf.NamedModel | URIRef,
         iri: Maybe[URIRef] = Nothing,
     ) -> Relationship.Builder:
-        object_iri = object_.iri if isinstance(object_, rdf.Model) else object_
-        subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject
+        object_iri = object_.iri if isinstance(object_, rdf.NamedModel) else object_
+        subject_iri = subject.iri if isinstance(subject, rdf.NamedModel) else subject
 
-        resource = cls._create_resource(
-            iri if iri is not None else hash_urn(subject_iri, predicate, object_iri)
+        resource_builder = rdf.NamedResource.builder(
+            iri=iri.or_else_call(lambda: hash_urn(subject_iri, predicate, object_iri))
         )
-        resource.add(RDF.object, object_iri)
-        resource.add(RDF.predicate, predicate)
-        resource.add(RDF.subject, subject_iri)
-        resource.add(RDF.type, RDF.Statement)
+        resource_builder.add(RDF.object, object_iri)
+        resource_builder.add(RDF.predicate, predicate)
+        resource_builder.add(RDF.subject, subject_iri)
+        resource_builder.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
         # resource.graph.add((subject_iri, predicate, object_iri))
         # Node -> Relationship instances
-        resource.graph.add((subject_iri, INTERCHANGE.relationship, resource.identifier))
+        resource_builder.graph.add(
+            (subject_iri, INTERCHANGE.relationship, resource_builder.identifier)
+        )
 
-        return cls.Builder(resource)
+        return cls.Builder(resource_builder)
 
     @property
     def object(self) -> URIRef:
-        return self._required_value(RDF.object, self._map_term_to_iri)
+        return self.resource.required_value(RDF.object, rdf.Resource.ValueMappers.iri)
 
     @property
     def predicate(self) -> URIRef:
-        return self._required_value(RDF.predicate, self._map_term_to_iri)
+        return self.resource.required_value(
+            RDF.predicate, rdf.Resource.ValueMappers.iri
+        )
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:
@@ -64,4 +68,4 @@ class Relationship(Model):
 
     @property
     def subject(self) -> URIRef:
-        return self._required_value(RDF.subject, self._map_term_to_iri)
+        return self.resource.required_value(RDF.subject, rdf.Resource.ValueMappers.iri)

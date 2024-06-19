@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, ClassVar, Self
 
 from rdflib import SKOS, Literal, URIRef
 
+from graphs2go.models import rdf
 from graphs2go.models.skos.concept_scheme import ConceptScheme
 from graphs2go.models.skos.labeled_model import LabeledModel
 
@@ -66,17 +67,17 @@ class Concept(LabeledModel):
             return self._resource_builder.add(predicate, object_)
 
         def build(self) -> Concept:
-            return Concept(resource=self._resource_builder.build())
+            return Concept(self._resource_builder.build())
 
     @classmethod
     def builder(cls, *, iri: URIRef) -> Builder:
-        return cls.Builder(cls._create_resource(iri=iri))
+        return cls.Builder(rdf.NamedResource.builder(iri=iri))
 
     @property
     def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
-        yield from self._values(
+        yield from self.resource.values(
             SKOS.inScheme,
-            lambda term: self._map_term_to_model_or_iri(
+            lambda quad: self._map_term_to_model_or_iri(
                 self._CONCEPT_SCHEME_CLASS, term
             ),
         )  # type: ignore

@@ -20,7 +20,7 @@ class Graph(rdf.Graph[Model]):
 
     def node_by_iri(self, iri: URIRef) -> Node:
         # For performance reasons, don't check if it's actually a Node
-        return Node(resource=self.rdflib_graph.resource(iri))
+        return Node(rdf.NamedResource(graph=self.rdflib_graph, iri=iri))
 
     def nodes(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[Node]:
         return self._models_by_rdf_type(Node, rdf_type=rdf_type)

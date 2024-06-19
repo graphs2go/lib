@@ -111,9 +111,7 @@ class Graph(Generic[ModelT]):
         self, model_class: type[_ModelT], *, rdf_type: Maybe[rdflib.URIRef] = Nothing
     ) -> Iterable[_ModelT]:
         for model_iri in self._model_iris_by_rdf_type(
-            rdf_type=(
-                rdf_type if rdf_type is not None else model_class.primary_rdf_type()
-            )
+            rdf_type.value_or(model_class.primary_rdf_type())
         ):
             yield model_class(
                 resource=NamedResource(graph=self.__rdflib_graph, iri=model_iri)

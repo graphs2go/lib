@@ -23,7 +23,7 @@ class Label(Model):
 
     class Builder(Model.Builder):
         def build(self) -> Label:
-            return Label(resource=self._resource)
+            return Label(self._resource_builder.build())
 
     __TYPE_TO_PREDICATE_MAP: ClassVar[dict[LabelType | None, URIRef]] = {
         label_type: label_type.skos_predicate for label_type in LabelType
@@ -39,29 +39,33 @@ class Label(Model):
         cls,
         *,
         literal_form: Literal,
-        subject: rdf.Model | URIRef,
+        subject: rdf.NamedModel | URIRef,
         type_: Maybe[LabelType] = Nothing,
         iri: Maybe[URIRef] = Nothing,
     ) -> Label.Builder:
-        resource = cls._create_resource(iri if iri is not None else uuid_urn())
-        resource.add(RDF.predicate, cls.__TYPE_TO_PREDICATE_MAP[type_])
-        subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject
-        resource.add(RDF.subject, subject_iri)
-        resource.add(RDF.type, SKOSXL.Label)
-        resource.add(SKOSXL.literalForm, literal_form)
+        resource_builder = rdf.NamedResource.builder(iri=iri.or_else_call(uuid_urn))
+        resource_builder.add(RDF.predicate, cls.__TYPE_TO_PREDICATE_MAP[type_])
+        subject_iri = subject.iri if isinstance(subject, rdf.NamedModel) else subject
+        resource_builder.add(RDF.subject, subject_iri)
+        resource_builder.add(RDF.type, SKOSXL.Label)
+        resource_builder.add(SKOSXL.literalForm, literal_form)
 
         # Add direct statements for ease of querying
-        resource.graph.add((subject_iri, INTERCHANGE.label, resource.identifier))
+        resource_builder.graph.add(
+            (subject_iri, INTERCHANGE.label, resource_builder.identifier)
+        )
         # if type_ is not None:
         #     resource.graph.add(
         #         (subject_iri, type_.skosxl_predicate, resource.identifier)
         #     )
 
-        return cls.Builder(resource)
+        return cls.Builder(resource_builder)
 
     @property
     def literal_form(self) -> Literal:
-        return self._required_value(SKOSXL.literalForm, self._map_term_to_literal)
+        return self.resource.required_value(
+            SKOSXL.literalForm, rdf.Resource.ValueMappers.literal
+        )
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:

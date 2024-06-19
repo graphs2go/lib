@@ -3,9 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from graphs2go.models.rdf.resource import Resource
+from returns.maybe import Maybe, Nothing
+from rdflib import Graph
 
 if TYPE_CHECKING:
-    from rdflib import Graph, URIRef
+    from rdflib import URIRef
 
 
 class NamedResource(Resource):
@@ -26,8 +28,8 @@ class NamedResource(Resource):
         self.__iri = iri
 
     @classmethod
-    def builder(cls, *, graph: Graph, iri: URIRef) -> Builder:  # type: ignore
-        return cls.Builder(graph=graph, iri=iri)
+    def builder(cls, *, iri: URIRef, graph: Maybe[Graph] = Nothing) -> Builder:  # type: ignore
+        return cls.Builder(graph=graph.or_else_call(lambda: Graph()), iri=iri)
 
     @property
     def iri(self) -> URIRef:

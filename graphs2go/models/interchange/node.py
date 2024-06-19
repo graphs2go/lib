@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Self, TypeVar
 
 from rdflib import RDF, URIRef
 
+from graphs2go.models import rdf
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.property import Property
@@ -23,24 +24,22 @@ class Node(Model):
 
     class Builder(Model.Builder):
         def add_rdf_type(self, rdf_type: URIRef) -> Self:
-            return self.add(RDF.type, rdf_type)
+            return self._resource_builder.add(RDF.type, rdf_type)
 
         def build(self) -> Node:
-            return Node(resource=self._resource)
+            return Node(self._resource_builder.build())
 
     @classmethod
     def builder(cls, *, iri: URIRef) -> Node.Builder:
-        return cls.Builder(cls._create_resource(iri))
+        return cls.Builder(rdf.NamedResource.builder(iri=iri))
 
     def __dependent_models(
         self, model_class: type[_ModelT], predicate: URIRef
     ) -> Iterable[_ModelT]:
-        for model_iri in self.resource.graph.objects(
-            predicate=predicate, subject=self.iri, unique=True
+        for resource in self.resource.values(
+            predicate, rdf.Resource.ValueMappers.named_resource, unique=True
         ):
-            if not isinstance(model_iri, URIRef):
-                continue
-            yield model_class(resource=self.resource.graph.resource(model_iri))
+            yield model_class(resource)
 
     @property
     def labels(self) -> Iterable[Label]:
