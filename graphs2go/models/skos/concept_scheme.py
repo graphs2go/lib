@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from rdflib import SKOS, URIRef
+from rdflib import SKOS, URIRef, RDF
 
 from graphs2go.models import rdf
 from graphs2go.models.skos.labeled_model import LabeledModel
@@ -13,7 +13,9 @@ class ConceptScheme(LabeledModel):
 
     @classmethod
     def builder(cls, *, iri: URIRef) -> Builder:
-        return cls.Builder(rdf.NamedResource.builder(iri=iri))
+        return cls.Builder(
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, cls.primary_rdf_type())
+        )
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:

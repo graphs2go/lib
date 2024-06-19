@@ -41,6 +41,7 @@ class Relationship(Model):
         resource_builder.add(RDF.object, object_iri)
         resource_builder.add(RDF.predicate, predicate)
         resource_builder.add(RDF.subject, subject_iri)
+        resource_builder.add(RDF.type, cls.primary_rdf_type())
         resource_builder.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)

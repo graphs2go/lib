@@ -32,7 +32,9 @@ class Node(Model):
 
     @classmethod
     def builder(cls, *, iri: URIRef) -> Node.Builder:
-        return cls.Builder(rdf.NamedResource.builder(iri=iri))
+        return cls.Builder(
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, cls.primary_rdf_type())
+        )
 
     def __dependent_models(
         self, model_class: type[_ModelT], predicate: URIRef

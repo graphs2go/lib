@@ -6,6 +6,7 @@ from graphs2go.models import rdf
 from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
+from rdflib import RDF
 
 if TYPE_CHECKING:
     from rdflib import Literal, URIRef
@@ -20,9 +21,11 @@ class Label(Model):
 
     @classmethod
     def builder(cls, *, literal_form: Literal, iri: URIRef) -> Builder:
-        resource_builder = rdf.NamedResource.builder(iri=iri)
-        resource_builder.add(SKOSXL.literalForm, literal_form)
-        return cls.Builder(resource_builder)
+        return cls.Builder(
+            rdf.NamedResource.builder(iri=iri)
+            .add(RDF.type, cls.primary_rdf_type())
+            .add(SKOSXL.literalForm, literal_form)
+        )
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:

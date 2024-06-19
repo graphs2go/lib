@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Self
 
-from rdflib import SKOS, Literal, URIRef
+from rdflib import SKOS, Literal, URIRef, RDF
 
 from graphs2go.models import rdf
 from graphs2go.models.skos.concept_scheme import ConceptScheme
@@ -73,7 +73,9 @@ class Concept(LabeledModel):
 
     @classmethod
     def builder(cls, *, iri: URIRef) -> Builder:
-        return cls.Builder(rdf.NamedResource.builder(iri=iri))
+        return cls.Builder(
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, cls.primary_rdf_type())
+        )
 
     @property
     def in_scheme(self) -> Iterable[ConceptScheme]:

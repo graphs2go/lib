@@ -49,6 +49,7 @@ class Label(Model):
         )
         subject_iri = subject.iri if isinstance(subject, rdf.NamedModel) else subject
         resource_builder.add(RDF.subject, subject_iri)
+        resource_builder.add(RDF.type, cls.primary_rdf_type())
         resource_builder.add(RDF.type, SKOSXL.Label)
         resource_builder.add(SKOSXL.literalForm, literal_form)
 

@@ -25,6 +25,7 @@ class Model:
 
     def __init__(self, resource: Resource):
         self.__resource = resource
+        assert self.primary_rdf_type() in self.rdf_types
 
     @property
     def identifier(self) -> Resource.Identifier:

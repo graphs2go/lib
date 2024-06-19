@@ -120,7 +120,6 @@ class Graph(Generic[ModelT]):
     def _model_iris_by_rdf_type(
         self, rdf_type: rdflib.URIRef
     ) -> Iterable[rdflib.URIRef]:
-        yielded_model_iris: set[rdflib.URIRef] = set()
         for model_iri in self.__rdflib_graph.subjects(
             predicate=rdflib.RDF.type,
             object=rdf_type,
@@ -128,11 +127,8 @@ class Graph(Generic[ModelT]):
         ):
             if not isinstance(model_iri, rdflib.URIRef):
                 continue
-            if model_iri in yielded_model_iris:
-                continue
 
             yield model_iri
-            yielded_model_iris.add(model_iri)
 
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
