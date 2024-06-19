@@ -47,7 +47,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                 assert any(
                     True
                     for skos_lexical_label in skos_lexical_labels_by_type[
-                        interchange_label.type
+                        interchange_label.type.unwrap()
                     ]
                     if isinstance(skos_lexical_label, Literal)
                     and skos_lexical_label == interchange_label.literal_form
@@ -55,7 +55,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                 assert any(
                     True
                     for skos_lexical_label in skos_lexical_labels_by_type[
-                        interchange_label.type
+                        interchange_label.type.unwrap()
                     ]
                     if isinstance(skos_lexical_label, skos.Label)
                     and skos_lexical_label.literal_form
