@@ -14,7 +14,7 @@ class LabeledModel(Model):
             self, *, label: Label | Literal | URIRef, type_: LabelType
         ) -> Self:
             if isinstance(label, Label):
-                self._resource.add(type_.skosxl_predicate, label.uri)
+                self._resource.add(type_.skosxl_predicate, label.iri)
             elif isinstance(label, Literal):
                 self._resource.add(type_.skos_predicate, label)
             elif isinstance(label, URIRef):

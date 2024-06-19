@@ -11,8 +11,8 @@ class ConceptScheme(LabeledModel):
             return ConceptScheme(resource=self._resource)
 
     @classmethod
-    def builder(cls, *, uri: URIRef) -> Builder:
-        return cls.Builder(cls._create_resource(uri=uri))
+    def builder(cls, *, iri: URIRef) -> Builder:
+        return cls.Builder(cls._create_resource(iri=iri))
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:

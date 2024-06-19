@@ -108,29 +108,29 @@ class Graph(Generic[ModelT]):
     def _models_by_rdf_type(
         self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef | None = None
     ) -> Iterable[_ModelT]:
-        for model_uri in self._model_uris_by_rdf_type(
+        for model_iri in self._model_iris_by_rdf_type(
             rdf_type=(
                 rdf_type if rdf_type is not None else model_class.primary_rdf_type()
             )
         ):
-            yield model_class(resource=self.__rdflib_graph.resource(model_uri))
+            yield model_class(resource=self.__rdflib_graph.resource(model_iri))
 
-    def _model_uris_by_rdf_type(
+    def _model_iris_by_rdf_type(
         self, rdf_type: rdflib.URIRef
     ) -> Iterable[rdflib.URIRef]:
-        yielded_model_uris: set[rdflib.URIRef] = set()
-        for model_uri in self.__rdflib_graph.subjects(
+        yielded_model_iris: set[rdflib.URIRef] = set()
+        for model_iri in self.__rdflib_graph.subjects(
             predicate=rdflib.RDF.type,
             object=rdf_type,
             unique=True,
         ):
-            if not isinstance(model_uri, rdflib.URIRef):
+            if not isinstance(model_iri, rdflib.URIRef):
                 continue
-            if model_uri in yielded_model_uris:
+            if model_iri in yielded_model_iris:
                 continue
 
-            yield model_uri
-            yielded_model_uris.add(model_uri)
+            yield model_iri
+            yielded_model_iris.add(model_iri)
 
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:

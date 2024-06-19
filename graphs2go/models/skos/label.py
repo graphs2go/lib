@@ -18,8 +18,8 @@ class Label(Model):
             return Label(resource=self._resource)
 
     @classmethod
-    def builder(cls, *, literal_form: Literal, uri: URIRef) -> Builder:
-        resource = cls._create_resource(uri=uri)
+    def builder(cls, *, literal_form: Literal, iri: URIRef) -> Builder:
+        resource = cls._create_resource(iri=iri)
         resource.add(SKOSXL.literalForm, literal_form)
         return cls.Builder(resource)
 

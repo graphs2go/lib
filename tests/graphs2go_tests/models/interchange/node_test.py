@@ -15,21 +15,21 @@ def test_labels(interchange_node: interchange.Node) -> None:
 def test_properties(interchange_graph: interchange.Graph) -> None:
     for node in interchange_graph.nodes():
         for property_ in node.properties:
-            assert property_.subject == node.uri
+            assert property_.subject == node.iri
             return
     pytest.fail("no node with properties")
 
 
 def test_relationships(interchange_graph: interchange.Graph) -> None:
-    all_node_uris = {node.uri for node in interchange_graph.nodes()}
+    all_node_iris = {node.iri for node in interchange_graph.nodes()}
     for node in interchange_graph.nodes():
         relationships = tuple(node.relationships)
         if not relationships:
             continue
         for relationship in relationships:
-            assert relationship.subject == node.uri
-            assert relationship.object != node.uri
-            assert relationship.object in all_node_uris
+            assert relationship.subject == node.iri
+            assert relationship.object != node.iri
+            assert relationship.object in all_node_iris
         return
     pytest.fail("didn't find node with relationships")
 

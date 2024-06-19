@@ -17,7 +17,7 @@ _PRIMARY_NODE_LABEL = "Node"
 @dataclass(frozen=True)
 class _OutputModel:
     cypher_statements: tuple[cypher.Statement, ...]
-    interchange_node_uri: URIRef
+    interchange_node_iri: URIRef
     interchange_relationship_objects: frozenset[URIRef]
 
 
@@ -25,24 +25,24 @@ class _UriTransformer:
     def __init__(self, namespace_manager: NamespaceManager):
         self.__namespace_manager = namespace_manager
 
-    def uri_to_curie(self, uri: URIRef) -> tuple[str, str]:
-        curie_parts = self.__namespace_manager.curie(uri).split(":", 1)
+    def iri_to_curie(self, iri: URIRef) -> tuple[str, str]:
+        curie_parts = self.__namespace_manager.curie(iri).split(":", 1)
         assert len(curie_parts) == 2
         return curie_parts[0], curie_parts[1]
 
-    def uri_to_node_id(self, uri: URIRef) -> str:
-        return str(uri)
+    def iri_to_node_id(self, iri: URIRef) -> str:
+        return str(iri)
 
-    def uri_to_node_label(self, uri: URIRef) -> str:
-        curie = self.uri_to_curie(uri)
+    def iri_to_node_label(self, iri: URIRef) -> str:
+        curie = self.iri_to_curie(iri)
         return curie[0].capitalize() + stringcase.pascalcase(curie[1])
 
-    def uri_to_property_name(self, uri: URIRef) -> str:
-        curie = self.uri_to_curie(uri)
+    def iri_to_property_name(self, iri: URIRef) -> str:
+        curie = self.iri_to_curie(iri)
         return curie[0].lower() + "_" + stringcase.snakecase(curie[1]).lower()
 
-    def uri_to_relationship_label(self, uri: URIRef) -> str:
-        curie = self.uri_to_curie(uri)
+    def iri_to_relationship_label(self, iri: URIRef) -> str:
+        curie = self.iri_to_curie(iri)
         return curie[0].upper() + "_" + stringcase.snakecase(curie[1]).upper()
 
 
@@ -50,7 +50,7 @@ def _transform_interchange_node(
     interchange_node: interchange.Node,
 ) -> Iterable[_OutputModel]:
     cypher_statements: list[cypher.Statement] = []
-    uri_transformer = _UriTransformer(
+    iri_transformer = _UriTransformer(
         namespace_manager=interchange_node.resource.graph.namespace_manager
     )
 
@@ -59,17 +59,17 @@ def _transform_interchange_node(
     node_labels: list[str] = [_PRIMARY_NODE_LABEL]
 
     create_node_statement_builder = cypher.CreateNodeStatement.builder(
-        id_=uri_transformer.uri_to_node_id(interchange_node.uri), label=node_labels[0]
+        id_=iri_transformer.iri_to_node_id(interchange_node.iri), label=node_labels[0]
     )
 
     for interchange_node_secondary_rdf_type in interchange_node_secondary_rdf_types:
         create_node_statement_builder.add_label(
-            uri_transformer.uri_to_node_label(interchange_node_secondary_rdf_type)
+            iri_transformer.iri_to_node_label(interchange_node_secondary_rdf_type)
         )
 
     property_names: set[str] = set()
     for interchange_property in interchange_node.properties:
-        property_name = uri_transformer.uri_to_property_name(
+        property_name = iri_transformer.iri_to_property_name(
             interchange_property.predicate
         )
         property_value = interchange_property.object.toPython()
@@ -91,7 +91,7 @@ def _transform_interchange_node(
     subject_node_pattern = (
         NodePattern.builder()
         .add_label(_PRIMARY_NODE_LABEL)
-        .add_property("id", uri_transformer.uri_to_node_id(interchange_node.uri))
+        .add_property("id", iri_transformer.iri_to_node_id(interchange_node.iri))
         .set_variable("subject")
         .build()
     )
@@ -104,7 +104,7 @@ def _transform_interchange_node(
             NodePattern.builder()
             .add_label(_PRIMARY_NODE_LABEL)
             .add_property(
-                "id", uri_transformer.uri_to_node_id(interchange_relationship_object)
+                "id", iri_transformer.iri_to_node_id(interchange_relationship_object)
             )
             .set_variable("object")
             .build()
@@ -112,7 +112,7 @@ def _transform_interchange_node(
 
         create_relationship_statement_builder = (
             cypher.CreateRelationshipStatement.builder(
-                label=uri_transformer.uri_to_relationship_label(
+                label=iri_transformer.iri_to_relationship_label(
                     interchange_relationship.predicate
                 ),
                 object_node_pattern=object_node_pattern,
@@ -134,7 +134,7 @@ def _transform_interchange_node(
 
     yield _OutputModel(
         cypher_statements=tuple(cypher_statements),
-        interchange_node_uri=interchange_node.uri,
+        interchange_node_iri=interchange_node.iri,
         interchange_relationship_objects=frozenset(interchange_relationship_objects),
     )
 
@@ -142,7 +142,7 @@ def _transform_interchange_node(
 def transform_interchange_graph_to_cypher_statements(
     interchange_graph_descriptor: interchange.Graph.Descriptor,
 ) -> Iterable[cypher.Statement]:
-    interchange_node_uris: set[URIRef] = set()
+    interchange_node_iris: set[URIRef] = set()
     interchange_relationship_objects: set[URIRef] = set()
 
     output_model: _OutputModel
@@ -151,7 +151,7 @@ def transform_interchange_graph_to_cypher_statements(
         transform_interchange_node=_transform_interchange_node,
         # in_process=True,
     ):
-        interchange_node_uris.add(output_model.interchange_node_uri)  # type: ignore
+        interchange_node_iris.add(output_model.interchange_node_iri)  # type: ignore
         for (
             interchange_relationship_object
         ) in output_model.interchange_relationship_objects:  # type: ignore
@@ -163,15 +163,15 @@ def transform_interchange_graph_to_cypher_statements(
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
-        uri_transformer = _UriTransformer(
+        iri_transformer = _UriTransformer(
             namespace_manager=interchange_graph.rdflib_graph.namespace_manager
         )
 
         for external_interchange_relation_object in (
-            interchange_relationship_objects - interchange_node_uris
+            interchange_relationship_objects - interchange_node_iris
         ):
             yield cypher.CreateNodeStatement.builder(
-                id_=uri_transformer.uri_to_node_id(
+                id_=iri_transformer.iri_to_node_id(
                     external_interchange_relation_object
                 ),
                 label=_PRIMARY_NODE_LABEL,

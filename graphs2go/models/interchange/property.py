@@ -24,22 +24,22 @@ class Property(Model):
         predicate: URIRef,
         object_: Literal,
         subject: rdf.Model | URIRef,
-        uri: URIRef | None = None,
+        iri: URIRef | None = None,
     ) -> Property.Builder:
-        subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
+        subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject
 
         resource = cls._create_resource(
-            uri if uri is not None else hash_urn(subject_uri, predicate, object_)
+            iri if iri is not None else hash_urn(subject_iri, predicate, object_)
         )
         resource.add(RDF.object, object_)
         resource.add(RDF.predicate, predicate)
-        resource.add(RDF.subject, subject_uri)
+        resource.add(RDF.subject, subject_iri)
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
-        # resource.graph.add((subject_uri, predicate, object_))
+        # resource.graph.add((subject_iri, predicate, object_))
         # Node -> Property instance
-        resource.graph.add((subject_uri, INTERCHANGE.property, resource.identifier))
+        resource.graph.add((subject_iri, INTERCHANGE.property, resource.identifier))
 
         return cls.Builder(resource)
 
@@ -49,7 +49,7 @@ class Property(Model):
 
     @property
     def predicate(self) -> URIRef:
-        return self._required_value(RDF.predicate, self._map_term_to_uri)
+        return self._required_value(RDF.predicate, self._map_term_to_iri)
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:
@@ -57,4 +57,4 @@ class Property(Model):
 
     @property
     def subject(self) -> URIRef:
-        return self._required_value(RDF.subject, self._map_term_to_uri)
+        return self._required_value(RDF.subject, self._map_term_to_iri)

@@ -29,18 +29,18 @@ class Node(Model):
             return Node(resource=self._resource)
 
     @classmethod
-    def builder(cls, *, uri: URIRef) -> Node.Builder:
-        return cls.Builder(cls._create_resource(uri))
+    def builder(cls, *, iri: URIRef) -> Node.Builder:
+        return cls.Builder(cls._create_resource(iri))
 
     def __dependent_models(
         self, model_class: type[_ModelT], predicate: URIRef
     ) -> Iterable[_ModelT]:
-        for model_uri in self.resource.graph.objects(
-            predicate=predicate, subject=self.uri, unique=True
+        for model_iri in self.resource.graph.objects(
+            predicate=predicate, subject=self.iri, unique=True
         ):
-            if not isinstance(model_uri, URIRef):
+            if not isinstance(model_iri, URIRef):
                 continue
-            yield model_class(resource=self.resource.graph.resource(model_uri))
+            yield model_class(resource=self.resource.graph.resource(model_iri))
 
     @property
     def labels(self) -> Iterable[Label]:

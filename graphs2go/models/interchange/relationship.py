@@ -29,33 +29,33 @@ class Relationship(Model):
         object_: rdf.Model | URIRef,
         predicate: URIRef,
         subject: rdf.Model | URIRef,
-        uri: URIRef | None = None,
+        iri: URIRef | None = None,
     ) -> Relationship.Builder:
-        object_uri = object_.uri if isinstance(object_, rdf.Model) else object_
-        subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
+        object_iri = object_.iri if isinstance(object_, rdf.Model) else object_
+        subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject
 
         resource = cls._create_resource(
-            uri if uri is not None else hash_urn(subject_uri, predicate, object_uri)
+            iri if iri is not None else hash_urn(subject_iri, predicate, object_iri)
         )
-        resource.add(RDF.object, object_uri)
+        resource.add(RDF.object, object_iri)
         resource.add(RDF.predicate, predicate)
-        resource.add(RDF.subject, subject_uri)
+        resource.add(RDF.subject, subject_iri)
         resource.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
-        # resource.graph.add((subject_uri, predicate, object_uri))
+        # resource.graph.add((subject_iri, predicate, object_iri))
         # Node -> Relationship instances
-        resource.graph.add((subject_uri, INTERCHANGE.relationship, resource.identifier))
+        resource.graph.add((subject_iri, INTERCHANGE.relationship, resource.identifier))
 
         return cls.Builder(resource)
 
     @property
     def object(self) -> URIRef:
-        return self._required_value(RDF.object, self._map_term_to_uri)
+        return self._required_value(RDF.object, self._map_term_to_iri)
 
     @property
     def predicate(self) -> URIRef:
-        return self._required_value(RDF.predicate, self._map_term_to_uri)
+        return self._required_value(RDF.predicate, self._map_term_to_iri)
 
     @classmethod
     def primary_rdf_type(cls) -> URIRef:
@@ -63,4 +63,4 @@ class Relationship(Model):
 
     @property
     def subject(self) -> URIRef:
-        return self._required_value(RDF.subject, self._map_term_to_uri)
+        return self._required_value(RDF.subject, self._map_term_to_iri)

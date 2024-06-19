@@ -77,7 +77,12 @@ class Resource:
         def date_or_datetime(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
         ) -> Maybe[date | datetime]:
-            return Resource.ValueMappers.__py_value(object_, date | datetime)
+            if not isinstance(object_, Literal):
+                return Nothing
+            value_py = object_.toPython()
+            if isinstance(value_py, date | datetime):
+                return Some(value_py)
+            return Nothing
 
         @staticmethod
         def datetime(
@@ -88,7 +93,7 @@ class Resource:
         @staticmethod
         def float(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
-        ) -> Maybe[int]:
+        ) -> Maybe[float]:
             if not isinstance(object_, Literal):
                 return Nothing
             value_py = object_.toPython()
@@ -142,7 +147,7 @@ class Resource:
             )
 
         @staticmethod
-        def __py_value(object_: Node, py_type: type[_PyValueT]) -> Some[_PyValueT]:
+        def __py_value(object_: Node, py_type: type[_PyValueT]) -> Maybe[_PyValueT]:
             if not isinstance(object_, Literal):
                 return Nothing
             py_value = object_.toPython()

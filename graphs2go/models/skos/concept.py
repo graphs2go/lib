@@ -69,14 +69,14 @@ class Concept(LabeledModel):
             return Concept(resource=self._resource)
 
     @classmethod
-    def builder(cls, *, uri: URIRef) -> Builder:
-        return cls.Builder(cls._create_resource(uri=uri))
+    def builder(cls, *, iri: URIRef) -> Builder:
+        return cls.Builder(cls._create_resource(iri=iri))
 
     @property
     def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
         yield from self._values(
             SKOS.inScheme,
-            lambda term: self._map_term_to_model_or_uri(
+            lambda term: self._map_term_to_model_or_iri(
                 self._CONCEPT_SCHEME_CLASS, term
             ),
         )  # type: ignore
@@ -100,6 +100,6 @@ class Concept(LabeledModel):
         for predicate in self.SEMANTIC_RELATION_PREDICATES:
             for value in self._values(
                 predicate,
-                lambda term: self._map_term_to_model_or_uri(self.__class__, term),
+                lambda term: self._map_term_to_model_or_iri(self.__class__, term),
             ):  # type: ignore
                 yield predicate, value  # type: ignore

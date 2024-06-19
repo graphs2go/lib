@@ -36,7 +36,7 @@ def interchange_graph_descriptor(
         ),
     ) as graph:
         concept_scheme = (
-            interchange.Node.builder(uri=uuid_urn())
+            interchange.Node.builder(iri=uuid_urn())
             .add_rdf_type(SKOS.ConceptScheme)
             .build()
         )
@@ -50,7 +50,7 @@ def interchange_graph_descriptor(
         )
 
         concepts = tuple(
-            interchange.Node.builder(uri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
+            interchange.Node.builder(iri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
             for _ in range(2)
         )
         for concept_i, concept in enumerate(concepts):
@@ -83,7 +83,7 @@ def interchange_graph_descriptor(
         for concept1, concept2 in itertools.combinations(concepts, 2):
             graph.add(
                 interchange.Relationship.builder(
-                    subject=concept1.uri, predicate=SKOS.broader, object_=concept2.uri
+                    subject=concept1.iri, predicate=SKOS.broader, object_=concept2.iri
                 ).build()
             )
 
@@ -138,12 +138,12 @@ def skos_concept_scheme(skos_graph: skos.Graph) -> skos.ConceptScheme:
 def skos_graph() -> skos.Graph:
     graph = skos.Graph(identifier=uuid_urn(), rdf_store=MemoryRdfStore())
 
-    concept_scheme = skos.ConceptScheme.builder(uri=uuid_urn()).build()
+    concept_scheme = skos.ConceptScheme.builder(iri=uuid_urn()).build()
     graph.add(concept_scheme)
 
     concept_builders: list[skos.Concept.Builder] = []
     for _ in range(2):
-        concept_builder = skos.Concept.builder(uri=uuid_urn())
+        concept_builder = skos.Concept.builder(iri=uuid_urn())
         concept_builder.add_in_scheme(concept_scheme)
         concept_builder.add_notation(Literal("testnotation"))
         concept_builder.add_note(SKOS.note, Literal("testnote"))
@@ -151,7 +151,7 @@ def skos_graph() -> skos.Graph:
         label_i = 1
         for label_type in LabelType:
             label = skos.Label.builder(
-                literal_form=Literal("label" + str(label_i)), uri=uuid_urn()
+                literal_form=Literal("label" + str(label_i)), iri=uuid_urn()
             ).build()
             graph.add(label)
             concept_builder.add_lexical_label(label=label, type_=label_type)

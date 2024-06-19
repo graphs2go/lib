@@ -18,12 +18,12 @@ class Graph(rdf.Graph[Model]):
     Non-picklable interchange graph. Used as an entry point for accessing top-level graph models.
     """
 
-    def node_by_uri(self, uri: URIRef) -> Node:
+    def node_by_iri(self, iri: URIRef) -> Node:
         # For performance reasons, don't check if it's actually a Node
-        return Node(resource=self.rdflib_graph.resource(uri))
+        return Node(resource=self.rdflib_graph.resource(iri))
 
     def nodes(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[Node]:
         return self._models_by_rdf_type(Node, rdf_type=rdf_type)
 
-    def node_uris(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[URIRef]:
-        return self._model_uris_by_rdf_type(rdf_type=rdf_type)
+    def node_iris(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[URIRef]:
+        return self._model_iris_by_rdf_type(rdf_type=rdf_type)

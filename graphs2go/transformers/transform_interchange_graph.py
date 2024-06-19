@@ -26,15 +26,15 @@ def _consumer(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
         while True:
-            interchange_node_uris: tuple[URIRef, ...] | None = work_queue.get()
+            interchange_node_iris: tuple[URIRef, ...] | None = work_queue.get()
 
-            if interchange_node_uris is None:
+            if interchange_node_iris is None:
                 work_queue.task_done()
                 break  # Signal from the producer there's no more work
 
             outputs: list[_OutputT] = []  # type: ignore
-            for interchange_node_uri in interchange_node_uris:
-                interchange_node = interchange_graph.node_by_uri(interchange_node_uri)
+            for interchange_node_iri in interchange_node_iris:
+                interchange_node = interchange_graph.node_by_iri(interchange_node_iri)
                 outputs.extend(transform_interchange_node(interchange_node))
             output_queue.put(tuple(outputs))
             work_queue.task_done()
@@ -46,20 +46,20 @@ def _producer(
 ) -> None:
     interchange_graph_descriptor, interchange_node_rdf_type = input_
 
-    interchange_node_uris_batch: list[URIRef] = []
+    interchange_node_iris_batch: list[URIRef] = []
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
-        for interchange_node_uri in interchange_graph.node_uris(
+        for interchange_node_iri in interchange_graph.node_iris(
             rdf_type=interchange_node_rdf_type
         ):
-            interchange_node_uris_batch.append(interchange_node_uri)
-            if len(interchange_node_uris_batch) == _INTERCHANGE_NODE_BATCH_SIZE:
-                work_queue.put(tuple(interchange_node_uris_batch))
-                interchange_node_uris_batch = []
+            interchange_node_iris_batch.append(interchange_node_iri)
+            if len(interchange_node_iris_batch) == _INTERCHANGE_NODE_BATCH_SIZE:
+                work_queue.put(tuple(interchange_node_iris_batch))
+                interchange_node_iris_batch = []
 
-    if interchange_node_uris_batch:
-        work_queue.put(tuple(interchange_node_uris_batch))
+    if interchange_node_iris_batch:
+        work_queue.put(tuple(interchange_node_iris_batch))
 
 
 def transform_interchange_graph(

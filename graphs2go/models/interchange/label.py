@@ -40,20 +40,20 @@ class Label(Model):
         literal_form: Literal,
         subject: rdf.Model | URIRef,
         type_: LabelType | None = None,
-        uri: URIRef | None = None,
+        iri: URIRef | None = None,
     ) -> Label.Builder:
-        resource = cls._create_resource(uri if uri is not None else uuid_urn())
+        resource = cls._create_resource(iri if iri is not None else uuid_urn())
         resource.add(RDF.predicate, cls.__TYPE_TO_PREDICATE_MAP[type_])
-        subject_uri = subject.uri if isinstance(subject, rdf.Model) else subject
-        resource.add(RDF.subject, subject_uri)
+        subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject
+        resource.add(RDF.subject, subject_iri)
         resource.add(RDF.type, SKOSXL.Label)
         resource.add(SKOSXL.literalForm, literal_form)
 
         # Add direct statements for ease of querying
-        resource.graph.add((subject_uri, INTERCHANGE.label, resource.identifier))
+        resource.graph.add((subject_iri, INTERCHANGE.label, resource.identifier))
         # if type_ is not None:
         #     resource.graph.add(
-        #         (subject_uri, type_.skosxl_predicate, resource.identifier)
+        #         (subject_iri, type_.skosxl_predicate, resource.identifier)
         #     )
 
         return cls.Builder(resource)
@@ -69,5 +69,5 @@ class Label(Model):
     @property
     def type(self) -> LabelType | None:
         return self.__PREDICATE_TO_TYPE_MAP[
-            self._required_value(RDF.predicate, self._map_term_to_uri)
+            self._required_value(RDF.predicate, self._map_term_to_iri)
         ]

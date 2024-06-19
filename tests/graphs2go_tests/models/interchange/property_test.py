@@ -26,5 +26,5 @@ def test_subject(
 ) -> None:
     assert isinstance(interchange_property.subject, URIRef)
     assert interchange_property.subject in {
-        node.uri for node in interchange_graph.nodes()
+        node.iri for node in interchange_graph.nodes()
     }

@@ -21,20 +21,20 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
         transform_interchange_graph_to_skos_models(interchange_graph_descriptor)
     )
 
-    skos_concept_schemes_by_uri = {
-        concept_scheme.uri: concept_scheme
+    skos_concept_schemes_by_iri = {
+        concept_scheme.iri: concept_scheme
         for concept_scheme in skos_graph.concept_schemes
     }
-    assert len(skos_concept_schemes_by_uri) == 1
-    concept_scheme = next(iter(skos_concept_schemes_by_uri.values()))
+    assert len(skos_concept_schemes_by_iri) == 1
+    concept_scheme = next(iter(skos_concept_schemes_by_iri.values()))
 
-    skos_concepts_by_uri = {concept.uri: concept for concept in skos_graph.concepts}
+    skos_concepts_by_iri = {concept.iri: concept for concept in skos_graph.concepts}
 
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
         for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
-            skos_concept = skos_concepts_by_uri[interchange_node.uri]
+            skos_concept = skos_concepts_by_iri[interchange_node.iri]
 
             skos_lexical_labels_by_type: dict[
                 LabelType | None, list[Literal | skos.Label | URIRef]
@@ -75,13 +75,13 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                     p=interchange_relationship.predicate
                 )
                 assert isinstance(other_resource, Resource)
-                other_uri = other_resource.identifier
-                assert isinstance(other_uri, URIRef)
+                other_iri = other_resource.identifier
+                assert isinstance(other_iri, URIRef)
                 if interchange_relationship.predicate == SKOS.inScheme:
-                    assert other_uri == concept_scheme.uri
+                    assert other_iri == concept_scheme.iri
                 else:
                     assert (
                         interchange_relationship.predicate
                         in skos.Concept.SEMANTIC_RELATION_PREDICATES
                     )
-                    assert other_uri in skos_concepts_by_uri
+                    assert other_iri in skos_concepts_by_iri

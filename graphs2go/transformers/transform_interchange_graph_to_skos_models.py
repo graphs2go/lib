@@ -23,7 +23,7 @@ def _transform_interchange_labels_to_skos_labels(
         skos_label = (
             skos.Label.builder(
                 literal_form=interchange_label.literal_form,
-                uri=interchange_label.uri,
+                iri=interchange_label.iri,
             )
             .set_created(interchange_label.created)
             .set_modified(interchange_label.modified)
@@ -40,7 +40,7 @@ def _transform_skos_concept_interchange_node_to_skos_models(
     interchange_node: interchange.Node,
 ) -> Iterable[skos.Model]:
     skos_concept_builder = (
-        skos.Concept.builder(uri=interchange_node.uri)  # type: ignore
+        skos.Concept.builder(iri=interchange_node.iri)  # type: ignore
         .set_created(interchange_node.created)
         .set_modified(interchange_node.modified)
     )
@@ -78,7 +78,7 @@ def _transform_skos_concept_scheme_interchange_node_to_skos_models(
     interchange_node: interchange.Node,
 ) -> Iterable[skos.Model]:
     skos_concept_scheme_builder = (
-        skos.ConceptScheme.builder(uri=interchange_node.uri)  # type: ignore
+        skos.ConceptScheme.builder(iri=interchange_node.iri)  # type: ignore
         .set_created(interchange_node.created)
         .set_modified(interchange_node.modified)
     )

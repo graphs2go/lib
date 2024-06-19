@@ -37,7 +37,7 @@ def test_in_scheme(
     in_schemes = tuple(skos_concept.in_scheme)
     assert len(in_schemes) == 1
     assert isinstance(in_schemes[0], skos.ConceptScheme)
-    assert in_schemes[0].uri == skos_concept_scheme.uri
+    assert in_schemes[0].iri == skos_concept_scheme.iri
 
 
 def test_notes(skos_concept: skos.Concept) -> None:
@@ -53,8 +53,8 @@ def test_semantic_relations(skos_graph: skos.Graph) -> None:
         for predicate, related_concept in concept.semantic_relations:
             assert predicate in skos.Concept.SEMANTIC_RELATION_PREDICATES
             assert isinstance(related_concept, skos.Concept)
-            assert related_concept.uri in {
-                concept.uri for concept in skos_graph.concepts
+            assert related_concept.iri in {
+                concept.iri for concept in skos_graph.concepts
             }
             return
     pytest.fail("no semantic relations")
