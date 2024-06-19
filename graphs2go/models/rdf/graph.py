@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypeVar
+from typing import TYPE_CHECKING, Self, TypeVar, Generic
 
 import rdflib
 from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
@@ -10,7 +10,7 @@ from graphs2go.models.rdf.model import Model
 from graphs2go.rdf_stores.rdf_store import RdfStore
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Callable
 
     from rdflib.graph import _QuadType
 
@@ -30,7 +30,10 @@ def _model_to_quads(model: Model) -> Iterable[_QuadType]:
         )
 
 
-class Graph:
+ModelT = TypeVar("ModelT", bound=Model, default=Model)
+
+
+class Graph(Generic[ModelT]):
     """
     Non-picklable RDF graph backed by RDF store.
     """
@@ -51,15 +54,20 @@ class Graph:
         )
         self.__rdf_store = rdf_store
 
-    def _add(self, model: Model) -> None:
+    def add(self, model: ModelT) -> None:
         self.__rdf_store.addN(_model_to_quads(model))
 
-    def _add_all(self, models: Iterable[Model]) -> None:
+    def add_all(self, models: Iterable[ModelT]) -> None:
         def models_to_quads() -> Iterable[_QuadType]:
             for model in models:
                 yield from _model_to_quads(model)
 
         self.__rdf_store.addN(models_to_quads())
+
+    def add_all_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
+        if self.is_empty:
+            self.add_all(lazy_models())
+        return self
 
     def close(self) -> None:
         self.__rdflib_graph.close()

@@ -1,6 +1,6 @@
 from urllib.parse import quote
 
-from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
+from dagster import AssetsDefinition, PartitionsDefinition, asset
 from rdflib import URIRef
 from tqdm import tqdm
 
@@ -19,24 +19,15 @@ def build_skos_graph_asset(
         interchange_graph: interchange.Graph.Descriptor,
         rdf_store_config: RdfStoreConfig,
     ) -> skos.Graph.Descriptor:
-        logger = get_dagster_logger()
-
         with skos.Graph.create(
             identifier=URIRef(f"urn:skos:{quote(interchange_graph.identifier)}"),
             rdf_store_config=rdf_store_config,
         ) as open_skos_graph:
-            if not open_skos_graph.is_empty:
-                logger.info("SKOS graph is not empty, skipping load")
-                return open_skos_graph.descriptor
-
-            logger.info("loading SKOS graph")
-            open_skos_graph.add_all(
-                tqdm(
+            return open_skos_graph.oadd_all_if_empty(
+                lambda: tqdm(
                     transform_interchange_graph_to_skos_models(interchange_graph),
                     desc="SKOS graph models",
                 )
-            )
-            logger.info("loaded SKOS graph")
-            return open_skos_graph.descriptor
+            ).descriptor
 
     return skos_graph
