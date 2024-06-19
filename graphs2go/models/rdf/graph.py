@@ -32,7 +32,7 @@ def _model_to_quads(model: Model) -> Iterable[_QuadType]:
         )
 
 
-ModelT = TypeVar("ModelT", bound=Model, default=Model)
+ModelT = TypeVar("ModelT", bound=Model)
 
 
 class Graph(Generic[ModelT]):

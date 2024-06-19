@@ -24,7 +24,7 @@ def build_skos_graph_asset(
             identifier=URIRef(f"urn:skos:{quote(interchange_graph.identifier)}"),
             rdf_store_config=rdf_store_config,
         ) as open_skos_graph:
-            return open_skos_graph.oadd_all_if_empty(
+            return open_skos_graph.add_all_if_empty(
                 lambda: tqdm(
                     transform_interchange_graph_to_skos_models(interchange_graph),
                     desc="SKOS graph models",
