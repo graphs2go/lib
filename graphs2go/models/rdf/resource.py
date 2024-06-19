@@ -1,15 +1,22 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
-from typing import Self, TypeVar
+from typing import Self, TypeVar, TYPE_CHECKING
 
+import rdflib.collection
 from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.term import Node
 from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
 
+
+if TYPE_CHECKING:
+    from graphs2go.models.rdf.named_resource import NamedResource
+
+
+_PyValueT = TypeVar("_PyValueT")
 _ValueT = TypeVar("_ValueT")
 _ValueMapper = Callable[[Node, Node, Node, Graph], Maybe[_ValueT]]
 
@@ -50,19 +57,44 @@ class Resource:
         def bool(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
         ) -> Maybe[bool]:
-            if not isinstance(object_, Literal):
-                return Nothing
-            value_py = object_.toPython()
-            return Some(value_py) if isinstance(value_py, bool) else Nothing
+            return Resource.ValueMappers.__py_value(object_, bool)
+
+        @staticmethod
+        def bytes(
+            _subject: Node, _predicate: Node, object_: Node, _graph: Graph
+        ) -> Maybe[bytes]:
+            return Resource.ValueMappers.__py_value(object_, bytes)
+
+        @staticmethod
+        def collection(
+            _subject: Node, _predicate: Node, object_: Node, graph: Graph
+        ) -> tuple[Node, ...] | None:
+            if not isinstance(object_, BNode | URIRef):
+                return None
+            return tuple(rdflib.collection.Collection(graph, object_))
+
+        @staticmethod
+        def date_or_datetime(
+            _subject: Node, _predicate: Node, object_: Node, _graph: Graph
+        ) -> Maybe[date | datetime]:
+            return Resource.ValueMappers.__py_value(object_, date | datetime)
 
         @staticmethod
         def datetime(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
         ) -> Maybe[datetime]:
+            return Resource.ValueMappers.__py_value(object_, datetime)
+
+        @staticmethod
+        def float(
+            _subject: Node, _predicate: Node, object_: Node, _graph: Graph
+        ) -> Maybe[int]:
             if not isinstance(object_, Literal):
                 return Nothing
             value_py = object_.toPython()
-            return Some(value_py) if isinstance(value_py, datetime) else Nothing
+            if isinstance(value_py, Decimal | float | int):
+                return Some(float(value_py))
+            return Nothing
 
         @staticmethod
         def identifier(
@@ -102,12 +134,19 @@ class Resource:
         @staticmethod
         def named_resource(
             subject: Node, predicate: Node, object_: Node, graph: Graph
-        ) -> Maybe[Resource]:
+        ) -> Maybe["NamedResource"]:
             from .named_resource import NamedResource
 
             return Resource.ValueMappers.iri(subject, predicate, object_, graph).map(
                 lambda iri: NamedResource(graph=graph, iri=iri)
             )
+
+        @staticmethod
+        def __py_value(object_: Node, py_type: type[_PyValueT]) -> Some[_PyValueT]:
+            if not isinstance(object_, Literal):
+                return Nothing
+            py_value = object_.toPython()
+            return Some(py_value) if isinstance(py_value, py_type) else Nothing
 
         @staticmethod
         def resource(
@@ -121,10 +160,7 @@ class Resource:
         def str(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
         ) -> Maybe[str]:
-            if not isinstance(object_, Literal):
-                return Nothing
-            value_py = object_.toPython()
-            return Some(value_py) if isinstance(value_py, str) else Nothing
+            return Resource.ValueMappers.__py_value(object_, str)
 
     def __init__(self, *, graph: Graph, identifier: BNode | URIRef):
         self.__graph = graph

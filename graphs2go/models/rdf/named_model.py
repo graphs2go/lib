@@ -15,13 +15,13 @@ class NamedModel(Model):
         def __init__(self, resource_builder: NamedResource.Builder):
             Model.Builder.__init__(self, resource_builder)
 
-        @property
-        def _resource_builder(self) -> NamedResource.Builder:
-            return cast(NamedResource.Builder, super()._resource_builder)
-
         @abstractmethod
         def build(self) -> NamedModel:
             raise NotImplementedError
+
+        @property
+        def _resource_builder(self) -> NamedResource.Builder:
+            return cast(NamedResource.Builder, super()._resource_builder)
 
     @property
     def resource(self) -> NamedResource:
