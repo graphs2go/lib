@@ -23,8 +23,8 @@ class Node(Model):
     """
 
     class Builder(Model.Builder):
-        def add_rdf_type(self, rdf_type: URIRef) -> Self:
-            self._resource_builder.add(RDF.type, rdf_type)
+        def add_type(self, type_: URIRef) -> Self:
+            self._resource_builder.add(INTERCHANGE.nodeType, type_)
             return self
 
         def build(self) -> Node:
@@ -33,7 +33,7 @@ class Node(Model):
     @classmethod
     def builder(cls, *, iri: URIRef) -> Node.Builder:
         return cls.Builder(
-            rdf.NamedResource.builder(iri=iri).add(RDF.type, cls.primary_rdf_type())
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, INTERCHANGE.Node)
         )
 
     def __dependent_models(
@@ -45,18 +45,17 @@ class Node(Model):
         ):
             yield model_class(resource)
 
-    @property
     def labels(self) -> Iterable[Label]:
         return self.__dependent_models(Label, INTERCHANGE.label)
 
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return INTERCHANGE.Node
-
-    @property
     def properties(self) -> Iterable[Property]:
         return self.__dependent_models(Property, INTERCHANGE.property)
 
-    @property
     def relationships(self) -> Iterable[Relationship]:
         return self.__dependent_models(Relationship, INTERCHANGE.relationship)
+
+    @property
+    def types(self) -> tuple[URIRef, ...]:
+        return tuple(
+            self.resource.values(INTERCHANGE.nodeType, rdf.Resource.ValueMappers.iri)
+        )

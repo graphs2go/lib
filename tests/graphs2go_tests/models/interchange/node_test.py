@@ -1,7 +1,7 @@
 import pytest
 from rdflib import URIRef
 
-from graphs2go.models import interchange
+from graphs2go.models import interchange, skos
 
 
 def test_builder(interchange_node: interchange.Node) -> None:  # noqa: ARG001
@@ -34,5 +34,6 @@ def test_relationships(interchange_graph: interchange.Graph) -> None:
     pytest.fail("didn't find node with relationships")
 
 
-def test_primary_rdf_type() -> None:
-    assert isinstance(interchange.Node.primary_rdf_type(), URIRef)
+def test_types(interchange_node: interchange.Node) -> None:
+    assert len(interchange_node.types) == 1
+    assert interchange_node.types[0] in (skos.Concept, skos.ConceptScheme)
