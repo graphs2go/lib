@@ -10,12 +10,14 @@ from graphs2go.models import rdf
 
 class Model(rdf.NamedModel, ABC):
     class Builder(rdf.NamedModel.Builder, ABC):
-        def set_created(self, created: date | datetime) -> Self:
-            self._resource_builder.set(DCTERMS.created, Literal(created))
+        def set_created(self, created: date | datetime | None) -> Self:
+            if created is not None:
+                self._resource_builder.set(DCTERMS.created, Literal(created))
             return self
 
-        def set_modified(self, modified: date | datetime) -> Self:
-            self._resource_builder.set(DCTERMS.modified, Literal(modified))
+        def set_modified(self, modified: date | datetime | None) -> Self:
+            if modified is not None:
+                self._resource_builder.set(DCTERMS.modified, Literal(modified))
             return self
 
     @property

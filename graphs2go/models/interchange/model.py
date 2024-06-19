@@ -19,7 +19,8 @@ class Model(rdf.NamedModel, ABC):
             return self
 
         def set_source(self, source: URIRef) -> Self:
-            return self._resource_builder.set(DCTERMS.source, source)
+            self._resource_builder.set(DCTERMS.source, source)
+            return self
 
     @property
     def created(self) -> Maybe[datetime]:

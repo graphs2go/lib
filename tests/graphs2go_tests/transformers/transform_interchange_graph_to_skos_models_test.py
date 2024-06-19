@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from rdflib import SKOS, Literal, URIRef
 from rdflib.resource import Resource
 
-from graphs2go.models import interchange, skos
+from graphs2go.models import interchange, skos, rdf
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
     transform_interchange_graph_to_skos_models,
@@ -71,12 +71,13 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                 assert isinstance(interchange_property.object, Literal)
 
             for interchange_relationship in interchange_node.relationships:
-                other_resource = skos_concept.resource.value(
-                    p=interchange_relationship.predicate
+                other_resource: rdf.NamedResource = (
+                    skos_concept.resource.required_value(
+                        interchange_relationship.predicate,
+                        rdf.Resource.ValueMappers.named_resource,
+                    )
                 )
-                assert isinstance(other_resource, Resource)
-                other_iri = other_resource.identifier
-                assert isinstance(other_iri, URIRef)
+                other_iri = other_resource.iri
                 if interchange_relationship.predicate == SKOS.inScheme:
                     assert other_iri == concept_scheme.iri
                 else:

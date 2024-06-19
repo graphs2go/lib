@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from rdflib import SKOS, Literal
+from returns.maybe import Some
 
 from graphs2go.models import interchange, skos
 from graphs2go.models.label_type import LabelType
@@ -45,7 +46,7 @@ def interchange_graph_descriptor(
             interchange.Label.builder(
                 literal_form=Literal("label"),
                 subject=concept_scheme,
-                type_=LabelType.PREFERRED,
+                type_=Some(LabelType.PREFERRED),
             ).build()
         )
 
@@ -60,7 +61,7 @@ def interchange_graph_descriptor(
                 interchange.Label.builder(
                     literal_form=Literal("label" + str(concept_i + 1)),
                     subject=concept,
-                    type_=LabelType.PREFERRED,
+                    type_=Some(LabelType.PREFERRED),
                 ).build()
             )
 
@@ -144,7 +145,7 @@ def skos_graph() -> skos.Graph:
     concept_builders: list[skos.Concept.Builder] = []
     for _ in range(2):
         concept_builder = skos.Concept.builder(iri=uuid_urn())
-        concept_builder.add_in_scheme(concept_scheme)
+        concept_builder.add_in_scheme(concept_scheme.iri)
         concept_builder.add_notation(Literal("testnotation"))
         concept_builder.add_note(SKOS.note, Literal("testnote"))
 
@@ -168,7 +169,7 @@ def skos_graph() -> skos.Graph:
         concept_builders, 2
     ):
         concept_builder_1.add_semantic_relation(
-            object_=concept_builder_2.build(), predicate=SKOS.broader
+            object_=concept_builder_2.build().iri, predicate=SKOS.broader
         )
 
     for concept_builder in concept_builders:

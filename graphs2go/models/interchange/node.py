@@ -24,7 +24,8 @@ class Node(Model):
 
     class Builder(Model.Builder):
         def add_rdf_type(self, rdf_type: URIRef) -> Self:
-            return self._resource_builder.add(RDF.type, rdf_type)
+            self._resource_builder.add(RDF.type, rdf_type)
+            return self
 
         def build(self) -> Node:
             return Node(self._resource_builder.build())
@@ -36,6 +37,7 @@ class Node(Model):
     def __dependent_models(
         self, model_class: type[_ModelT], predicate: URIRef
     ) -> Iterable[_ModelT]:
+        resource: rdf.NamedResource
         for resource in self.resource.values(
             predicate, rdf.Resource.ValueMappers.named_resource, unique=True
         ):

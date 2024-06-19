@@ -1,6 +1,8 @@
 from collections.abc import Iterable
 
 from rdflib import SKOS
+from returns.maybe import Some
+from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, skos
 from graphs2go.transformers.transform_interchange_graph import (
@@ -13,11 +15,12 @@ def _transform_interchange_labels_to_skos_labels(
     subject_skos_model_builder: skos.LabeledModel.Builder,
 ) -> Iterable[skos.Label]:
     for interchange_label in interchange_node.labels:
-        if interchange_label.type is None:
+        if not is_successful(interchange_label.type):
             continue
 
         subject_skos_model_builder.add_lexical_label(
-            label=interchange_label.literal_form, type_=interchange_label.type
+            label=interchange_label.literal_form,
+            type_=interchange_label.type.unwrap(),
         )
 
         skos_label = (
@@ -25,14 +28,14 @@ def _transform_interchange_labels_to_skos_labels(
                 literal_form=interchange_label.literal_form,
                 iri=interchange_label.iri,
             )
-            .set_created(interchange_label.created)
-            .set_modified(interchange_label.modified)
+            .set_created(interchange_label.created.value_or(None))
+            .set_modified(interchange_label.modified.value_or(None))
             .build()
         )
         yield skos_label
 
         subject_skos_model_builder.add_lexical_label(
-            label=skos_label, type_=interchange_label.type
+            label=skos_label, type_=interchange_label.type.unwrap()
         )
 
 
@@ -41,8 +44,8 @@ def _transform_skos_concept_interchange_node_to_skos_models(
 ) -> Iterable[skos.Model]:
     skos_concept_builder = (
         skos.Concept.builder(iri=interchange_node.iri)  # type: ignore
-        .set_created(interchange_node.created)
-        .set_modified(interchange_node.modified)
+        .set_created(interchange_node.created.value_or(None))
+        .set_modified(interchange_node.modified.value_or(None))
     )
 
     yield from _transform_interchange_labels_to_skos_labels(
@@ -79,8 +82,8 @@ def _transform_skos_concept_scheme_interchange_node_to_skos_models(
 ) -> Iterable[skos.Model]:
     skos_concept_scheme_builder = (
         skos.ConceptScheme.builder(iri=interchange_node.iri)  # type: ignore
-        .set_created(interchange_node.created)
-        .set_modified(interchange_node.modified)
+        .set_created(interchange_node.created.value_or(None))
+        .set_modified(interchange_node.modified.value_or(None))
     )
 
     yield from _transform_interchange_labels_to_skos_labels(
