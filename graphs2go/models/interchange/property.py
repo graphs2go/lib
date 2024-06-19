@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from rdflib import RDF, Literal, URIRef
+from returns.maybe import Maybe, Nothing
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
@@ -24,7 +25,7 @@ class Property(Model):
         predicate: URIRef,
         object_: Literal,
         subject: rdf.Model | URIRef,
-        iri: URIRef | None = None,
+        iri: Maybe[URIRef] = Nothing,
     ) -> Property.Builder:
         subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject
 

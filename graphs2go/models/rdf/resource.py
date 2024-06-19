@@ -68,10 +68,10 @@ class Resource:
         @staticmethod
         def collection(
             _subject: Node, _predicate: Node, object_: Node, graph: Graph
-        ) -> tuple[Node, ...] | None:
+        ) -> Maybe[tuple[Node, ...]]:
             if not isinstance(object_, BNode | URIRef):
-                return None
-            return tuple(rdflib.collection.Collection(graph, object_))
+                return Nothing
+            return Some(tuple(rdflib.collection.Collection(graph, object_)))
 
         @staticmethod
         def date_or_datetime(

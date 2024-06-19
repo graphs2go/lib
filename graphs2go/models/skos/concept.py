@@ -46,16 +46,16 @@ class Concept(LabeledModel):
 
     class Builder(LabeledModel.Builder):
         def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
-            return self.add(SKOS.inScheme, in_scheme)
+            return self._resource_builder.add(SKOS.inScheme, in_scheme)
 
-        def add_notation(self, notation: Literal | None) -> Self:
-            return self.add(SKOS.notation, notation)
+        def add_notation(self, notation: Literal) -> Self:
+            return self._resource_builder.add(SKOS.notation, notation)
 
         def add_note(self, predicate: URIRef, object_: Literal) -> Self:
             if predicate not in Concept.NOTE_PREDICATES:
                 raise ValueError(f"{predicate} is not a note predicate")
 
-            return self.add(predicate, object_)
+            return self._resource_builder.add(predicate, object_)
 
         def add_semantic_relation(
             self, predicate: URIRef, object_: Concept | URIRef
@@ -63,10 +63,10 @@ class Concept(LabeledModel):
             if predicate not in Concept.SEMANTIC_RELATION_PREDICATES:
                 raise ValueError(f"{predicate} is not a semantic relation")
 
-            return self.add(predicate, object_)
+            return self._resource_builder.add(predicate, object_)
 
         def build(self) -> Concept:
-            return Concept(resource=self._resource)
+            return Concept(resource=self._resource_builder.build())
 
     @classmethod
     def builder(cls, *, iri: URIRef) -> Builder:

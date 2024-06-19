@@ -2,26 +2,29 @@ from datetime import date, datetime
 from typing import Self
 
 from rdflib import DCTERMS, Literal
+from returns.maybe import Maybe
 
 from graphs2go.models import rdf
 
 
 class Model(rdf.Model):
     class Builder(rdf.Model.Builder):
-        def set_created(self, created: date | datetime | None) -> Self:
-            return self.set(
-                DCTERMS.created, Literal(created) if created is not None else None
-            )
+        def set_created(self, created: date | datetime) -> Self:
+            self._resource_builder.set(DCTERMS.created, Literal(created))
+            return self
 
-        def set_modified(self, modified: date | datetime | None) -> Self:
-            return self.set(
-                DCTERMS.modified, Literal(modified) if modified is not None else None
-            )
+        def set_modified(self, modified: date | datetime) -> Self:
+            self._resource_builder.set(DCTERMS.modified, Literal(modified))
+            return self
 
     @property
-    def created(self) -> datetime | None:
-        return self._optional_value(DCTERMS.created, self._map_term_to_datetime)
+    def created(self) -> Maybe[datetime]:
+        return self.resource.optional_value(
+            DCTERMS.created, rdf.Resource.ValueMappers.datetime
+        )
 
     @property
-    def modified(self) -> datetime | None:
-        return self._optional_value(DCTERMS.modified, self._map_term_to_datetime)
+    def modified(self) -> Maybe[datetime]:
+        return self.resource.optional_value(
+            DCTERMS.modified, rdf.Resource.ValueMappers.datetime
+        )

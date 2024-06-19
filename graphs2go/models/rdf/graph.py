@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING, Self, TypeVar, Generic
 
 import rdflib
 from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
+from returns.maybe import Maybe, Nothing
 
 from graphs2go.models.rdf.model import Model
+from graphs2go.models.rdf.named_resource import NamedResource
 from graphs2go.rdf_stores.rdf_store import RdfStore
 
 if TYPE_CHECKING:
@@ -106,14 +108,16 @@ class Graph(Generic[ModelT]):
         return self.__rdf_store.is_empty
 
     def _models_by_rdf_type(
-        self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef | None = None
+        self, model_class: type[_ModelT], *, rdf_type: Maybe[rdflib.URIRef] = Nothing
     ) -> Iterable[_ModelT]:
         for model_iri in self._model_iris_by_rdf_type(
             rdf_type=(
                 rdf_type if rdf_type is not None else model_class.primary_rdf_type()
             )
         ):
-            yield model_class(resource=self.__rdflib_graph.resource(model_iri))
+            yield model_class(
+                resource=NamedResource(graph=self.__rdflib_graph, iri=model_iri)
+            )
 
     def _model_iris_by_rdf_type(
         self, rdf_type: rdflib.URIRef

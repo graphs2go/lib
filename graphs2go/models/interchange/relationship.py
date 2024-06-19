@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from rdflib import RDF
+from returns.maybe import Maybe, Nothing
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
@@ -29,7 +30,7 @@ class Relationship(Model):
         object_: rdf.Model | URIRef,
         predicate: URIRef,
         subject: rdf.Model | URIRef,
-        iri: URIRef | None = None,
+        iri: Maybe[URIRef] = Nothing,
     ) -> Relationship.Builder:
         object_iri = object_.iri if isinstance(object_, rdf.Model) else object_
         subject_iri = subject.iri if isinstance(subject, rdf.Model) else subject

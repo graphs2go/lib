@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 
 from rdflib import RDF, RDFS
+from returns.maybe import Nothing, Maybe
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
@@ -39,8 +40,8 @@ class Label(Model):
         *,
         literal_form: Literal,
         subject: rdf.Model | URIRef,
-        type_: LabelType | None = None,
-        iri: URIRef | None = None,
+        type_: Maybe[LabelType] = Nothing,
+        iri: Maybe[URIRef] = Nothing,
     ) -> Label.Builder:
         resource = cls._create_resource(iri if iri is not None else uuid_urn())
         resource.add(RDF.predicate, cls.__TYPE_TO_PREDICATE_MAP[type_])
@@ -67,7 +68,11 @@ class Label(Model):
         return INTERCHANGE.Label
 
     @property
-    def type(self) -> LabelType | None:
-        return self.__PREDICATE_TO_TYPE_MAP[
-            self._required_value(RDF.predicate, self._map_term_to_iri)
-        ]
+    def type(self) -> Maybe[LabelType]:
+        return Maybe.from_optional(
+            self.__PREDICATE_TO_TYPE_MAP[
+                self.resource.required_value(
+                    RDF.predicate, rdf.Resource.ValueMappers.iri
+                )
+            ]
+        )

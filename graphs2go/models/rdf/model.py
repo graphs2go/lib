@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 from rdflib import URIRef, RDF
+from graphs2go.models.rdf.resource import Resource
 
 if TYPE_CHECKING:
-    from graphs2go.models.rdf.resource import Resource
+    from collections.abc import Iterable
 
 
 class Model:
