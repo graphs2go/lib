@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 from rdflib import SKOS, Literal, URIRef
-from rdflib.resource import Resource
 
 from graphs2go.models import interchange, skos, rdf
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore

@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 
 from rdflib import SKOS
-from returns.maybe import Some
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, skos

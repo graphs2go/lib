@@ -139,7 +139,7 @@ class Resource:
         @staticmethod
         def named_resource(
             subject: Node, predicate: Node, object_: Node, graph: Graph
-        ) -> Maybe["NamedResource"]:
+        ) -> Maybe[NamedResource]:
             from .named_resource import NamedResource
 
             return Resource.ValueMappers.iri(subject, predicate, object_, graph).map(

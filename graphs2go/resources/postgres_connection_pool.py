@@ -88,6 +88,4 @@ class PostgresConnectionPool(ConfigurableResource):  # type: ignore
         finally:
             connection_pool.putconn(conn)
             t1 = monotonic()
-            connection_pool._stats[connection_pool._USAGE_MS] += int(  # noqa: SLF001
-                1000.0 * (t1 - t0)
-            )
+            connection_pool._stats[connection_pool._USAGE_MS] += int(1000.0 * (t1 - t0))

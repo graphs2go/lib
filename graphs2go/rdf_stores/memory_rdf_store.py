@@ -27,7 +27,7 @@ class MemoryRdfStore(RdfStore):
         self,
         triple: _TripleType,
         context: _ContextType,
-        quoted: bool = False,  # noqa: FBT001, FBT002
+        quoted: bool = False,
     ) -> None:
         self.__delegate.add(triple, context, quoted)
 
@@ -38,7 +38,7 @@ class MemoryRdfStore(RdfStore):
         self,
         prefix: str,
         namespace: URIRef,
-        override: bool = True,  # noqa: FBT001, FBT002
+        override: bool = True,
     ) -> None:
         self.__delegate.bind(prefix, namespace, override)
 

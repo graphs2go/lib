@@ -7,7 +7,7 @@ from graphs2go.transformers.transform_interchange_graph import (
 
 
 def _transform_interchange_node_to_direct_rdf_models(
-    interchange_node: interchange.Node,
+    interchange_node: interchange.Node,  # noqa: ARG001
 ) -> Iterable[rdf.Model]:
     return ()
 
@@ -26,5 +26,5 @@ def transform_interchange_graph_to_direct_rdf_models(
     yield from transform_interchange_graph(
         in_process=True,
         interchange_graph_descriptor=interchange_graph_descriptor,
-        transform_interchange_node=_transform_interchange_node_to_rdf_models,
+        transform_interchange_node=_transform_interchange_node_to_direct_rdf_models,
     )

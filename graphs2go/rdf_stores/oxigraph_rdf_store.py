@@ -194,7 +194,7 @@ class OxigraphRdfStore(RdfStore):
         self,
         triple: _TripleType,
         context: Graph,
-        quoted: bool = False,  # noqa: FBT001, FBT002
+        quoted: bool = False,
     ) -> None:
         if quoted:
             raise ValueError("Oxigraph stores are not formula aware")
@@ -214,7 +214,7 @@ class OxigraphRdfStore(RdfStore):
         self,
         prefix: str,
         namespace: URIRef,
-        override: bool = True,  # noqa: FBT001, FBT002
+        override: bool = True,
     ) -> None:
         if not override and (
             prefix in self.__namespace_for_prefix
@@ -226,9 +226,7 @@ class OxigraphRdfStore(RdfStore):
         self.__namespace_for_prefix[prefix] = namespace
         self.__prefix_for_namespace[namespace] = prefix
 
-    def close(
-        self, commit_pending_transaction: bool = False  # noqa: ARG002, FBT001, FBT002
-    ) -> None:
+    def close(self, commit_pending_transaction: bool = False) -> None:  # noqa: ARG002
         # There's no explicit close on the pyoxigraph Store.
         # Delete all references to the pyoxigraph Store so it gets garbage collected and releases its lock.
         with contextlib.suppress(AttributeError):
@@ -297,7 +295,7 @@ class OxigraphRdfStore(RdfStore):
         yield from self.__namespace_for_prefix.items()
 
     def open(
-        self, configuration: str, create: bool = False  # noqa: ARG002, FBT001, FBT002
+        self, configuration: str, create: bool = False  # noqa: ARG002
     ) -> int | None:
         return rdflib.store.VALID_STORE
 

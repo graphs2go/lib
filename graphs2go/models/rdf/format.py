@@ -15,8 +15,8 @@ class Format(Enum):
     def __init__(
         self,
         file_extension: str,
-        line_oriented: bool,  # noqa: FBT001
-        supports_quads: bool,  # noqa: FBT001
+        line_oriented: bool,
+        supports_quads: bool,
     ):
         self.file_extension = file_extension
         self.line_oriented = line_oriented
@@ -44,8 +44,8 @@ class Format(Enum):
     def __new__(
         cls,
         file_extension: str,
-        line_oriented: bool,  # noqa: ARG003, FBT001
-        supports_quads: bool,  # noqa: ARG003, FBT001
+        line_oriented: bool,  # noqa: ARG003
+        supports_quads: bool,  # noqa: ARG003
     ):
         obj = object.__new__(cls)
         obj._value_ = file_extension

@@ -1,12 +1,10 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING
 
 import stringcase
 from rdflib import URIRef
 from rdflib.namespace import NamespaceManager
-from returns.maybe import Maybe
 from returns.pipeline import is_successful
 
 from graphs2go.models import cypher, interchange
@@ -14,6 +12,10 @@ from graphs2go.models.cypher.node_pattern import NodePattern
 from graphs2go.transformers.transform_interchange_graph import (
     transform_interchange_graph,
 )
+
+if TYPE_CHECKING:
+    from datetime import datetime
+    from returns.maybe import Maybe
 
 _PRIMARY_NODE_LABEL = "Node"
 
@@ -76,20 +78,23 @@ def _transform_interchange_node(
         property_name = iri_transformer.iri_to_property_name(
             interchange_property.predicate
         )
-        property_value = interchange_property.object.toPython()
-        create_node_statement_builder.add_property(property_name, property_value)
+        interchange_property_value = interchange_property.object.toPython()
+        create_node_statement_builder.add_property(
+            property_name, interchange_property_value
+        )
         property_names.add(property_name)
 
     for interchange_node_property_name in ("created", "modified"):
         if interchange_node_property_name in property_names:
             continue
-        property_value: Maybe[datetime] = getattr(
+        interchange_node_property_value: Maybe[datetime] = getattr(
             interchange_node, interchange_node_property_name
         )
-        if not is_successful(property_value):
+        if not is_successful(interchange_node_property_value):
             continue
         create_node_statement_builder.add_property(
-            interchange_node_property_name, property_value.unwrap()
+            interchange_node_property_name,
+            interchange_node_property_value.unwrap(),
         )
 
     cypher_statements.append(create_node_statement_builder.build())
@@ -127,13 +132,14 @@ def _transform_interchange_node(
         )
 
         for interchange_relationship_property_name in ("created", "modified"):
-            property_value: Maybe[datetime] = getattr(
+            interchange_relationship_property_value: Maybe[datetime] = getattr(
                 interchange_relationship, interchange_relationship_property_name
             )
-            if not is_successful(property_value):
+            if not is_successful(interchange_relationship_property_value):
                 continue
             create_relationship_statement_builder.add_property(
-                interchange_node_property_name, property_value.unwrap()
+                interchange_node_property_name,
+                interchange_relationship_property_value.unwrap(),
             )
 
         cypher_statements.append(create_relationship_statement_builder.build())
