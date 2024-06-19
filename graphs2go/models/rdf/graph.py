@@ -111,23 +111,25 @@ class Graph(Generic[ModelT]):
     def _models_by_rdf_type(
         self, *, model_class: type[_ModelT], rdf_type: rdflib.URIRef
     ) -> Iterable[_ModelT]:
-        for model_iri in self._model_iris_by_rdf_type(rdf_type):
-            yield model_class(
+        return (
+            model_class(
                 resource=NamedResource(graph=self.__rdflib_graph, iri=model_iri)
             )
+            for model_iri in self._model_iris_by_rdf_type(rdf_type)
+        )
 
     def _model_iris_by_rdf_type(
         self, rdf_type: rdflib.URIRef
     ) -> Iterable[rdflib.URIRef]:
-        for model_iri in self.__rdflib_graph.subjects(
-            predicate=rdflib.RDF.type,
-            object=rdf_type,
-            unique=True,
-        ):
-            if not isinstance(model_iri, rdflib.URIRef):
-                continue
-
-            yield model_iri
+        return (
+            model_iri
+            for model_iri in self.__rdflib_graph.subjects(
+                predicate=rdflib.RDF.type,
+                object=rdf_type,
+                unique=True,
+            )
+            if isinstance(model_iri, rdflib.URIRef)
+        )
 
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
