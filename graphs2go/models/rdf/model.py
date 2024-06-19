@@ -27,13 +27,13 @@ class Model(ABC):
     Abstract base class for models backed by an rdflib Resource.
     """
 
-    class Builder(ABC):
+    class Builder:
         def __init__(self, resource: Resource):
             if not isinstance(resource.identifier, URIRef):
                 raise TypeError("expected URI-identified resource")
             self.__resource = resource
 
-        def _add(
+        def add(
             self, predicate: URIRef, object_: Literal | Model | URIRef | None
         ) -> Self:
             if object_ is not None:
@@ -43,7 +43,10 @@ class Model(ABC):
                     self._resource.add(predicate, object_)
             return self
 
-        def _set(
+        def build(self) -> Model:
+            return Model(self._resource)
+
+        def set(
             self, predicate: URIRef, object_: Literal | Model | URIRef | None
         ) -> Self:
             if object_ is not None:
@@ -54,10 +57,6 @@ class Model(ABC):
             else:
                 self._resource.remove(predicate)
             return self
-
-        @abstractmethod
-        def build(self) -> Model:
-            pass
 
         @property
         def _resource(self) -> Resource:

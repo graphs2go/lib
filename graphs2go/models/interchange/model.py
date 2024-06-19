@@ -9,17 +9,17 @@ from graphs2go.models import rdf
 class Model(rdf.Model):
     class Builder(rdf.Model.Builder):
         def set_created(self, created: date | datetime | None) -> Self:
-            return self._set(
+            return self.set(
                 DCTERMS.created, Literal(created) if created is not None else None
             )
 
         def set_modified(self, modified: date | datetime | None) -> Self:
-            return self._set(
+            return self.set(
                 DCTERMS.modified, Literal(modified) if modified is not None else None
             )
 
         def set_source(self, source: URIRef | None) -> Self:
-            return self._set(DCTERMS.source, source)
+            return self.set(DCTERMS.source, source)
 
     @property
     def created(self) -> datetime | None:
