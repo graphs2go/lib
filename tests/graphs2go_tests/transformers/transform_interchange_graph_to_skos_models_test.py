@@ -32,7 +32,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
-        for interchange_node in interchange_graph.nodes(rdf_type=SKOS.Concept):
+        for interchange_node in interchange_graph.nodes_by_type(SKOS.Concept):
             skos_concept = skos_concepts_by_iri[interchange_node.iri]
 
             skos_lexical_labels_by_type: dict[

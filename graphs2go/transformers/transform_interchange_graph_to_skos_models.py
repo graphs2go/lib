@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 
 from rdflib import SKOS
+from returns.maybe import Some
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, skos
@@ -101,12 +102,12 @@ def transform_interchange_graph_to_skos_models(
     yield from transform_interchange_graph(
         in_process=True,
         interchange_graph_descriptor=interchange_graph_descriptor,
-        interchange_node_rdf_type=SKOS.ConceptScheme,
+        interchange_node_type=Some(SKOS.ConceptScheme),
         transform_interchange_node=_transform_skos_concept_scheme_interchange_node_to_skos_models,
     )
 
     yield from transform_interchange_graph(
         interchange_graph_descriptor=interchange_graph_descriptor,
-        interchange_node_rdf_type=SKOS.Concept,
+        interchange_node_type=Some(SKOS.Concept),
         transform_interchange_node=_transform_skos_concept_interchange_node_to_skos_models,
     )

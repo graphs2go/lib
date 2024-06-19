@@ -3,9 +3,10 @@ from multiprocessing import JoinableQueue, Queue
 from typing import TypeVar
 
 from rdflib import URIRef
+from returns.maybe import Nothing, Maybe
+from returns.pipeline import is_successful
 
 from graphs2go.models import interchange
-from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.transformers.parallel_transform import parallel_transform
 
 _INTERCHANGE_NODE_BATCH_SIZE = 100
@@ -44,14 +45,16 @@ def _producer(
     input_: _ProducerInputT,
     work_queue: JoinableQueue,
 ) -> None:
-    interchange_graph_descriptor, interchange_node_rdf_type = input_
+    interchange_graph_descriptor, interchange_node_type = input_
 
     interchange_node_iris_batch: list[URIRef] = []
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
-        for interchange_node_iri in interchange_graph.node_iris(
-            rdf_type=interchange_node_rdf_type
+        for interchange_node_iri in (
+            interchange_graph.node_iris_by_type(interchange_node_type)
+            if interchange_node_type is not None
+            else interchange_graph.node_iris()
         ):
             interchange_node_iris_batch.append(interchange_node_iri)
             if len(interchange_node_iris_batch) == _INTERCHANGE_NODE_BATCH_SIZE:
@@ -66,15 +69,17 @@ def transform_interchange_graph(
     *,
     interchange_graph_descriptor: interchange.Graph.Descriptor,
     transform_interchange_node: _TransformInterchangeNode,
-    interchange_node_rdf_type: URIRef = INTERCHANGE.Node,
+    interchange_node_type: Maybe[URIRef] = Nothing,
     in_process: bool = False
 ) -> Iterable[_OutputT]:
     if in_process:
         with interchange.Graph.open(
             interchange_graph_descriptor, read_only=True
         ) as interchange_graph:
-            for interchange_node in interchange_graph.nodes(
-                rdf_type=interchange_node_rdf_type
+            for interchange_node in (
+                interchange_graph.nodes_by_type(interchange_node_type.unwrap())
+                if is_successful(interchange_node_type)
+                else interchange_graph.nodes()
             ):
                 yield from transform_interchange_node(interchange_node)
         return
@@ -88,6 +93,6 @@ def transform_interchange_graph(
         producer=_producer,
         producer_input=(
             interchange_graph_descriptor,
-            interchange_node_rdf_type,
+            interchange_node_type.value_or(None),
         ),
     )

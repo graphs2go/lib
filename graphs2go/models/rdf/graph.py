@@ -109,7 +109,7 @@ class Graph(Generic[ModelT]):
         return self.__rdf_store.is_empty
 
     def _models_by_rdf_type(
-        self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef
+        self, *, model_class: type[_ModelT], rdf_type: rdflib.URIRef
     ) -> Iterable[_ModelT]:
         for model_iri in self._model_iris_by_rdf_type(rdf_type):
             yield model_class(
