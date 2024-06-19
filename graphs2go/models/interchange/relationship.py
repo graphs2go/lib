@@ -41,7 +41,7 @@ class Relationship(Model):
         resource_builder.add(RDF.object, object_iri)
         resource_builder.add(RDF.predicate, predicate)
         resource_builder.add(RDF.subject, subject_iri)
-        resource_builder.add(RDF.type, cls.primary_rdf_type())
+        resource_builder.add(RDF.type, INTERCHANGE.Relationship)
         resource_builder.add(RDF.type, RDF.Statement)
         # Add direct statements for ease of querying
         # (s, p, o)
@@ -62,10 +62,6 @@ class Relationship(Model):
         return self.resource.required_value(
             RDF.predicate, rdf.Resource.ValueMappers.iri
         )
-
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return INTERCHANGE.Relationship
 
     @property
     def subject(self) -> URIRef:

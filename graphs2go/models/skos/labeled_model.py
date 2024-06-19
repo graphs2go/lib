@@ -27,7 +27,6 @@ class LabeledModel(Model, ABC):
 
     _LABEL_CLASS = Label
 
-    @property
     def lexical_labels(self) -> Iterable[tuple[LabelType, Label | Literal]]:
         for label_type in LabelType:
             literal: Literal

@@ -2,12 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from returns.maybe import Some
-
 from graphs2go.models import rdf
+from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.node import Node
 from graphs2go.namespaces.interchange import INTERCHANGE
-from graphs2go.models.interchange.model import Model
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -25,7 +23,7 @@ class Graph(rdf.Graph[Model]):
         return Node(rdf.NamedResource(graph=self.rdflib_graph, iri=iri))
 
     def nodes(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[Node]:
-        return self._models_by_rdf_type(Node, rdf_type=Some(rdf_type))
+        return self._models_by_rdf_type(Node, rdf_type=rdf_type)
 
     def node_iris(self, *, rdf_type: URIRef = INTERCHANGE.Node) -> Iterable[URIRef]:
         return self._model_iris_by_rdf_type(rdf_type=rdf_type)

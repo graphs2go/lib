@@ -1,7 +1,7 @@
 import pytest
-from rdflib import URIRef
+from rdflib import SKOS
 
-from graphs2go.models import interchange, skos
+from graphs2go.models import interchange
 
 
 def test_builder(interchange_node: interchange.Node) -> None:  # noqa: ARG001
@@ -9,12 +9,12 @@ def test_builder(interchange_node: interchange.Node) -> None:  # noqa: ARG001
 
 
 def test_labels(interchange_node: interchange.Node) -> None:
-    assert tuple(interchange_node.labels)
+    assert tuple(interchange_node.labels())
 
 
 def test_properties(interchange_graph: interchange.Graph) -> None:
     for node in interchange_graph.nodes():
-        for property_ in node.properties:
+        for property_ in node.properties():
             assert property_.subject == node.iri
             return
     pytest.fail("no node with properties")
@@ -23,7 +23,7 @@ def test_properties(interchange_graph: interchange.Graph) -> None:
 def test_relationships(interchange_graph: interchange.Graph) -> None:
     all_node_iris = {node.iri for node in interchange_graph.nodes()}
     for node in interchange_graph.nodes():
-        relationships = tuple(node.relationships)
+        relationships = tuple(node.relationships())
         if not relationships:
             continue
         for relationship in relationships:
@@ -36,4 +36,4 @@ def test_relationships(interchange_graph: interchange.Graph) -> None:
 
 def test_types(interchange_node: interchange.Node) -> None:
     assert len(interchange_node.types) == 1
-    assert interchange_node.types[0] in (skos.Concept, skos.ConceptScheme)
+    assert interchange_node.types[0] in (SKOS.Concept, SKOS.ConceptScheme)

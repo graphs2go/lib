@@ -38,7 +38,7 @@ def interchange_graph_descriptor(
     ) as graph:
         concept_scheme = (
             interchange.Node.builder(iri=uuid_urn())
-            .add_rdf_type(SKOS.ConceptScheme)
+            .add_type(SKOS.ConceptScheme)
             .build()
         )
         graph.add(concept_scheme)
@@ -51,7 +51,7 @@ def interchange_graph_descriptor(
         )
 
         concepts = tuple(
-            interchange.Node.builder(iri=uuid_urn()).add_rdf_type(SKOS.Concept).build()
+            interchange.Node.builder(iri=uuid_urn()).add_type(SKOS.Concept).build()
             for _ in range(2)
         )
         for concept_i, concept in enumerate(concepts):
@@ -93,7 +93,7 @@ def interchange_graph_descriptor(
 
 @pytest.fixture()
 def interchange_label(interchange_node: interchange.Node) -> interchange.Label:
-    return next(iter(interchange_node.labels))
+    return next(iter(interchange_node.labels()))
 
 
 @pytest.fixture()
@@ -106,7 +106,7 @@ def interchange_node(interchange_graph: interchange.Graph) -> interchange.Node:
 @pytest.fixture()
 def interchange_property(interchange_graph: interchange.Graph) -> interchange.Property:
     for node in interchange_graph.nodes():
-        for property_ in node.properties:
+        for property_ in node.properties():
             return property_
     pytest.fail("no properties")
 
@@ -116,21 +116,21 @@ def interchange_relationship(
     interchange_graph: interchange.Graph,
 ) -> interchange.Relationship:
     for node in interchange_graph.nodes():
-        for relationship in node.relationships:
+        for relationship in node.relationships():
             return relationship
     pytest.fail("no relationships")
 
 
 @pytest.fixture(scope="session")
 def skos_concept(skos_graph: skos.Graph) -> skos.Concept:
-    for concept in skos_graph.concepts:
+    for concept in skos_graph.concepts():
         return concept
     pytest.fail("no concepts")
 
 
 @pytest.fixture(scope="session")
 def skos_concept_scheme(skos_graph: skos.Graph) -> skos.ConceptScheme:
-    for concept_scheme in skos_graph.concept_schemes:
+    for concept_scheme in skos_graph.concept_schemes():
         return concept_scheme
     pytest.fail("no concept schemes")
 
@@ -180,6 +180,6 @@ def skos_graph() -> skos.Graph:
 
 @pytest.fixture(scope="session")
 def skos_label(skos_graph: skos.Graph) -> skos.Label:
-    for label in skos_graph.labels:
+    for label in skos_graph.labels():
         return label
     pytest.fail("no labels")

@@ -22,12 +22,12 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
 
     skos_concept_schemes_by_iri = {
         concept_scheme.iri: concept_scheme
-        for concept_scheme in skos_graph.concept_schemes
+        for concept_scheme in skos_graph.concept_schemes()
     }
     assert len(skos_concept_schemes_by_iri) == 1
     concept_scheme = next(iter(skos_concept_schemes_by_iri.values()))
 
-    skos_concepts_by_iri = {concept.iri: concept for concept in skos_graph.concepts}
+    skos_concepts_by_iri = {concept.iri: concept for concept in skos_graph.concepts()}
 
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
@@ -38,12 +38,12 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
             skos_lexical_labels_by_type: dict[
                 LabelType | None, list[Literal | skos.Label | URIRef]
             ] = {}
-            for label_type, skos_lexical_label in skos_concept.lexical_labels:
+            for label_type, skos_lexical_label in skos_concept.lexical_labels():
                 skos_lexical_labels_by_type.setdefault(label_type, []).append(
                     skos_lexical_label
                 )
 
-            for interchange_label in interchange_node.labels:
+            for interchange_label in interchange_node.labels():
                 assert any(
                     True
                     for skos_lexical_label in skos_lexical_labels_by_type[
@@ -62,14 +62,14 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                     == interchange_label.literal_form
                 )
 
-            for interchange_property in interchange_node.properties:
+            for interchange_property in interchange_node.properties():
                 assert (
                     interchange_property.predicate == SKOS.notation
                     or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
                 )
                 assert isinstance(interchange_property.object, Literal)
 
-            for interchange_relationship in interchange_node.relationships:
+            for interchange_relationship in interchange_node.relationships():
                 other_resource: rdf.NamedResource = (
                     skos_concept.resource.required_value(
                         interchange_relationship.predicate,

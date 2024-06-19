@@ -27,6 +27,6 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                 if isinstance(s, cypher.CreateRelationshipStatement)
             )
         ) == sum(
-            len(tuple(interchange_node.relationships))
+            len(tuple(interchange_node.relationships()))
             for interchange_node in interchange_graph.nodes()
         )

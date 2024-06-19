@@ -60,21 +60,19 @@ def _transform_interchange_node(
         namespace_manager=interchange_node.resource.graph.namespace_manager
     )
 
-    interchange_node_secondary_rdf_types = tuple(interchange_node.secondary_rdf_types)
-
     node_labels: list[str] = [_PRIMARY_NODE_LABEL]
 
     create_node_statement_builder = cypher.CreateNodeStatement.builder(
         id_=iri_transformer.iri_to_node_id(interchange_node.iri), label=node_labels[0]
     )
 
-    for interchange_node_secondary_rdf_type in interchange_node_secondary_rdf_types:
+    for type_iri in interchange_node.types:
         create_node_statement_builder.add_label(
-            iri_transformer.iri_to_node_label(interchange_node_secondary_rdf_type)
+            iri_transformer.iri_to_node_label(type_iri)
         )
 
     property_names: set[str] = set()
-    for interchange_property in interchange_node.properties:
+    for interchange_property in interchange_node.properties():
         property_name = iri_transformer.iri_to_property_name(
             interchange_property.predicate
         )
@@ -107,7 +105,7 @@ def _transform_interchange_node(
         .build()
     )
     interchange_relationship_objects: set[URIRef] = set()
-    for interchange_relationship in interchange_node.relationships:
+    for interchange_relationship in interchange_node.relationships():
         interchange_relationship_object = interchange_relationship.object
         interchange_relationship_objects.add(interchange_relationship_object)
 

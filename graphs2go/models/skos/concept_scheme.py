@@ -14,9 +14,5 @@ class ConceptScheme(LabeledModel):
     @classmethod
     def builder(cls, *, iri: URIRef) -> Builder:
         return cls.Builder(
-            rdf.NamedResource.builder(iri=iri).add(RDF.type, cls.primary_rdf_type())
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, SKOS.ConceptScheme)
         )
-
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return SKOS.ConceptScheme

@@ -23,13 +23,9 @@ class Label(Model):
     def builder(cls, *, literal_form: Literal, iri: URIRef) -> Builder:
         return cls.Builder(
             rdf.NamedResource.builder(iri=iri)
-            .add(RDF.type, cls.primary_rdf_type())
+            .add(RDF.type, SKOSXL.Label)
             .add(SKOSXL.literalForm, literal_form)
         )
-
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return SKOSXL.Label
 
     @property
     def literal_form(self) -> Literal:

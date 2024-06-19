@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import TYPE_CHECKING, cast
 
 from graphs2go.models.rdf.model import Model
@@ -15,9 +14,8 @@ class NamedModel(Model):
         def __init__(self, resource_builder: NamedResource.Builder):
             Model.Builder.__init__(self, resource_builder)
 
-        @abstractmethod
         def build(self) -> NamedModel:
-            raise NotImplementedError
+            return NamedModel(self._resource_builder.build())
 
         @property
         def _resource_builder(self) -> NamedResource.Builder:

@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Self, TypeVar, Generic
 
 import rdflib
 from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
-from returns.maybe import Maybe, Nothing
 
 from graphs2go.models.rdf.model import Model
 from graphs2go.models.rdf.named_resource import NamedResource
@@ -56,15 +55,17 @@ class Graph(Generic[ModelT]):
         )
         self.__rdf_store = rdf_store
 
-    def add(self, model: ModelT) -> None:
+    def add(self, model: ModelT) -> Self:
         self.__rdf_store.addN(_model_to_quads(model))
+        return self
 
-    def add_all(self, models: Iterable[ModelT]) -> None:
+    def add_all(self, models: Iterable[ModelT]) -> Self:
         def models_to_quads() -> Iterable[_QuadType]:
             for model in models:
                 yield from _model_to_quads(model)
 
         self.__rdf_store.addN(models_to_quads())
+        return self
 
     def add_all_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
         if self.is_empty:
@@ -108,11 +109,9 @@ class Graph(Generic[ModelT]):
         return self.__rdf_store.is_empty
 
     def _models_by_rdf_type(
-        self, model_class: type[_ModelT], *, rdf_type: Maybe[rdflib.URIRef] = Nothing
+        self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef
     ) -> Iterable[_ModelT]:
-        for model_iri in self._model_iris_by_rdf_type(
-            rdf_type.value_or(model_class.primary_rdf_type())
-        ):
+        for model_iri in self._model_iris_by_rdf_type(rdf_type):
             yield model_class(
                 resource=NamedResource(graph=self.__rdflib_graph, iri=model_iri)
             )

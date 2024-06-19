@@ -4,6 +4,7 @@ from typing import Self
 
 from rdflib import DCTERMS, Literal, URIRef
 from returns.maybe import Maybe
+from returns.pipeline import is_successful
 
 from graphs2go.models import rdf
 
@@ -30,6 +31,10 @@ class Model(rdf.NamedModel, ABC):
         return self.resource.optional_value(
             DCTERMS.created, rdf.Resource.ValueMappers.datetime
         )
+
+    @property
+    def is_reified(self) -> bool:
+        return is_successful(self.created) or is_successful(self.modified)
 
     @property
     def modified(self) -> Maybe[datetime]:

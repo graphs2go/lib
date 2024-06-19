@@ -10,10 +10,10 @@ from graphs2go.transformers.transform_interchange_graph import (
 
 
 def _transform_interchange_labels_to_skos_labels(
-    interchange_node: interchange.Node,
+    interchange_labels: Iterable[interchange.Label],
     subject_skos_model_builder: skos.LabeledModel.Builder,
 ) -> Iterable[skos.Label]:
-    for interchange_label in interchange_node.labels:
+    for interchange_label in interchange_labels:
         if not is_successful(interchange_label.type):
             continue
 
@@ -21,6 +21,9 @@ def _transform_interchange_labels_to_skos_labels(
             label=interchange_label.literal_form,
             type_=interchange_label.type.unwrap(),
         )
+
+        if not interchange_label.is_reified:
+            continue
 
         skos_label = (
             skos.Label.builder(
@@ -48,11 +51,11 @@ def _transform_skos_concept_interchange_node_to_skos_models(
     )
 
     yield from _transform_interchange_labels_to_skos_labels(
-        interchange_node, skos_concept_builder
+        interchange_node.labels(), skos_concept_builder
     )
 
     # Interchange properties with predicates that are skos:note sub-properties
-    for interchange_property in interchange_node.properties:
+    for interchange_property in interchange_node.properties():
         if interchange_property.predicate == SKOS.notation:
             skos_concept_builder.add_notation(interchange_property.object)
         elif interchange_property.predicate in skos.Concept.NOTE_PREDICATES:
@@ -61,7 +64,7 @@ def _transform_skos_concept_interchange_node_to_skos_models(
             )
 
     # Interchange relationships between concepts -> SKOS semantic relations
-    for interchange_relationship in interchange_node.relationships:
+    for interchange_relationship in interchange_node.relationships():
         if interchange_relationship.predicate == SKOS.inScheme:
             skos_concept_builder.add_in_scheme(interchange_relationship.object)
         elif (
@@ -86,7 +89,7 @@ def _transform_skos_concept_scheme_interchange_node_to_skos_models(
     )
 
     yield from _transform_interchange_labels_to_skos_labels(
-        interchange_node, skos_concept_scheme_builder
+        interchange_node.labels(), skos_concept_scheme_builder
     )
 
     yield skos_concept_scheme_builder.build()

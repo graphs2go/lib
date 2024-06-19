@@ -74,24 +74,21 @@ class Concept(LabeledModel):
     @classmethod
     def builder(cls, *, iri: URIRef) -> Builder:
         return cls.Builder(
-            rdf.NamedResource.builder(iri=iri).add(RDF.type, cls.primary_rdf_type())
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, SKOS.Concept)
         )
 
-    @property
-    def in_scheme(self) -> Iterable[ConceptScheme]:
+    def in_schemes(self) -> Iterable[ConceptScheme]:
         resource: rdf.NamedResource
         for resource in self.resource.values(
             SKOS.inScheme, rdf.Resource.ValueMappers.named_resource
         ):
             yield self._CONCEPT_SCHEME_CLASS(resource)
 
-    @property
     def notations(self) -> Iterable[Literal]:
         yield from self.resource.values(
             SKOS.notation, rdf.Resource.ValueMappers.literal
         )
 
-    @property
     def notes(self) -> Iterable[tuple[URIRef, Literal]]:
         for predicate in self.NOTE_PREDICATES:
             value: Literal
@@ -100,11 +97,6 @@ class Concept(LabeledModel):
             ):
                 yield predicate, value
 
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return SKOS.Concept
-
-    @property
     def semantic_relations(self) -> Iterable[tuple[URIRef, Concept]]:
         for predicate in self.SEMANTIC_RELATION_PREDICATES:
             resource: rdf.NamedResource
