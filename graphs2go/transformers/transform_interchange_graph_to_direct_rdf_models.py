@@ -16,12 +16,12 @@ def _transform_interchange_node_to_direct_rdf_models(
 
     for interchange_label in interchange_node.labels():
         if is_successful(interchange_label.type):
-            rdf_resource_builder.add(RDFS.label, interchange_label.literal_form)
-        else:
             rdf_resource_builder.add(
                 interchange_label.type.unwrap().skos_predicate,
                 interchange_label.literal_form,
             )
+        else:
+            rdf_resource_builder.add(RDFS.label, interchange_label.literal_form)
 
     for interchange_property in interchange_node.properties():
         rdf_resource_builder.add(
