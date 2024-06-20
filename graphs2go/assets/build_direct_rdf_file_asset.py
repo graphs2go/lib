@@ -1,4 +1,7 @@
+from collections.abc import Callable
+
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
+from rdflib import URIRef
 from returns.maybe import Maybe, Nothing
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
@@ -11,7 +14,8 @@ from graphs2go.resources.output_config import OutputConfig
 def build_direct_rdf_file_asset(
     *,
     partitions_def: Maybe[PartitionsDefinition] = Nothing,
-    rdf_formats: tuple[rdf.Format, ...] = (rdf.Format.NQUADS,)
+    rdf_formats: tuple[rdf.Format, ...] = (rdf.Format.NQUADS,),
+    rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def direct_rdf_file(
@@ -28,6 +32,7 @@ def build_direct_rdf_file_asset(
             with RdfDirectoryLoader.create(
                 directory_path=output_directory_path,
                 rdf_format=rdf_format,
+                rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
             ) as loader, rdf.Graph.open(
                 direct_rdf_graph, read_only=True
             ) as open_rdf_graph:
