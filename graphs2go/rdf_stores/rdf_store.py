@@ -9,8 +9,6 @@ from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph
 from returns.pipeline import is_successful
 
-from graphs2go.rdf_stores import MemoryRdfStore
-
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -37,6 +35,8 @@ class RdfStore(rdflib.store.Store, ABC):
         rdf_store_config_parsed = rdf_store_config.parse()
 
         if not is_successful(rdf_store_config_parsed.directory_path):
+            from .memory_rdf_store import MemoryRdfStore
+
             return MemoryRdfStore()
 
         from .oxigraph_rdf_store import OxigraphRdfStore
