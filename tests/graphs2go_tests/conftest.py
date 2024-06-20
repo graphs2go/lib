@@ -1,6 +1,5 @@
 import itertools
 from collections.abc import Iterable
-from pathlib import Path
 
 import pytest
 from rdflib import SKOS, Literal

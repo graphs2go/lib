@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import rdflib.store
 from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph
+from returns.maybe import Some
 from returns.pipeline import is_successful
 
 if TYPE_CHECKING:
@@ -74,7 +75,7 @@ class RdfStore(rdflib.store.Store, ABC):
         from .oxigraph_rdf_store import OxigraphRdfStore
 
         if isinstance(descriptor, MemoryRdfStore.Descriptor):
-            return MemoryRdfStore()
+            return MemoryRdfStore(memory=Some(descriptor.memory))
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
             descriptor_: OxigraphRdfStore.Descriptor = descriptor
             return OxigraphRdfStore(
