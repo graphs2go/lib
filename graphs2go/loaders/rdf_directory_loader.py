@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC
-from collections.abc import Callable
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, final, override
 
@@ -15,6 +14,7 @@ from graphs2go.loaders.directory_loader import DirectoryLoader
 from graphs2go.loaders.rdf_loader import RdfLoader
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from graphs2go.models import rdf
 
 
