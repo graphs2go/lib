@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from abc import ABC
 from pathlib import Path
-from typing import IO, TYPE_CHECKING
+from typing import IO, TYPE_CHECKING, final, override
 
 import markus
 from pathvalidate import sanitize_filename
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 metrics = markus.get_metrics(__name__)
 
 
-class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
+class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
     """
     Loader that writes RDF graphs to files in a directory on the local file system.
 
@@ -56,6 +57,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader):
         )
 
 
+@final
 class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
     def __init__(self, *, directory_path: Path, rdf_format: rdf.Format):
         BufferingRdfLoader.__init__(
@@ -68,6 +70,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
             self, directory_path=directory_path, rdf_format=rdf_format
         )
 
+    @override
     def close(self) -> None:
         for stream, graph in self.rdf_graphs_by_identifier.items():
             with metrics.timer("buffered_graph_write"):
@@ -78,6 +81,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
                 )
 
 
+@final
 class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
     def __init__(self, *, directory_path: Path, rdf_format: rdf.Format):
         RdfDirectoryLoader.__init__(
@@ -86,6 +90,7 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         self.__open_files_by_graph_identifier: dict[str, IO[bytes]] = {}
         assert self._rdf_format.line_oriented
 
+    @override
     def load(self, rdf_graph: Graph) -> None:
         if not isinstance(rdf_graph.identifier, URIRef):
             raise ValueError("graph must have a named identifier")  # noqa: TRY004
@@ -118,6 +123,7 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
             )
             open_file.flush()
 
+    @override
     def close(self) -> None:
         for open_file in self.__open_files_by_graph_identifier.values():
             open_file.close()
