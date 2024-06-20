@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dagster import ConfigurableResource, EnvVar
-from returns.maybe import Maybe, Nothing
+from returns.maybe import Maybe, Nothing, Some
 
 _TRANSACTIONAL_DEFAULT = False
 
@@ -37,5 +37,8 @@ class RdfStoreConfig(ConfigurableResource):  # type: ignore
 
     def parse(self) -> Parsed:
         return RdfStoreConfig.Parsed(
-            directory_path=Path(self.directory_path), transactional=self.transactional
+            directory_path=(
+                Some(Path(self.directory_path)) if self.directory_path else Nothing
+            ),
+            transactional=self.transactional,
         )
