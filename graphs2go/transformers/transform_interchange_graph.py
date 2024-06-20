@@ -3,9 +3,10 @@ from multiprocessing import JoinableQueue, Queue
 from typing import TypeVar
 
 from rdflib import URIRef
+from returns.maybe import Maybe, Nothing
+from returns.pipeline import is_successful
 
 from graphs2go.models import interchange
-from graphs2go.namespaces.interchange import INTERCHANGE
 from graphs2go.transformers.parallel_transform import parallel_transform
 
 _INTERCHANGE_NODE_BATCH_SIZE = 100
@@ -26,15 +27,15 @@ def _consumer(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
         while True:
-            interchange_node_uris: tuple[URIRef, ...] | None = work_queue.get()
+            interchange_node_iris: tuple[URIRef, ...] | None = work_queue.get()
 
-            if interchange_node_uris is None:
+            if interchange_node_iris is None:
                 work_queue.task_done()
                 break  # Signal from the producer there's no more work
 
             outputs: list[_OutputT] = []  # type: ignore
-            for interchange_node_uri in interchange_node_uris:
-                interchange_node = interchange_graph.node_by_uri(interchange_node_uri)
+            for interchange_node_iri in interchange_node_iris:
+                interchange_node = interchange_graph.node_by_iri(interchange_node_iri)
                 outputs.extend(transform_interchange_node(interchange_node))
             output_queue.put(tuple(outputs))
             work_queue.task_done()
@@ -44,37 +45,41 @@ def _producer(
     input_: _ProducerInputT,
     work_queue: JoinableQueue,
 ) -> None:
-    interchange_graph_descriptor, interchange_node_rdf_type = input_
+    interchange_graph_descriptor, interchange_node_type = input_
 
-    interchange_node_uris_batch: list[URIRef] = []
+    interchange_node_iris_batch: list[URIRef] = []
     with interchange.Graph.open(
         interchange_graph_descriptor, read_only=True
     ) as interchange_graph:
-        for interchange_node_uri in interchange_graph.node_uris(
-            rdf_type=interchange_node_rdf_type
+        for interchange_node_iri in (
+            interchange_graph.node_iris_by_type(interchange_node_type)
+            if interchange_node_type is not None
+            else interchange_graph.node_iris()
         ):
-            interchange_node_uris_batch.append(interchange_node_uri)
-            if len(interchange_node_uris_batch) == _INTERCHANGE_NODE_BATCH_SIZE:
-                work_queue.put(tuple(interchange_node_uris_batch))
-                interchange_node_uris_batch = []
+            interchange_node_iris_batch.append(interchange_node_iri)
+            if len(interchange_node_iris_batch) == _INTERCHANGE_NODE_BATCH_SIZE:
+                work_queue.put(tuple(interchange_node_iris_batch))
+                interchange_node_iris_batch = []
 
-    if interchange_node_uris_batch:
-        work_queue.put(tuple(interchange_node_uris_batch))
+    if interchange_node_iris_batch:
+        work_queue.put(tuple(interchange_node_iris_batch))
 
 
 def transform_interchange_graph(
     *,
     interchange_graph_descriptor: interchange.Graph.Descriptor,
     transform_interchange_node: _TransformInterchangeNode,
-    interchange_node_rdf_type: URIRef = INTERCHANGE.Node,
+    interchange_node_type: Maybe[URIRef] = Nothing,
     in_process: bool = False
 ) -> Iterable[_OutputT]:
     if in_process:
         with interchange.Graph.open(
             interchange_graph_descriptor, read_only=True
         ) as interchange_graph:
-            for interchange_node in interchange_graph.nodes(
-                rdf_type=interchange_node_rdf_type
+            for interchange_node in (
+                interchange_graph.nodes_by_type(interchange_node_type.unwrap())
+                if is_successful(interchange_node_type)
+                else interchange_graph.nodes()
             ):
                 yield from transform_interchange_node(interchange_node)
         return
@@ -88,6 +93,6 @@ def transform_interchange_graph(
         producer=_producer,
         producer_input=(
             interchange_graph_descriptor,
-            interchange_node_rdf_type,
+            interchange_node_type.value_or(None),
         ),
     )

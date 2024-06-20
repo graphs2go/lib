@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, final, override
 
 import stringcase
 
@@ -10,11 +10,13 @@ if TYPE_CHECKING:
     from io import TextIOWrapper
 
 
+@final
 class CypherDirectoryLoader(DirectoryLoader):
     def __init__(self, *, directory_path: Path):
         DirectoryLoader.__init__(self, directory_path=directory_path)
         self.__open_files_by_name: dict[str, TextIOWrapper] = {}
 
+    @override
     def close(self) -> None:
         for open_file in self.__open_files_by_name.values():
             open_file.close()

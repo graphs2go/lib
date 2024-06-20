@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypeVar
+from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 import rdflib
 from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
 
 from graphs2go.models.rdf.model import Model
+from graphs2go.models.rdf.named_resource import NamedResource
 from graphs2go.rdf_stores.rdf_store import RdfStore
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
     from rdflib.graph import _QuadType
 
@@ -30,7 +31,10 @@ def _model_to_quads(model: Model) -> Iterable[_QuadType]:
         )
 
 
-class Graph:
+ModelT = TypeVar("ModelT", bound=Model)
+
+
+class Graph(Generic[ModelT]):
     """
     Non-picklable RDF graph backed by RDF store.
     """
@@ -51,15 +55,22 @@ class Graph:
         )
         self.__rdf_store = rdf_store
 
-    def _add(self, model: Model) -> None:
+    def add(self, model: ModelT) -> Self:
         self.__rdf_store.addN(_model_to_quads(model))
+        return self
 
-    def _add_all(self, models: Iterable[Model]) -> None:
+    def add_all(self, models: Iterable[ModelT]) -> Self:
         def models_to_quads() -> Iterable[_QuadType]:
             for model in models:
                 yield from _model_to_quads(model)
 
         self.__rdf_store.addN(models_to_quads())
+        return self
+
+    def add_all_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
+        if self.is_empty:
+            self.add_all(lazy_models())
+        return self
 
     def close(self) -> None:
         self.__rdflib_graph.close()
@@ -98,31 +109,27 @@ class Graph:
         return self.__rdf_store.is_empty
 
     def _models_by_rdf_type(
-        self, model_class: type[_ModelT], *, rdf_type: rdflib.URIRef | None = None
+        self, *, model_class: type[_ModelT], rdf_type: rdflib.URIRef
     ) -> Iterable[_ModelT]:
-        for model_uri in self._model_uris_by_rdf_type(
-            rdf_type=(
-                rdf_type if rdf_type is not None else model_class.primary_rdf_type()
+        return (
+            model_class(
+                resource=NamedResource(graph=self.__rdflib_graph, iri=model_iri)
             )
-        ):
-            yield model_class(resource=self.__rdflib_graph.resource(model_uri))
+            for model_iri in self._model_iris_by_rdf_type(rdf_type)
+        )
 
-    def _model_uris_by_rdf_type(
+    def _model_iris_by_rdf_type(
         self, rdf_type: rdflib.URIRef
     ) -> Iterable[rdflib.URIRef]:
-        yielded_model_uris: set[rdflib.URIRef] = set()
-        for model_uri in self.__rdflib_graph.subjects(
-            predicate=rdflib.RDF.type,
-            object=rdf_type,
-            unique=True,
-        ):
-            if not isinstance(model_uri, rdflib.URIRef):
-                continue
-            if model_uri in yielded_model_uris:
-                continue
-
-            yield model_uri
-            yielded_model_uris.add(model_uri)
+        return (
+            model_iri
+            for model_iri in self.__rdflib_graph.subjects(
+                predicate=rdflib.RDF.type,
+                object=rdf_type,
+                unique=True,
+            )
+            if isinstance(model_iri, rdflib.URIRef)
+        )
 
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Self
 
-from rdflib import SKOS, Literal, URIRef
+from rdflib import RDF, SKOS, Literal, URIRef
 
+from graphs2go.models import rdf
 from graphs2go.models.skos.concept_scheme import ConceptScheme
 from graphs2go.models.skos.labeled_model import LabeledModel
 
@@ -45,61 +46,61 @@ class Concept(LabeledModel):
     )
 
     class Builder(LabeledModel.Builder):
-        def add_in_scheme(self, in_scheme: ConceptScheme | URIRef) -> Self:
-            return self._add(SKOS.inScheme, in_scheme)
+        def add_in_scheme(self, in_scheme: URIRef) -> Self:
+            self._resource_builder.add(SKOS.inScheme, in_scheme)
+            return self
 
-        def add_notation(self, notation: Literal | None) -> Self:
-            return self._add(SKOS.notation, notation)
+        def add_notation(self, notation: Literal) -> Self:
+            self._resource_builder.add(SKOS.notation, notation)
+            return self
 
         def add_note(self, predicate: URIRef, object_: Literal) -> Self:
             if predicate not in Concept.NOTE_PREDICATES:
                 raise ValueError(f"{predicate} is not a note predicate")
 
-            return self._add(predicate, object_)
+            self._resource_builder.add(predicate, object_)
+            return self
 
-        def add_semantic_relation(
-            self, predicate: URIRef, object_: Concept | URIRef
-        ) -> Self:
+        def add_semantic_relation(self, predicate: URIRef, object_: URIRef) -> Self:
             if predicate not in Concept.SEMANTIC_RELATION_PREDICATES:
                 raise ValueError(f"{predicate} is not a semantic relation")
 
-            return self._add(predicate, object_)
+            self._resource_builder.add(predicate, object_)
+            return self
 
         def build(self) -> Concept:
-            return Concept(resource=self._resource)
+            return Concept(self._resource_builder.build())
 
     @classmethod
-    def builder(cls, *, uri: URIRef) -> Builder:
-        return cls.Builder(cls._create_resource(uri=uri))
+    def builder(cls, *, iri: URIRef) -> Builder:
+        return cls.Builder(
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, SKOS.Concept)
+        )
 
-    @property
-    def in_scheme(self) -> Iterable[ConceptScheme | URIRef]:
-        yield from self._values(
-            SKOS.inScheme,
-            lambda term: self._map_term_to_model_or_uri(
-                self._CONCEPT_SCHEME_CLASS, term
-            ),
-        )  # type: ignore
+    def in_schemes(self) -> Iterable[ConceptScheme]:
+        resource: rdf.NamedResource
+        for resource in self.resource.values(
+            SKOS.inScheme, rdf.Resource.ValueMappers.named_resource
+        ):
+            yield self._CONCEPT_SCHEME_CLASS(resource)
 
-    @property
     def notations(self) -> Iterable[Literal]:
-        yield from self._values(SKOS.notation, self._map_term_to_literal)  # type: ignore
+        yield from self.resource.values(
+            SKOS.notation, rdf.Resource.ValueMappers.literal
+        )
 
-    @property
     def notes(self) -> Iterable[tuple[URIRef, Literal]]:
         for predicate in self.NOTE_PREDICATES:
-            for value in self._values(predicate, self._map_term_to_literal):
+            value: Literal
+            for value in self.resource.values(
+                predicate, rdf.Resource.ValueMappers.literal
+            ):
                 yield predicate, value
 
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return SKOS.Concept
-
-    @property
-    def semantic_relations(self) -> Iterable[tuple[URIRef, Concept | URIRef]]:
+    def semantic_relations(self) -> Iterable[tuple[URIRef, Concept]]:
         for predicate in self.SEMANTIC_RELATION_PREDICATES:
-            for value in self._values(
-                predicate,
-                lambda term: self._map_term_to_model_or_uri(self.__class__, term),
-            ):  # type: ignore
-                yield predicate, value  # type: ignore
+            resource: rdf.NamedResource
+            for resource in self.resource.values(
+                predicate, rdf.Resource.ValueMappers.named_resource
+            ):
+                yield predicate, self.__class__(resource)

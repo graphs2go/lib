@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Self, TypeVar
 
 from rdflib import RDF, URIRef
 
+from graphs2go.models import rdf
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.property import Property
@@ -22,38 +23,39 @@ class Node(Model):
     """
 
     class Builder(Model.Builder):
-        def add_rdf_type(self, rdf_type: URIRef) -> Self:
-            return self._add(RDF.type, rdf_type)
+        def add_type(self, type_: URIRef) -> Self:
+            self._resource_builder.add(INTERCHANGE.nodeType, type_)
+            return self
 
         def build(self) -> Node:
-            return Node(resource=self._resource)
+            return Node(self._resource_builder.build())
 
     @classmethod
-    def builder(cls, *, uri: URIRef) -> Node.Builder:
-        return cls.Builder(cls._create_resource(uri))
+    def builder(cls, iri: URIRef) -> Node.Builder:
+        return cls.Builder(
+            rdf.NamedResource.builder(iri=iri).add(RDF.type, INTERCHANGE.Node)
+        )
 
     def __dependent_models(
         self, model_class: type[_ModelT], predicate: URIRef
     ) -> Iterable[_ModelT]:
-        for model_uri in self.resource.graph.objects(
-            predicate=predicate, subject=self.uri, unique=True
+        resource: rdf.NamedResource
+        for resource in self.resource.values(
+            predicate, rdf.Resource.ValueMappers.named_resource, unique=True
         ):
-            if not isinstance(model_uri, URIRef):
-                continue
-            yield model_class(resource=self.resource.graph.resource(model_uri))
+            yield model_class(resource)
 
-    @property
     def labels(self) -> Iterable[Label]:
         return self.__dependent_models(Label, INTERCHANGE.label)
 
-    @classmethod
-    def primary_rdf_type(cls) -> URIRef:
-        return INTERCHANGE.Node
-
-    @property
     def properties(self) -> Iterable[Property]:
         return self.__dependent_models(Property, INTERCHANGE.property)
 
-    @property
     def relationships(self) -> Iterable[Relationship]:
         return self.__dependent_models(Relationship, INTERCHANGE.relationship)
+
+    @property
+    def types(self) -> tuple[URIRef, ...]:
+        return tuple(
+            self.resource.values(INTERCHANGE.nodeType, rdf.Resource.ValueMappers.iri)
+        )

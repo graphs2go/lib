@@ -17,14 +17,10 @@ def test_predicate(interchange_property: interchange.Property) -> None:
     assert isinstance(interchange_property.predicate, URIRef)
 
 
-def test_primary_rdf_type() -> None:
-    assert isinstance(interchange.Property.primary_rdf_type(), URIRef)
-
-
 def test_subject(
     interchange_graph: interchange.Graph, interchange_property: interchange.Property
 ) -> None:
     assert isinstance(interchange_property.subject, URIRef)
     assert interchange_property.subject in {
-        node.uri for node in interchange_graph.nodes()
+        node.iri for node in interchange_graph.nodes()
     }

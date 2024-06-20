@@ -1,7 +1,8 @@
 from urllib.parse import quote
 
-from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
+from dagster import AssetsDefinition, PartitionsDefinition, asset
 from rdflib import URIRef
+from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
 from graphs2go.models import interchange, skos
@@ -12,31 +13,22 @@ from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
 
 
 def build_skos_graph_asset(
-    *, partitions_def: PartitionsDefinition | None = None
+    *, partitions_def: Maybe[PartitionsDefinition] = Nothing
 ) -> AssetsDefinition:
-    @asset(code_version="1", partitions_def=partitions_def)
+    @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def skos_graph(
         interchange_graph: interchange.Graph.Descriptor,
         rdf_store_config: RdfStoreConfig,
     ) -> skos.Graph.Descriptor:
-        logger = get_dagster_logger()
-
         with skos.Graph.create(
             identifier=URIRef(f"urn:skos:{quote(interchange_graph.identifier)}"),
             rdf_store_config=rdf_store_config,
         ) as open_skos_graph:
-            if not open_skos_graph.is_empty:
-                logger.info("SKOS graph is not empty, skipping load")
-                return open_skos_graph.descriptor
-
-            logger.info("loading SKOS graph")
-            open_skos_graph.add_all(
-                tqdm(
+            return open_skos_graph.add_all_if_empty(
+                lambda: tqdm(
                     transform_interchange_graph_to_skos_models(interchange_graph),
                     desc="SKOS graph models",
                 )
-            )
-            logger.info("loaded SKOS graph")
-            return open_skos_graph.descriptor
+            ).descriptor
 
     return skos_graph

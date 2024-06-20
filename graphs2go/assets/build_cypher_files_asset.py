@@ -1,4 +1,5 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
+from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
 from graphs2go.loaders.cypher_directory_loader import CypherDirectoryLoader
@@ -10,9 +11,9 @@ from graphs2go.transformers.transform_interchange_graph_to_cypher_statements imp
 
 
 def build_cypher_files_asset(
-    *, partitions_def: PartitionsDefinition | None = None
+    *, partitions_def: Maybe[PartitionsDefinition] = Nothing
 ) -> AssetsDefinition:
-    @asset(code_version="1", partitions_def=partitions_def)
+    @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def cypher_files(
         interchange_graph: interchange.Graph.Descriptor, output_config: OutputConfig
     ) -> None:

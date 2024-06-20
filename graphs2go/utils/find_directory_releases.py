@@ -11,7 +11,7 @@ def find_directory_releases(
     *,
     logger: Logger,
     release_directory_path: Path,
-    release_factory: Callable[[Path], ReleaseT]
+    release_factory: Callable[[Path], ReleaseT],
 ) -> tuple[ReleaseT, ...]:
     """
     Find releases (of e.g., SNOMED-CT, UMLS, et al.) in the release_directory path or its subdirectories.
@@ -22,7 +22,7 @@ def find_directory_releases(
     release_directory_path = release_directory_path.absolute()
     if not release_directory_path.is_dir():
         raise ValueError(
-            "release directory {release_directory_path} is not a directory"
+            f"release directory {release_directory_path} is not a directory"
         )
 
     releases: list[ReleaseT] = []

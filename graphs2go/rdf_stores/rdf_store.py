@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 import rdflib.store
 from pathvalidate import sanitize_filename
 from rdflib import ConjunctiveGraph
+from returns.maybe import Some
+from returns.pipeline import is_successful
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -33,10 +35,16 @@ class RdfStore(rdflib.store.Store, ABC):
     def create_(*, identifier: URIRef, rdf_store_config: RdfStoreConfig) -> RdfStore:
         rdf_store_config_parsed = rdf_store_config.parse()
 
+        if not is_successful(rdf_store_config_parsed.directory_path):
+            from .memory_rdf_store import MemoryRdfStore
+
+            return MemoryRdfStore()
+
         from .oxigraph_rdf_store import OxigraphRdfStore
 
         oxigraph_subdirectory_path = (
-            rdf_store_config_parsed.directory_path / sanitize_filename(identifier)
+            rdf_store_config_parsed.directory_path.unwrap()
+            / sanitize_filename(identifier)
         )
         oxigraph_subdirectory_path.mkdir(parents=True, exist_ok=True)
         return OxigraphRdfStore(
@@ -67,7 +75,7 @@ class RdfStore(rdflib.store.Store, ABC):
         from .oxigraph_rdf_store import OxigraphRdfStore
 
         if isinstance(descriptor, MemoryRdfStore.Descriptor):
-            return MemoryRdfStore()
+            return MemoryRdfStore(memory=Some(descriptor.memory))
         if isinstance(descriptor, OxigraphRdfStore.Descriptor):
             descriptor_: OxigraphRdfStore.Descriptor = descriptor
             return OxigraphRdfStore(
