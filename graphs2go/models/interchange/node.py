@@ -31,7 +31,7 @@ class Node(Model):
             return Node(self._resource_builder.build())
 
     @classmethod
-    def builder(cls, *, iri: URIRef) -> Node.Builder:
+    def builder(cls, iri: URIRef) -> Node.Builder:
         return cls.Builder(
             rdf.NamedResource.builder(iri=iri).add(RDF.type, INTERCHANGE.Node)
         )

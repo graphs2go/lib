@@ -26,10 +26,10 @@ class Relationship(Model):
     @classmethod
     def builder(
         cls,
-        *,
-        object_: rdf.NamedModel | URIRef,
-        predicate: URIRef,
         subject: rdf.NamedModel | URIRef,
+        predicate: URIRef,
+        object_: rdf.NamedModel | URIRef,
+        *,
         iri: Maybe[URIRef] = Nothing,
     ) -> Relationship.Builder:
         object_iri = object_.iri if isinstance(object_, rdf.NamedModel) else object_

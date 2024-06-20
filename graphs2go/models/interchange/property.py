@@ -21,10 +21,10 @@ class Property(Model):
     @classmethod
     def builder(
         cls,
-        *,
+        subject: rdf.NamedModel | URIRef,
         predicate: URIRef,
         object_: Literal,
-        subject: rdf.NamedModel | URIRef,
+        *,
         iri: Maybe[URIRef] = Nothing,
     ) -> Property.Builder:
         subject_iri = subject.iri if isinstance(subject, rdf.NamedModel) else subject
