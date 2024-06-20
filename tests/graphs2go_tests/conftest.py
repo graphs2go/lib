@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 from rdflib import SKOS, Literal
-from returns.maybe import Some
+from returns.maybe import Some, Nothing
 
 from graphs2go.models import interchange, skos
 from graphs2go.models.label_type import LabelType
@@ -25,15 +25,13 @@ def interchange_graph(
 
 
 @pytest.fixture()
-def interchange_graph_descriptor(
-    tmp_path: Path,
-) -> interchange.Graph.Descriptor:
+def interchange_graph_descriptor() -> interchange.Graph.Descriptor:
     interchange_graph_identifier = uuid_urn()
     with interchange.Graph(
         identifier=interchange_graph_identifier,
         rdf_store=OxigraphRdfStore.create_(
             identifier=interchange_graph_identifier,
-            rdf_store_config=RdfStoreConfig.default(directory_path_default=tmp_path),
+            rdf_store_config=RdfStoreConfig.default(directory_path_default=Nothing),
         ),
     ) as graph:
         concept_scheme = (

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from dagster import ConfigurableResource, EnvVar
+from returns.maybe import Maybe, Nothing
 
 _TRANSACTIONAL_DEFAULT = False
 
@@ -11,23 +12,23 @@ _TRANSACTIONAL_DEFAULT = False
 class RdfStoreConfig(ConfigurableResource):  # type: ignore
     @dataclass(frozen=True)
     class Parsed:
-        directory_path: Path
+        directory_path: Maybe[Path]
         transactional: bool
 
     directory_path: str
     transactional: bool
 
     @classmethod
-    def default(cls, *, directory_path_default: Path) -> RdfStoreConfig:
+    def default(cls, *, directory_path_default: Maybe[Path]) -> RdfStoreConfig:
         return RdfStoreConfig(
-            directory_path=str(directory_path_default),
+            directory_path=str(directory_path_default.value_or("")),
             transactional=_TRANSACTIONAL_DEFAULT,
         )
 
     @classmethod
-    def from_env_vars(cls, *, directory_path_default: Path) -> RdfStoreConfig:
+    def from_env_vars(cls, *, directory_path_default: Maybe[Path]) -> RdfStoreConfig:
         return cls(
-            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(str(directory_path_default)),  # type: ignore
+            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(str(directory_path_default.value_or(""))),  # type: ignore
             transactional=EnvVar.int("RDF_STORE_TRANSACTIONAL").get_value(
                 1 if _TRANSACTIONAL_DEFAULT else 0
             )
