@@ -1,4 +1,4 @@
-from rdflib import RDF, Graph, SKOS
+from rdflib import RDF, SKOS, Graph
 
 from graphs2go.models import interchange, rdf
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore

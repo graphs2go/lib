@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 
 from rdflib import RDF, RDFS
-from returns.maybe import Nothing, Maybe
+from returns.maybe import Maybe, Nothing
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model

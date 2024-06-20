@@ -1,7 +1,7 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
 from rdflib import Namespace
 from rdflib.namespace import DefinedNamespace
-from returns.maybe import Nothing, Maybe
+from returns.maybe import Maybe, Nothing
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import interchange, rdf

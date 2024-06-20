@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from datetime import datetime, date
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Self, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib.collection
 from rdflib import BNode, Graph, Literal, URIRef
 from rdflib.term import Node
 from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
-
 
 if TYPE_CHECKING:
     from graphs2go.models.rdf.named_resource import NamedResource

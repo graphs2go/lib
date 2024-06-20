@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Self
 
-from rdflib import SKOS, Literal, URIRef, RDF
+from rdflib import RDF, SKOS, Literal, URIRef
 
 from graphs2go.models import rdf
 from graphs2go.models.skos.concept_scheme import ConceptScheme

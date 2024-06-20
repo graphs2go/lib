@@ -15,6 +15,7 @@ from graphs2go.transformers.transform_interchange_graph import (
 
 if TYPE_CHECKING:
     from datetime import datetime
+
     from returns.maybe import Maybe
 
 _PRIMARY_NODE_LABEL = "Node"

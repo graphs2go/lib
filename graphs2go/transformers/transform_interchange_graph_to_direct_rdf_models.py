@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 
-from rdflib import RDFS, RDF
+from rdflib import RDF, RDFS
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, rdf

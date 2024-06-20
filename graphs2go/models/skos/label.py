@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from rdflib import RDF
+
 from graphs2go.models import rdf
 from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces.skosxl import SKOSXL
-from rdflib import RDF
 
 if TYPE_CHECKING:
     from rdflib import Literal, URIRef

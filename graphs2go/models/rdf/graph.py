@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypeVar, Generic
+from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 import rdflib
 from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
@@ -11,7 +11,7 @@ from graphs2go.models.rdf.named_resource import NamedResource
 from graphs2go.rdf_stores.rdf_store import RdfStore
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Callable
+    from collections.abc import Callable, Iterable
 
     from rdflib.graph import _QuadType
 

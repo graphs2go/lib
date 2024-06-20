@@ -3,7 +3,7 @@ from multiprocessing import JoinableQueue, Queue
 from typing import TypeVar
 
 from rdflib import URIRef
-from returns.maybe import Nothing, Maybe
+from returns.maybe import Maybe, Nothing
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange

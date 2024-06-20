@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from rdflib import SKOS, URIRef, RDF
+from rdflib import RDF, SKOS, URIRef
 
 from graphs2go.models import rdf
 from graphs2go.models.skos.labeled_model import LabeledModel

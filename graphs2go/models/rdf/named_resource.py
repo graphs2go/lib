@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from graphs2go.models.rdf.resource import Resource
-from returns.maybe import Maybe, Nothing
 from rdflib import Graph
+from returns.maybe import Maybe, Nothing
+
+from graphs2go.models.rdf.resource import Resource
 
 if TYPE_CHECKING:
     from rdflib import URIRef
