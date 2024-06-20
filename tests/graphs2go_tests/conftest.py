@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 import pytest
 from rdflib import SKOS, Literal
-from returns.maybe import Some, Nothing
+from returns.maybe import Nothing, Some
 
 from graphs2go.models import interchange, skos
 from graphs2go.models.label_type import LabelType
