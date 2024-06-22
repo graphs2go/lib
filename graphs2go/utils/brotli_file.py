@@ -18,8 +18,13 @@ class BrotliFile(RawIOBase):
         filename: Path | str,
         mode: Literal["w", "wb"],
         brotli_mode: int = brotli.MODE_GENERIC,
+        lgblock: int = 0,
+        lgwin: int = 22,
+        quality: int = 11,
     ):  # noqa: ARG002
-        self.__compressor = brotli.Compressor(mode=brotli_mode)
+        self.__compressor = brotli.Compressor(
+            mode=brotli_mode, lgblock=lgblock, lgwin=lgwin, quality=quality
+        )
         self.__underlying_file = Path(filename).open("wb")  # noqa: SIM115
 
     def close(self) -> None:

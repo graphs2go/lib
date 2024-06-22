@@ -15,6 +15,7 @@ from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
 from graphs2go.loaders.directory_loader import DirectoryLoader
 from graphs2go.loaders.rdf_loader import RdfLoader
 from graphs2go.models.compression_method import CompressionMethod
+from graphs2go.utils.brotli_file import BrotliFile
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -79,6 +80,8 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
             return file_path.open("w+b")
         file_path.unlink(missing_ok=True)
         match self.__rdf_file_format.compression_method.unwrap():
+            case CompressionMethod.BROTLI:
+                return BrotliFile(file_path, "wb")
             case CompressionMethod.BZIP2:
                 return bz2.BZ2File(file_path, "wb")
             case CompressionMethod.GZIP:
