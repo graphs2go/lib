@@ -20,7 +20,7 @@ def test_rdflib_serialize(tmp_path: Path) -> None:
 
     brotli_file_path = tmp_path / "graph.ttl.br"
     with BrotliFile(brotli_file_path, "wb") as brotli_file:
-        graph.serialize(destination=brotli_file, encoding="utf-8", format="ttl")
+        graph.serialize(destination=brotli_file, encoding="utf-8", format="ttl")  # type: ignore
     with brotli_file_path.open("rb") as brotli_file:
         brotli_ttl = brotli.decompress(brotli_file.read()).decode("utf-8")
         assert brotli_ttl == graph_ttl

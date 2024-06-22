@@ -37,7 +37,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
     large volumes of data because they can be streamed.
     """
 
-    _OpenRdfGraphFile = bz2.BZ2File | gzip.GzipFile | IO[bytes]
+    _OpenRdfGraphFile = BrotliFile | bz2.BZ2File | gzip.GzipFile | IO[bytes]
 
     def __init__(
         self,
