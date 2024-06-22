@@ -3,6 +3,7 @@ from rdflib import Namespace
 from rdflib.namespace import DefinedNamespace
 from returns.maybe import Maybe, Nothing
 
+from graphs2go.assets.rdf_file_asset_defaults import RDF_FILE_FORMATS_DEFAULT
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import interchange, rdf
 from graphs2go.namespaces import NAMESPACES
@@ -13,7 +14,7 @@ def build_interchange_file_asset(
     *,
     partitions_def: Maybe[PartitionsDefinition] = Nothing,
     namespaces: dict[str, type[DefinedNamespace] | Namespace] = NAMESPACES,
-    rdf_formats: tuple[rdf.Format, ...] = (rdf.Format.NQUADS,)
+    rdf_file_formats: tuple[rdf.FileFormat, ...] = RDF_FILE_FORMATS_DEFAULT,
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def interchange_file(
@@ -21,15 +22,15 @@ def build_interchange_file_asset(
     ) -> None:
         logger = get_dagster_logger()
         output_directory_path = output_config.parse().directory_path / "interchange"
-        for rdf_format in rdf_formats:
+        for rdf_file_format in rdf_file_formats:
             logger.info(
                 "loading interchange graph to %s files in %s",
-                rdf_format.file_extension,
+                rdf_file_format.format_.file_extension,
                 output_directory_path,
             )
             with RdfDirectoryLoader.create(
                 directory_path=output_directory_path,
-                rdf_format=rdf_format,
+                rdf_file_format=rdf_file_format,
             ) as loader, interchange.Graph.open(
                 interchange_graph, read_only=True
             ) as open_interchange_graph:
@@ -39,7 +40,7 @@ def build_interchange_file_asset(
                 loader.load(rdflib_graph)
             logger.info(
                 "loaded interchange graph to %s files in %s",
-                rdf_format.file_extension,
+                rdf_file_format.format_.file_extension,
                 output_directory_path,
             )
 
