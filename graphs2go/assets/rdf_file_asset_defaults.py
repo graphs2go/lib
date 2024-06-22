@@ -5,7 +5,7 @@ from graphs2go.models.compression_method import CompressionMethod
 
 RDF_FILE_FORMATS_DEFAULT = (
     rdf.FileFormat(
-        compression_method=Some(CompressionMethod.GZIP),
+        compression_method=Some(CompressionMethod.BROTLI),
         format_=rdf.Format.NTRIPLES,
     ),
     rdf.FileFormat(format_=rdf.Format.TURTLE),
