@@ -1,11 +1,4 @@
-# shared
-
-Code shared by multiple pipelines to e.g., write RDF to files.
-
-## Prerequisites
-
-* [Python](https://www.python.org/)
-* [Python Poetry](https://python-poetry.org/)
+# Code shared by multiple pipelines to e.g., write RDF to files.
 
 ## One-time setup
 
