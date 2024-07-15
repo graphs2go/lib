@@ -14,7 +14,7 @@ class Format(Enum):
     TURTLE = "ttl", False, False
 
     def __init__(
-        self, file_extension: str, line_oriented: bool, supports_quads: bool, Compr
+        self, file_extension: str, line_oriented: bool, supports_quads: bool
     ):
         self.file_extension = file_extension
         self.line_oriented = line_oriented
