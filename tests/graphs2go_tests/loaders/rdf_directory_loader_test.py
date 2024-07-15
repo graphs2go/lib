@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 from rdflib import ConjunctiveGraph, Graph, URIRef
-from returns.maybe import Some, Nothing
+from returns.maybe import Nothing, Some
 from returns.pipeline import is_successful
 
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader

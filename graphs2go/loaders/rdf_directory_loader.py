@@ -18,8 +18,9 @@ from graphs2go.models.compression_method import CompressionMethod
 from graphs2go.utils.brotli_file import BrotliFile
 
 if TYPE_CHECKING:
-    from pathlib import Path
     from collections.abc import Callable
+    from pathlib import Path
+
     from graphs2go.models import rdf
 
 

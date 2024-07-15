@@ -1,7 +1,7 @@
 from collections.abc import Buffer
 from io import RawIOBase
 from pathlib import Path
-from typing import Literal, override, final
+from typing import Literal, final, override
 
 import brotli
 
