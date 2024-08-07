@@ -68,6 +68,10 @@ class Concept(LabeledModel):
             self._resource_builder.add(predicate, object_)
             return self
 
+        def add_top_concept_of(self, top_concept_of: URIRef) -> Self:
+            self._resource_builder.add(SKOS.topConceptOf, top_concept_of)
+            return self
+
         def build(self) -> Concept:
             return Concept(self._resource_builder.build())
 

@@ -64,10 +64,12 @@ def _transform_skos_concept_interchange_node_to_skos_models(
                 interchange_property.predicate, interchange_property.object
             )
 
-    # Interchange relationships between concepts -> SKOS semantic relations
+    # Interchange relationships
     for interchange_relationship in interchange_node.relationships():
         if interchange_relationship.predicate == SKOS.inScheme:
             skos_concept_builder.add_in_scheme(interchange_relationship.object)
+        elif interchange_relationship.predicate == SKOS.topConceptOf:
+            skos_concept_builder.add_top_concept_of(interchange_relationship.object)
         elif (
             interchange_relationship.predicate
             in skos.Concept.SEMANTIC_RELATION_PREDICATES
@@ -92,6 +94,10 @@ def _transform_skos_concept_scheme_interchange_node_to_skos_models(
     yield from _transform_interchange_labels_to_skos_labels(
         interchange_node.labels(), skos_concept_scheme_builder
     )
+
+    for interchange_relationship in interchange_node.relationships():
+        if interchange_relationship.predicate == SKOS.hasTopConcept:
+            skos_concept_scheme_builder.add_top_concept(interchange_relationship.object)
 
     yield skos_concept_scheme_builder.build()
 
