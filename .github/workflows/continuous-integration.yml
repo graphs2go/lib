@@ -1,6 +1,8 @@
 name: Continuous Integration
 on:
   push:
+    branches-ignore:
+      - "main"
   workflow_dispatch:
 jobs:
   continuous-integration:
@@ -20,7 +22,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: venv-${{{{ runner.os }}}}-${{{{ steps.setup-python.outputs.python-version }}}}-${{{{ hashFiles('poetry.lock') }}}}-v3
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}-v3
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: script/bootstrap
