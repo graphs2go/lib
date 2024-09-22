@@ -26,6 +26,7 @@ ignore = [
     "PLC0414", # Import alias does not rename original package
     "PLR",     # Too many XXX
     "PLR2004", # Magic values
+    "PT001",   # Use pytest.fixture over pytest.fixture()
     "S101",    # assert
     "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
     "S608",    # Possible SQL injection
