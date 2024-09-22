@@ -1,8 +1,17 @@
-# Code shared by multiple pipelines to e.g., write RDF to files.
+# Graphs2go shared Python library
 
-## One-time setup
+## Getting started
 
-### Install Python dependencies
+    pip install graphs2go
+
+## Development
+
+### Prerequisites
+
+* [Python 3.12](https://www.python.org/)
+* [Python Poetry](https://python-poetry.org/)
+
+### One-time setup
 
     script/bootstrap
 
@@ -12,6 +21,7 @@
 
 ## Structure of this project
 
+* `.github/workflows`: GitHub Actions CI/CD workflows
 * `graphs2go`: Python code
 * `script`: scripts following the [Scripts To Rule Them All](https://github.com/github/scripts-to-rule-them-all) normalized script pattern
 * `tests`: unit tests
