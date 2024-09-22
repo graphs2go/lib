@@ -1,0 +1,39 @@
+name: Continuous Deployment
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+jobs:
+  continuous-deployment:
+    name: Build, test, and publish
+    environment:
+      name: pypi
+      url: https://pypi.org/p/graphs2go
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.x"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-in-project: true
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-v2-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: script/bootstrap
+      - name: Run tests
+        run: script/test
+      - name: Build distributions
+        run: poetry build
+      - name: Publish package distributions to PyPI via trusted publishing (set up in PyPI)
+        uses: pypa/gh-action-pypi-publish@release/v1
