@@ -1,15 +1,10 @@
 /.env.local
-history/
 .idea/
-.logs_queue/
-logs/
 .mypy_cache/
 .nux/
 __pycache__/
 *.pyc
 .pytest_cache/
 .ruff_cache/
-schedules/
-storage/
 tmp*
 .vscode/
