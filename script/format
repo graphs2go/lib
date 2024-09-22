@@ -5,4 +5,4 @@ set -e
 cd "$(dirname "$0")/.."
 
 poetry run isort graphs2go tests
-poetry run black graphs2go tests
+poetry run ruff format graphs2go tests

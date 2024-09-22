@@ -19,6 +19,7 @@ ignore = [
     "G004",    # Logging statement uses f-string
     "I001",    # Import block is un-sorted or un-formatted
     "ICN001",  # Pandas should be imported as pd
+    "ISC001",  # Single-line implicit string concatenation
     "N815",    # Mixed-case variables
     "PERF401", # Use a list comprehension
     "PGH003",  # Use specific rule codes when ignoring type issues
