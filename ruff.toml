@@ -1,1 +1,40 @@
-../ruff.toml
+target-version = "py312"
+
+[lint]
+ignore = [
+    "ANN101",  # missing-type-self
+    "ANN102",  # missing-type-cls,
+    "ANN204",  # Missing return type annotation for __init__
+    "B019",    # functools.cache memory leak
+    "C901",    # Function is too complex
+    "COM812",  # Trailing comma missing
+    "EM101",   # Exception message must not use a string literal
+    "D",       # Missing docstrings
+    "E501",    # Line too long
+    "EM102",   # Exception must not use an f-string literal
+    "ERA001",  # Commented-out code
+    "FA",      # Missing from __future__ import annotations
+    "FIX002",  # Line contains TODO
+    "FBT",     # Boolean-typed positional arguments
+    "G004",    # Logging statement uses f-string
+    "I001",    # Import block is un-sorted or un-formatted
+    "ICN001",  # Pandas should be imported as pd
+    "N815",    # Mixed-case variables
+    "PERF401", # Use a list comprehension
+    "PGH003",  # Use specific rule codes when ignoring type issues
+    "PLC0414", # Import alias does not rename original package
+    "PLR",     # Too many XXX
+    "PLR2004", # Magic values
+    "S101",    # assert
+    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "S608",    # Possible SQL injection
+    "SLF001",  # Private member access
+    "TD002",   # Missing author in TODO
+    "TD003",   # Missing issue link on the line following TODO
+    "TRY003",  # Avoid specifying long messages outside the exception class
+    "TRY301",  # Abstract raise to an inner function
+]
+select = ["ALL"]
+
+[lint.flake8-annotations]
+allow-star-arg-any = true
