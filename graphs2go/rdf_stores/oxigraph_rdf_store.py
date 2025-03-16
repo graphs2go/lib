@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from shutil import rmtree
 from typing import TYPE_CHECKING, Any
 
+import pyoxigraph
 import pyoxigraph as ox
 import rdflib.store
 from rdflib.graph import (
@@ -283,10 +284,15 @@ class OxigraphRdfStore(RdfStore):
         raise NotImplementedError
 
     def load(self, *, mime_type: str, source: Path) -> None:
-        if self.__transactional:
-            self.pyoxigraph_store.load(input=source, mime_type=mime_type)
-        else:
-            self.pyoxigraph_store.bulk_load(input=source, mime_type=mime_type)
+        with source.open("rb") as input_:
+            if self.__transactional:
+                self.pyoxigraph_store.load(
+                    input=input_, format=pyoxigraph.RdfFormat.from_media_type(mime_type)
+                )
+            else:
+                self.pyoxigraph_store.bulk_load(
+                    input=input_, format=pyoxigraph.RdfFormat.from_media_type(mime_type)
+                )
 
     def namespace(self, prefix: str) -> URIRef | None:
         return self.__namespace_for_prefix.get(prefix)
