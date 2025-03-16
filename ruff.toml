@@ -2,8 +2,6 @@ target-version = "py312"
 
 [lint]
 ignore = [
-    "ANN101",  # missing-type-self
-    "ANN102",  # missing-type-cls,
     "ANN204",  # Missing return type annotation for __init__
     "B019",    # functools.cache memory leak
     "C901",    # Function is too complex
