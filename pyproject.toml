@@ -16,7 +16,7 @@ readme = "README.md"
 dagster = "^1.10"
 markus = "^4.2.0"
 pathvalidate = "^3.2.0"
-psycopg = "^3.1.18"
+psycopg = {extras = ["binary"], version = "^3.2.6"}
 psycopg-pool = "^3.1.18"
 python = ">=3.12,<3.13"
 rdflib = "^7.0.0"
