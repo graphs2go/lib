@@ -5,8 +5,9 @@ from typing import TYPE_CHECKING, cast
 from graphs2go.models.rdf.model import Model
 
 if TYPE_CHECKING:
-    from graphs2go.models.rdf.named_resource import NamedResource
     from rdflib import URIRef
+
+    from graphs2go.models.rdf.named_resource import NamedResource
 
 
 class NamedModel(Model):
