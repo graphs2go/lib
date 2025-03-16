@@ -15,7 +15,7 @@ def build_skos_file_asset(
     *,
     partitions_def: Maybe[PartitionsDefinition] = Nothing,
     rdf_file_formats: tuple[rdf.FileFormat, ...] = RDF_FILE_FORMATS_DEFAULT,
-    rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing
+    rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing,
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def skos_file(
@@ -29,11 +29,14 @@ def build_skos_file_asset(
                 rdf_file_format.format_.file_extension,
                 output_directory_path,
             )
-            with RdfDirectoryLoader.create(
-                directory_path=output_directory_path,
-                rdf_file_format=rdf_file_format,
-                rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
-            ) as loader, skos.Graph.open(skos_graph, read_only=True) as open_skos_graph:
+            with (
+                RdfDirectoryLoader.create(
+                    directory_path=output_directory_path,
+                    rdf_file_format=rdf_file_format,
+                    rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
+                ) as loader,
+                skos.Graph.open(skos_graph, read_only=True) as open_skos_graph,
+            ):
                 rdflib_graph = open_skos_graph.rdflib_graph
                 rdflib_graph.bind("skosxl", SKOSXL)
                 loader.load(rdflib_graph)

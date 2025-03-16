@@ -20,7 +20,9 @@ class DirectoryInputConfig(ConfigurableResource):  # type: ignore
     @classmethod
     def from_env_vars(cls, *, directory_path_default: Path) -> DirectoryInputConfig:
         return cls(
-            directory_path=EnvVar("GRAPHS2GO_INPUT_DIRECTORY_PATH").get_value(str(directory_path_default)),  # type: ignore
+            directory_path=EnvVar("GRAPHS2GO_INPUT_DIRECTORY_PATH").get_value(
+                str(directory_path_default)
+            ),  # type: ignore
         )
 
     def parse(self) -> Parsed:

@@ -20,7 +20,9 @@ class FileInputConfig(ConfigurableResource):  # type: ignore
     @classmethod
     def from_env_vars(cls, *, file_path_default: Path) -> FileInputConfig:
         return cls(
-            file_path=EnvVar("GRAPHS2GO_INPUT_FILE_PATH").get_value(str(file_path_default)),  # type: ignore
+            file_path=EnvVar("GRAPHS2GO_INPUT_FILE_PATH").get_value(
+                str(file_path_default)
+            ),  # type: ignore
         )
 
     def parse(self) -> Parsed:

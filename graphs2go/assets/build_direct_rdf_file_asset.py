@@ -16,7 +16,7 @@ def build_direct_rdf_file_asset(
     *,
     partitions_def: Maybe[PartitionsDefinition] = Nothing,
     rdf_file_formats: tuple[rdf.FileFormat, ...] = RDF_FILE_FORMATS_DEFAULT,
-    rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing
+    rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing,
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def direct_rdf_file(
@@ -30,13 +30,14 @@ def build_direct_rdf_file_asset(
                 rdf_file_format.format_.file_extension,
                 output_directory_path,
             )
-            with RdfDirectoryLoader.create(
-                directory_path=output_directory_path,
-                rdf_file_format=rdf_file_format,
-                rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
-            ) as loader, rdf.Graph.open(
-                direct_rdf_graph, read_only=True
-            ) as open_rdf_graph:
+            with (
+                RdfDirectoryLoader.create(
+                    directory_path=output_directory_path,
+                    rdf_file_format=rdf_file_format,
+                    rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
+                ) as loader,
+                rdf.Graph.open(direct_rdf_graph, read_only=True) as open_rdf_graph,
+            ):
                 rdflib_graph = open_rdf_graph.rdflib_graph
                 rdflib_graph.bind("schema", SDO)
                 rdflib_graph.bind("skosxl", SKOSXL)

@@ -28,12 +28,15 @@ def build_interchange_file_asset(
                 rdf_file_format.format_.file_extension,
                 output_directory_path,
             )
-            with RdfDirectoryLoader.create(
-                directory_path=output_directory_path,
-                rdf_file_format=rdf_file_format,
-            ) as loader, interchange.Graph.open(
-                interchange_graph, read_only=True
-            ) as open_interchange_graph:
+            with (
+                RdfDirectoryLoader.create(
+                    directory_path=output_directory_path,
+                    rdf_file_format=rdf_file_format,
+                ) as loader,
+                interchange.Graph.open(
+                    interchange_graph, read_only=True
+                ) as open_interchange_graph,
+            ):
                 rdflib_graph = open_interchange_graph.rdflib_graph
                 for namespace_prefix, namespace in namespaces.items():
                     rdflib_graph.bind(namespace_prefix, namespace)

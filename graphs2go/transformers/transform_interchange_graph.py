@@ -70,7 +70,7 @@ def transform_interchange_graph(
     interchange_graph_descriptor: interchange.Graph.Descriptor,
     transform_interchange_node: _TransformInterchangeNode,
     interchange_node_type: Maybe[URIRef] = Nothing,
-    in_process: bool = False
+    in_process: bool = False,
 ) -> Iterable[_OutputT]:
     if in_process:
         with interchange.Graph.open(

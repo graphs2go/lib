@@ -24,10 +24,15 @@ _DEFAULT_GRAPH = rdflib.Graph(identifier=DATASET_DEFAULT_GRAPH_ID)
 
 def _model_to_quads(model: Model) -> Iterable[_QuadType]:
     for s, p, o in model.resource.graph:
-        yield s, p, o, (
-            _DEFAULT_GRAPH
-            if isinstance(model.resource.graph.identifier, rdflib.BNode)
-            else model.resource.graph
+        yield (
+            s,
+            p,
+            o,
+            (
+                _DEFAULT_GRAPH
+                if isinstance(model.resource.graph.identifier, rdflib.BNode)
+                else model.resource.graph
+            ),
         )
 
 

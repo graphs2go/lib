@@ -11,7 +11,7 @@ def find_file_releases(
     *,
     logger: Logger,
     release_directory_path: Path,
-    release_factory: Callable[[Path], ReleaseT]
+    release_factory: Callable[[Path], ReleaseT],
 ) -> tuple[ReleaseT, ...]:
     """
     Find releases (of e.g., SNOMED-CT, UMLS, et al.) in the release_directory path or its subdirectories.

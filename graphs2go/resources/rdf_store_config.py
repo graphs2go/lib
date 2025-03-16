@@ -28,7 +28,9 @@ class RdfStoreConfig(ConfigurableResource):  # type: ignore
     @classmethod
     def from_env_vars(cls, *, directory_path_default: Maybe[Path]) -> RdfStoreConfig:
         return cls(
-            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(str(directory_path_default.value_or(""))),  # type: ignore
+            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(
+                str(directory_path_default.value_or(""))
+            ),  # type: ignore
             transactional=EnvVar.int("RDF_STORE_TRANSACTIONAL").get_value(
                 1 if _TRANSACTIONAL_DEFAULT else 0
             )

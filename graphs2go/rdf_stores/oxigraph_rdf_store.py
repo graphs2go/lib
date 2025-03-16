@@ -295,7 +295,9 @@ class OxigraphRdfStore(RdfStore):
         yield from self.__namespace_for_prefix.items()
 
     def open(
-        self, configuration: str, create: bool = False  # noqa: ARG002
+        self,
+        configuration: str,
+        create: bool = False,  # noqa: ARG002
     ) -> int | None:
         return rdflib.store.VALID_STORE
 
@@ -349,10 +351,13 @@ class OxigraphRdfStore(RdfStore):
                 graphs = (_graph_from_ox(quad.graph_name, store=self),)
 
             yield (
-                _subject_from_ox(quad.subject),
-                _predicate_from_ox(quad.predicate),
-                _object_from_ox(quad.object),
-            ), iter(graphs)
+                (
+                    _subject_from_ox(quad.subject),
+                    _predicate_from_ox(quad.predicate),
+                    _object_from_ox(quad.object),
+                ),
+                iter(graphs),
+            )
 
     def update(
         self,

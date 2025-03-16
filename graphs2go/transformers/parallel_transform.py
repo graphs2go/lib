@@ -46,7 +46,7 @@ def parallel_transform(
     consumer_input: _ConsumerInputT,
     producer: _Producer,
     producer_input: _ProducerInputT,
-    consumer_count: int | None = None
+    consumer_count: int | None = None,
 ) -> Iterable[_OutputT]:
     """
     Generic function for performing parallel transformation of an input to zero or more outputs.

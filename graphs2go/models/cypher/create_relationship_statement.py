@@ -34,7 +34,7 @@ class CreateRelationshipStatement(Statement):
             return CreateRelationshipStatement(
                 cypher_str=f"""\
 MATCH {self.__subject_node_pattern.cypher_str}, {self.__object_node_pattern.cypher_str}
-CREATE ({self.__subject_node_pattern.variable})-[:{self.__label}{' {' + str(self.__properties) + '}' if self.__properties else ''}]->({self.__object_node_pattern.variable});"""
+CREATE ({self.__subject_node_pattern.variable})-[:{self.__label}{" {" + str(self.__properties) + "}" if self.__properties else ""}]->({self.__object_node_pattern.variable});"""
             )
 
     @classmethod
