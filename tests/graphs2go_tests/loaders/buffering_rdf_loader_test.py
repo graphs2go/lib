@@ -5,7 +5,7 @@ from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
 
 
 @pytest.mark.parametrize(
-    argnames="rdf_graph_type",
+    argnames=("rdf_graph_type",),
     argvalues=tuple((rdf_graph_type,) for rdf_graph_type in (ConjunctiveGraph, Graph)),
 )
 def test_load(
@@ -21,7 +21,7 @@ def test_load(
                 quad_graph.add(triple)
             loader.load(quad_graph)
         else:
-            assert rdf_graph_type == Graph
+            assert rdf_graph_type == Graph, type(rdf_graph_type)
             loader.load(rdf_graph)
 
     assert len(loader.rdf_graphs_by_identifier) == 2
