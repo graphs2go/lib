@@ -1,4 +1,3 @@
-import os
 from collections.abc import Callable
 from logging import Logger
 from pathlib import Path
@@ -27,7 +26,7 @@ def find_file_releases(
 
     releases: list[ReleaseT] = []
 
-    for file_name in os.listdir(release_directory_path):
+    for file_name in Path.iterdir(release_directory_path):
         file_path = release_directory_path / file_name
         if not file_path.is_file():
             continue

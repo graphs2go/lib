@@ -1,4 +1,3 @@
-import os
 from collections.abc import Callable
 from logging import Logger
 from pathlib import Path
@@ -36,7 +35,7 @@ def find_directory_releases(
             release_directory_path,
         )
 
-        for subdir_name in os.listdir(release_directory_path):
+        for subdir_name in Path.iterdir(release_directory_path):
             release_subdirectory_path = release_directory_path / subdir_name
             try:
                 releases.append(release_factory(release_subdirectory_path))

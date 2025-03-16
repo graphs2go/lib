@@ -21,6 +21,7 @@ ignore = [
     "N815",    # Mixed-case variables
     "PERF401", # Use a list comprehension
     "PGH003",  # Use specific rule codes when ignoring type issues
+    "PGH004",  # Use specific rules when using 'ruff: noqa'
     "PLC0414", # Import alias does not rename original package
     "PLR",     # Too many XXX
     "PLR2004", # Magic values

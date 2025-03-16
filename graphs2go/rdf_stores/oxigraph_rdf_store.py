@@ -296,7 +296,7 @@ class OxigraphRdfStore(RdfStore):
 
     def open(
         self,
-        configuration: str,
+        configuration: str,  # noqa: ARG002
         create: bool = False,  # noqa: ARG002
     ) -> int | None:
         return rdflib.store.VALID_STORE

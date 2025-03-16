@@ -9,7 +9,7 @@ from graphs2go.rdf_stores.rdf_store import RdfStore
 
 class RdfStoreTest:
     @pytest.fixture()
-    def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:  # noqa: PT004
+    def rdf_store(self, tmp_path: Path) -> Iterable[RdfStore]:
         raise NotImplementedError
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")

@@ -4,7 +4,7 @@ from rdflib import SKOS
 from graphs2go.models import interchange
 
 
-def test_builder(interchange_node: interchange.Node) -> None:  # noqa: ARG001
+def test_builder(interchange_node: interchange.Node) -> None:
     pass
 
 

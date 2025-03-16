@@ -27,7 +27,7 @@ def test_lexical_labels(skos_concept: skos.Concept) -> None:
         )
 
 
-def test_builder(skos_concept: skos.Concept) -> None:  # noqa: ARG001
+def test_builder(skos_concept: skos.Concept) -> None:
     pass
 
 

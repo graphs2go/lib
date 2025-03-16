@@ -4,7 +4,7 @@ from graphs2go.models import interchange
 
 
 def test_builder(
-    interchange_property: interchange.Property,  # noqa: ARG001
+    interchange_property: interchange.Property,
 ) -> None:
     pass
 

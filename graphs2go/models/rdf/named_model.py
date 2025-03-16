@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast
 
 from graphs2go.models.rdf.model import Model
-from graphs2go.models.rdf.named_resource import NamedResource
 
 if TYPE_CHECKING:
+    from graphs2go.models.rdf.named_resource import NamedResource
     from rdflib import URIRef
 
 
@@ -19,11 +19,11 @@ class NamedModel(Model):
 
         @property
         def _resource_builder(self) -> NamedResource.Builder:
-            return cast(NamedResource.Builder, super()._resource_builder)
+            return cast("NamedResource.Builder", super()._resource_builder)
 
     @property
     def resource(self) -> NamedResource:
-        return cast(NamedResource, super().resource)
+        return cast("NamedResource", super().resource)
 
     @property
     def identifier(self) -> URIRef:
