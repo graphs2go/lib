@@ -6,7 +6,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "graphs2go"
-version = "1.0.1"
+version = "1.0.2"
 description = "Graphs2go shared Python library"
 license = "Apache-2.0"
 authors = ["Minor Gordon <minorg@server.fake>"]
