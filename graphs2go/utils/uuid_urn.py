@@ -1,10 +1,10 @@
 from uuid import uuid4
 
-from rdflib import URIRef
+from graphs2go.models import rdf
 
 
-def uuid_urn() -> URIRef:
+def uuid_urn() -> rdf.Iri:
     """
     Generate a UUID URN (https://datatracker.ietf.org/doc/html/rfc4122).
     """
-    return URIRef(f"urn:uuid:{uuid4()}")
+    return rdf.Iri(f"urn:uuid:{uuid4()}")

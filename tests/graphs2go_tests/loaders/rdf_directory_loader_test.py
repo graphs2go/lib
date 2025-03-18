@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pytest
-from rdflib import ConjunctiveGraph, Graph, URIRef
+from rdflib import ConjunctiveGraph, Graph
 from returns.maybe import Nothing, Some
 from returns.pipeline import is_successful
 
@@ -48,7 +48,7 @@ def test_load(
     if not is_successful(rdf_file_format.compression_method):
         for rdf_graph in rdf_graphs:
             quad_graph = ConjunctiveGraph()
-            assert isinstance(rdf_graph.identifier, URIRef)
+            assert isinstance(rdf_graph.identifier, rdf.Iri)
             quad_graph.parse(loader.rdf_graph_file_path(rdf_graph.identifier))
             assert len(tuple(quad_graph.quads())) == 1
     else:

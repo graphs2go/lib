@@ -3,11 +3,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import stringcase
-from rdflib import URIRef
 from rdflib.namespace import NamespaceManager
 from returns.pipeline import is_successful
 
-from graphs2go.models import cypher, interchange
+from graphs2go.models import cypher, interchange, rdf
 from graphs2go.models.cypher.node_pattern import NodePattern
 from graphs2go.transformers.transform_interchange_graph import (
     transform_interchange_graph,
@@ -24,31 +23,31 @@ _PRIMARY_NODE_LABEL = "Node"
 @dataclass(frozen=True)
 class _OutputModel:
     cypher_statements: tuple[cypher.Statement, ...]
-    interchange_node_iri: URIRef
-    interchange_relationship_objects: frozenset[URIRef]
+    interchange_node_iri: rdf.Iri
+    interchange_relationship_objects: frozenset[rdf.Iri]
 
 
 class _UriTransformer:
     def __init__(self, namespace_manager: NamespaceManager):
         self.__namespace_manager = namespace_manager
 
-    def iri_to_curie(self, iri: URIRef) -> tuple[str, str]:
+    def iri_to_curie(self, iri: rdf.Iri) -> tuple[str, str]:
         curie_parts = self.__namespace_manager.curie(iri).split(":", 1)
         assert len(curie_parts) == 2
         return curie_parts[0], curie_parts[1]
 
-    def iri_to_node_id(self, iri: URIRef) -> str:
+    def iri_to_node_id(self, iri: rdf.Iri) -> str:
         return str(iri)
 
-    def iri_to_node_label(self, iri: URIRef) -> str:
+    def iri_to_node_label(self, iri: rdf.Iri) -> str:
         curie = self.iri_to_curie(iri)
         return curie[0].capitalize() + stringcase.pascalcase(curie[1])
 
-    def iri_to_property_name(self, iri: URIRef) -> str:
+    def iri_to_property_name(self, iri: rdf.Iri) -> str:
         curie = self.iri_to_curie(iri)
         return curie[0].lower() + "_" + stringcase.snakecase(curie[1]).lower()
 
-    def iri_to_relationship_label(self, iri: URIRef) -> str:
+    def iri_to_relationship_label(self, iri: rdf.Iri) -> str:
         curie = self.iri_to_curie(iri)
         return curie[0].upper() + "_" + stringcase.snakecase(curie[1]).upper()
 
@@ -105,7 +104,7 @@ def _transform_interchange_node(
         .set_variable("subject")
         .build()
     )
-    interchange_relationship_objects: set[URIRef] = set()
+    interchange_relationship_objects: set[rdf.Iri] = set()
     for interchange_relationship in interchange_node.relationships():
         interchange_relationship_object = interchange_relationship.object
         interchange_relationship_objects.add(interchange_relationship_object)
@@ -153,8 +152,8 @@ def _transform_interchange_node(
 def transform_interchange_graph_to_cypher_statements(
     interchange_graph_descriptor: interchange.Graph.Descriptor,
 ) -> Iterable[cypher.Statement]:
-    interchange_node_iris: set[URIRef] = set()
-    interchange_relationship_objects: set[URIRef] = set()
+    interchange_node_iris: set[rdf.Iri] = set()
+    interchange_relationship_objects: set[rdf.Iri] = set()
 
     output_model: _OutputModel
     for output_model in transform_interchange_graph(

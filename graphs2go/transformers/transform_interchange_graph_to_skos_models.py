@@ -1,10 +1,10 @@
 from collections.abc import Iterable
 
-from rdflib import SKOS
 from returns.maybe import Some
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, skos
+from graphs2go.namespaces import SKOS
 from graphs2go.transformers.transform_interchange_graph import (
     transform_interchange_graph,
 )

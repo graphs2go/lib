@@ -2,18 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
-from rdflib import RDF, RDFS
 from returns.maybe import Maybe, Nothing
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.label_type import LabelType
-from graphs2go.namespaces.interchange import INTERCHANGE
-from graphs2go.namespaces.skosxl import SKOSXL
+from graphs2go.namespaces import INTERCHANGE, SKOSXL, RDF, RDFS
 from graphs2go.utils.uuid_urn import uuid_urn
-
-if TYPE_CHECKING:
-    from rdflib import Literal, URIRef
 
 
 class Label(Model):
@@ -25,12 +20,12 @@ class Label(Model):
         def build(self) -> Label:
             return Label(self._resource_builder.build())
 
-    __TYPE_TO_PREDICATE_MAP: ClassVar[dict[LabelType | None, URIRef]] = {
+    __TYPE_TO_PREDICATE_MAP: ClassVar[dict[LabelType | None, rdf.Iri]] = {
         label_type: label_type.skos_predicate for label_type in LabelType
     }
     __TYPE_TO_PREDICATE_MAP[None] = RDFS.label
 
-    __PREDICATE_TO_TYPE_MAP: ClassVar[dict[URIRef, LabelType | None]] = {
+    __PREDICATE_TO_TYPE_MAP: ClassVar[dict[rdf.Iri, LabelType | None]] = {
         value: key for key, value in __TYPE_TO_PREDICATE_MAP.items()
     }
 
@@ -38,10 +33,10 @@ class Label(Model):
     def builder(
         cls,
         *,
-        literal_form: Literal,
-        subject: rdf.NamedModel | URIRef,
+        literal_form: rdf.Literal,
+        subject: rdf.NamedModel | rdf.Iri,
         type_: Maybe[LabelType] = Nothing,
-        iri: Maybe[URIRef] = Nothing,
+        iri: Maybe[rdf.Iri] = Nothing,
     ) -> Label.Builder:
         resource_builder = rdf.NamedResource.builder(iri=iri.or_else_call(uuid_urn))
         resource_builder.add(
@@ -65,7 +60,7 @@ class Label(Model):
         return cls.Builder(resource_builder)
 
     @property
-    def literal_form(self) -> Literal:
+    def literal_form(self) -> rdf.Literal:
         return self.resource.required_value(
             SKOSXL.literalForm, rdf.Resource.ValueMappers.literal
         )

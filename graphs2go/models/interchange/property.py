@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from rdflib import RDF, Literal, URIRef
 from returns.maybe import Maybe, Nothing
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
-from graphs2go.namespaces.interchange import INTERCHANGE
+from graphs2go.namespaces import INTERCHANGE, RDF
 from graphs2go.utils.hash_urn import hash_urn
 
 
@@ -21,11 +20,11 @@ class Property(Model):
     @classmethod
     def builder(
         cls,
-        subject: rdf.NamedModel | URIRef,
-        predicate: URIRef,
-        object_: Literal,
+        subject: rdf.NamedModel | rdf.Iri,
+        predicate: rdf.Iri,
+        object_: rdf.Literal,
         *,
-        iri: Maybe[URIRef] = Nothing,
+        iri: Maybe[rdf.Iri] = Nothing,
     ) -> Property.Builder:
         subject_iri = subject.iri if isinstance(subject, rdf.NamedModel) else subject
 
@@ -48,17 +47,17 @@ class Property(Model):
         return cls.Builder(resource_builder)
 
     @property
-    def object(self) -> Literal:
+    def object(self) -> rdf.Literal:
         return self.resource.required_value(
             RDF.object, rdf.Resource.ValueMappers.literal
         )
 
     @property
-    def predicate(self) -> URIRef:
+    def predicate(self) -> rdf.Iri:
         return self.resource.required_value(
             RDF.predicate, rdf.Resource.ValueMappers.iri
         )
 
     @property
-    def subject(self) -> URIRef:
+    def subject(self) -> rdf.Iri:
         return self.resource.required_value(RDF.subject, rdf.Resource.ValueMappers.iri)

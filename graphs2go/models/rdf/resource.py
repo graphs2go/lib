@@ -6,7 +6,10 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Self, TypeVar
 
 import rdflib.collection
-from rdflib import BNode, Graph, Literal, URIRef
+from rdflib import Graph
+from graphs2go.models.rdf.blank_node import BlankNode
+from graphs2go.models.rdf.literal import Literal
+from graphs2go.models.rdf.iri import Iri
 from rdflib.term import Node
 from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
@@ -25,14 +28,14 @@ class Resource:
     Bespoke RDF Resource class, in lieu of the rdflib Resource.
     """
 
-    Identifier = BNode | URIRef
+    Identifier = BlankNode | Iri
 
     class Builder:
         def __init__(self, *, graph: Graph, identifier: Resource.Identifier) -> None:
             self.__graph = graph
             self.__identifier = identifier
 
-        def add(self, predicate: URIRef, object_: Node) -> Self:
+        def add(self, predicate: Iri, object_: Node) -> Self:
             self.__graph.add((self.__identifier, predicate, object_))
             return self
 
@@ -44,10 +47,10 @@ class Resource:
             return self.__graph
 
         @property
-        def identifier(self) -> BNode | URIRef:
+        def identifier(self) -> BlankNode | Iri:
             return self.__identifier
 
-        def set(self, predicate: URIRef, object_: Node) -> Self:
+        def set(self, predicate: Iri, object_: Node) -> Self:
             self.__graph.set((self.__identifier, predicate, object_))
             return self
 
@@ -68,7 +71,7 @@ class Resource:
         def collection(
             _subject: Node, _predicate: Node, object_: Node, graph: Graph
         ) -> Maybe[tuple[Node, ...]]:
-            if not isinstance(object_, BNode | URIRef):
+            if not isinstance(object_, BlankNode | Iri):
                 return Nothing
             return Some(tuple(rdflib.collection.Collection(graph, object_)))
 
@@ -104,7 +107,7 @@ class Resource:
         def identifier(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
         ) -> Maybe[Resource.Identifier]:
-            return Some(object_) if isinstance(object_, BNode | URIRef) else Nothing
+            return Some(object_) if isinstance(object_, BlankNode | Iri) else Nothing
 
         @staticmethod
         def identity(
@@ -126,8 +129,8 @@ class Resource:
         @staticmethod
         def iri(
             _subject: Node, _predicate: Node, object_: Node, _graph: Graph
-        ) -> Maybe[URIRef]:
-            return Some(object_) if isinstance(object_, URIRef) else Nothing
+        ) -> Maybe[Iri]:
+            return Some(object_) if isinstance(object_, Iri) else Nothing
 
         @staticmethod
         def literal(
@@ -166,7 +169,7 @@ class Resource:
         ) -> Maybe[str]:
             return Resource.ValueMappers.__py_value(object_, str)
 
-    def __init__(self, *, graph: Graph, identifier: BNode | URIRef):
+    def __init__(self, *, graph: Graph, identifier: BlankNode | Iri):
         self.__graph = graph
         self.__identifier = identifier
 
@@ -183,7 +186,7 @@ class Resource:
         return self.__graph
 
     def has_value(
-        self, predicate: URIRef, mapper: _ValueMapper = ValueMappers.identity
+        self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
     ) -> bool:
         for _value in self.values(predicate, mapper=mapper):  # type: ignore
             return True
@@ -194,7 +197,7 @@ class Resource:
         return self.__identifier
 
     def optional_value(
-        self, predicate: URIRef, mapper: _ValueMapper = ValueMappers.identity
+        self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
     ) -> Maybe[_ValueT]:  # type: ignore
         for value in self.values(predicate, mapper=mapper):  # type: ignore
             return Some(value)
@@ -202,7 +205,7 @@ class Resource:
 
     def optional_value_with_default(
         self,
-        predicate: URIRef,
+        predicate: Iri,
         default: _ValueT,
         mapper: _ValueMapper = ValueMappers.identity,
     ) -> _ValueT:  # type: ignore
@@ -211,7 +214,7 @@ class Resource:
         return default
 
     def required_value(
-        self, predicate: URIRef, mapper: _ValueMapper = ValueMappers.identity
+        self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
     ) -> _ValueT:  # type: ignore
         value: Maybe[_ValueT] = self.optional_value(predicate, mapper=mapper)
         if not is_successful(value):
@@ -220,7 +223,7 @@ class Resource:
 
     def values(
         self,
-        predicate: URIRef,
+        predicate: Iri,
         mapper: _ValueMapper = ValueMappers.identity,
         unique: bool = False,
     ) -> Iterable[_ValueT]:  # type: ignore

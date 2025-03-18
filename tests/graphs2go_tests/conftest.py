@@ -2,11 +2,10 @@ import itertools
 from collections.abc import Iterable
 
 import pytest
-from rdflib import SKOS, Literal
 from returns.maybe import Nothing, Some
 
-from graphs2go.models import interchange, skos
-from graphs2go.models.label_type import LabelType
+from graphs2go.models import interchange, rdf, skos, LabelType
+from graphs2go.namespaces import SKOS
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.rdf_stores.oxigraph_rdf_store import OxigraphRdfStore
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
@@ -41,7 +40,7 @@ def interchange_graph_descriptor() -> interchange.Graph.Descriptor:
         graph.add(concept_scheme)
         graph.add(
             interchange.Label.builder(
-                literal_form=Literal("label"),
+                literal_form=rdf.Literal("label"),
                 subject=concept_scheme,
                 type_=Some(LabelType.PREFERRED),
             ).build()
@@ -56,7 +55,7 @@ def interchange_graph_descriptor() -> interchange.Graph.Descriptor:
 
             graph.add(
                 interchange.Label.builder(
-                    literal_form=Literal("label" + str(concept_i + 1)),
+                    literal_form=rdf.Literal("label" + str(concept_i + 1)),
                     subject=concept,
                     type_=Some(LabelType.PREFERRED),
                 ).build()
@@ -66,7 +65,7 @@ def interchange_graph_descriptor() -> interchange.Graph.Descriptor:
                 interchange.Property.builder(
                     subject=concept,
                     predicate=SKOS.definition,
-                    object_=Literal("definition" + str(concept_i + 1)),
+                    object_=rdf.Literal("definition" + str(concept_i + 1)),
                 ).build()
             )
 
@@ -143,20 +142,20 @@ def skos_graph() -> skos.Graph:
     for _ in range(2):
         concept_builder = skos.Concept.builder(iri=uuid_urn())
         concept_builder.add_in_scheme(concept_scheme.iri)
-        concept_builder.add_notation(Literal("testnotation"))
-        concept_builder.add_note(SKOS.note, Literal("testnote"))
+        concept_builder.add_notation(rdf.Literal("testnotation"))
+        concept_builder.add_note(SKOS.note, rdf.Literal("testnote"))
 
         label_i = 1
         for label_type in LabelType:
             label = skos.Label.builder(
-                literal_form=Literal("label" + str(label_i)), iri=uuid_urn()
+                literal_form=rdf.Literal("label" + str(label_i)), iri=uuid_urn()
             ).build()
             graph.add(label)
             concept_builder.add_lexical_label(label=label, type_=label_type)
             label_i += 1
 
             concept_builder.add_lexical_label(
-                label=Literal("label" + str(label_i)), type_=label_type
+                label=rdf.Literal("label" + str(label_i)), type_=label_type
             )
             label_i += 1
 

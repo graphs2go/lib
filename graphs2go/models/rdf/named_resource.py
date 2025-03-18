@@ -8,12 +8,12 @@ from returns.maybe import Maybe, Nothing
 from graphs2go.models.rdf.resource import Resource
 
 if TYPE_CHECKING:
-    from rdflib import URIRef
+    from graphs2go.models.rdf.iri import Iri
 
 
 class NamedResource(Resource):
     class Builder(Resource.Builder):
-        def __init__(self, *, graph: Graph, iri: URIRef):
+        def __init__(self, *, graph: Graph, iri: Iri):
             Resource.Builder.__init__(self, graph=graph, identifier=iri)
             self.__iri = iri
 
@@ -21,17 +21,17 @@ class NamedResource(Resource):
             return NamedResource(graph=self.__graph, iri=self.__iri)
 
         @property
-        def iri(self) -> URIRef:
+        def iri(self) -> Iri:
             return self.__iri
 
-    def __init__(self, *, graph: Graph, iri: URIRef):
+    def __init__(self, *, graph: Graph, iri: Iri):
         Resource.__init__(self, graph=graph, identifier=iri)
         self.__iri = iri
 
     @classmethod
-    def builder(cls, *, iri: URIRef, graph: Maybe[Graph] = Nothing) -> Builder:  # type: ignore
+    def builder(cls, *, iri: Iri, graph: Maybe[Graph] = Nothing) -> Builder:  # type: ignore
         return cls.Builder(graph=graph.or_else_call(lambda: Graph()), iri=iri)
 
     @property
-    def iri(self) -> URIRef:
+    def iri(self) -> Iri:
         return self.__iri

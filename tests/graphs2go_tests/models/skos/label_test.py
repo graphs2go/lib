@@ -1,6 +1,4 @@
-from rdflib import Literal
-
-from graphs2go.models import skos
+from graphs2go.models import rdf, skos
 
 
 def test_builder(skos_label: skos.Label) -> None:
@@ -8,4 +6,4 @@ def test_builder(skos_label: skos.Label) -> None:
 
 
 def test_literal_form(skos_label: skos.Label) -> None:
-    assert isinstance(skos_label.literal_form, Literal)
+    assert isinstance(skos_label.literal_form, rdf.Literal)

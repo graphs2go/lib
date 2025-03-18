@@ -1,12 +1,13 @@
-from rdflib import Namespace
-from rdflib.namespace import DefinedNamespace
+from rdflib import Namespace as _Namespace, DCTERMS, RDF, RDFS, SKOS  # noqa: F401
+from rdflib.namespace import DefinedNamespace as _DefinedNamespace
 
-from graphs2go.namespaces.dash import DASH
-from graphs2go.namespaces.interchange import INTERCHANGE
-from graphs2go.namespaces.skosxl import SKOSXL
+from .dash import DASH
+from .interchange import INTERCHANGE
+from .skosxl import SKOSXL
 
-NAMESPACES: dict[str, type[DefinedNamespace] | Namespace] = {
+NAMESPACES: dict[str, type[_DefinedNamespace] | _Namespace] = {
     "dash": DASH,
     "interchange": INTERCHANGE,
+    "skos": "SKOS",
     "skosxl": SKOSXL,
 }

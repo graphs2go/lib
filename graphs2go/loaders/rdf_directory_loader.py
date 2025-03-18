@@ -7,14 +7,14 @@ from typing import IO, TYPE_CHECKING, final, override
 
 import markus
 from pathvalidate import sanitize_filename
-from rdflib import ConjunctiveGraph, Graph, URIRef
+from rdflib import ConjunctiveGraph, Graph
 from returns.maybe import Maybe, Nothing
 from returns.pipeline import is_successful
 
 from graphs2go.loaders.buffering_rdf_loader import BufferingRdfLoader
 from graphs2go.loaders.directory_loader import DirectoryLoader
 from graphs2go.loaders.rdf_loader import RdfLoader
-from graphs2go.models.compression_method import CompressionMethod
+from graphs2go.models import CompressionMethod, rdf
 from graphs2go.utils.brotli_file import BrotliFile
 
 if TYPE_CHECKING:
@@ -45,11 +45,11 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
         *,
         directory_path: Path,
         rdf_file_format: rdf.FileFormat,
-        rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]],
+        rdf_graph_identifier_to_file_stem: Maybe[Callable[[rdf.Iri], str]],
     ):
         DirectoryLoader.__init__(self, directory_path=directory_path)
         self.__rdf_file_format = rdf_file_format
-        self.__rdf_graph_identifier_to_file_stem: Callable[[URIRef], str] = (
+        self.__rdf_graph_identifier_to_file_stem: Callable[[rdf.Iri], str] = (
             rdf_graph_identifier_to_file_stem.value_or(
                 lambda identifier: sanitize_filename(identifier)
             )
@@ -61,7 +61,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
         *,
         directory_path: Path,
         rdf_file_format: rdf.FileFormat,
-        rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing,
+        rdf_graph_identifier_to_file_stem: Maybe[Callable[[rdf.Iri], str]] = Nothing,
     ) -> RdfDirectoryLoader:
         if rdf_file_format.format_.line_oriented:
             return _StreamingRdfDirectoryLoader(
@@ -75,7 +75,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
             rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
         )
 
-    def _open_rdf_graph_file(self, identifier: URIRef) -> _OpenRdfGraphFile:
+    def _open_rdf_graph_file(self, identifier: rdf.Iri) -> _OpenRdfGraphFile:
         file_path = self.rdf_graph_file_path(identifier)
         if not is_successful(self.__rdf_file_format.compression_method):
             return file_path.open("w+b")
@@ -94,7 +94,7 @@ class RdfDirectoryLoader(DirectoryLoader, RdfLoader, ABC):
     def _rdf_file_format(self) -> rdf.FileFormat:
         return self.__rdf_file_format
 
-    def rdf_graph_file_path(self, identifier: URIRef) -> Path:
+    def rdf_graph_file_path(self, identifier: rdf.Iri) -> Path:
         file_name = f"{self.__rdf_graph_identifier_to_file_stem(identifier)}.{self._rdf_file_format.format_.file_extension}"
         if is_successful(self._rdf_file_format.compression_method):
             file_name += "." + (
@@ -110,7 +110,7 @@ class _BufferingRdfDirectoryLoader(BufferingRdfLoader, RdfDirectoryLoader):
         *,
         directory_path: Path,
         rdf_file_format: rdf.FileFormat,
-        rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]],
+        rdf_graph_identifier_to_file_stem: Maybe[Callable[[rdf.Iri], str]],
     ):
         BufferingRdfLoader.__init__(
             self,
@@ -146,7 +146,7 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
         *,
         directory_path: Path,
         rdf_file_format: rdf.FileFormat,
-        rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]],
+        rdf_graph_identifier_to_file_stem: Maybe[Callable[[rdf.Iri], str]],
     ):
         RdfDirectoryLoader.__init__(
             self,
@@ -161,7 +161,7 @@ class _StreamingRdfDirectoryLoader(RdfDirectoryLoader):
 
     @override
     def load(self, rdf_graph: Graph) -> None:
-        if not isinstance(rdf_graph.identifier, URIRef):
+        if not isinstance(rdf_graph.identifier, rdf.Iri):
             raise ValueError("graph must have a named identifier")  # noqa: TRY004
 
         open_file = self.__open_files_by_graph_identifier.get(rdf_graph.identifier)

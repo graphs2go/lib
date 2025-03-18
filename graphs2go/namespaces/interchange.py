@@ -1,5 +1,5 @@
 from rdflib.namespace import DefinedNamespace, Namespace
-from rdflib.term import URIRef
+from graphs2go.models import rdf
 
 
 class INTERCHANGE(DefinedNamespace):
@@ -8,13 +8,13 @@ class INTERCHANGE(DefinedNamespace):
     _fail = True
 
     # Classes
-    Label: URIRef
-    Node: URIRef
-    Property: URIRef
-    Relationship: URIRef
+    Label: rdf.Iri
+    Node: rdf.Iri
+    Property: rdf.Iri
+    Relationship: rdf.Iri
 
     # Properties
-    label: URIRef  # Node->Label
-    nodeType: URIRef
-    property: URIRef  # Node -> Property
-    relationship: URIRef  # Node -> Relationship
+    label: rdf.Iri  # Node->Label
+    nodeType: rdf.Iri
+    property: rdf.Iri  # Node -> Property
+    relationship: rdf.Iri  # Node -> Relationship

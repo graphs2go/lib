@@ -1,3 +1,4 @@
+from rdflib import DCTERMS, RDF, RDFS, SKOS  # noqa: F401
 from .dash import DASH as DASH
 from .interchange import INTERCHANGE as INTERCHANGE
 from .namespaces import NAMESPACES as NAMESPACES

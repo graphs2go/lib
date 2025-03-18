@@ -1,18 +1,19 @@
 from typing import override
 
-from rdflib import ConjunctiveGraph, Graph, URIRef
+from rdflib import ConjunctiveGraph, Graph
 
+from graphs2go.models import rdf
 from graphs2go.loaders.rdf_loader import RdfLoader
 
 
 class BufferingRdfLoader(RdfLoader):
     def __init__(self, *, default_rdf_graph_type: type[Graph] = Graph):
         self.__default_rdf_graph_type = default_rdf_graph_type
-        self.__rdf_graphs_by_identifier: dict[URIRef, Graph] = {}
+        self.__rdf_graphs_by_identifier: dict[rdf.Iri, Graph] = {}
 
     @override
     def load(self, rdf_graph: Graph) -> None:
-        if not isinstance(rdf_graph.identifier, URIRef):
+        if not isinstance(rdf_graph.identifier, rdf.Iri):
             raise ValueError("graph must have a named identifier")  # noqa: TRY004
 
         identifier_graph = self.__rdf_graphs_by_identifier.get(rdf_graph.identifier)
@@ -39,5 +40,5 @@ class BufferingRdfLoader(RdfLoader):
         pass
 
     @property
-    def rdf_graphs_by_identifier(self) -> dict[URIRef, Graph]:
+    def rdf_graphs_by_identifier(self) -> dict[rdf.Iri, Graph]:
         return self.__rdf_graphs_by_identifier.copy()

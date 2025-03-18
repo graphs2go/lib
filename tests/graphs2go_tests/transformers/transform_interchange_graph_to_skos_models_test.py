@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING
 
-from rdflib import SKOS, Literal, URIRef
-
 from graphs2go.models import interchange, rdf, skos
+from graphs2go.namespaces import SKOS
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
     transform_interchange_graph_to_skos_models,
@@ -36,7 +35,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
             skos_concept = skos_concepts_by_iri[interchange_node.iri]
 
             skos_lexical_labels_by_type: dict[
-                LabelType | None, list[Literal | skos.Label | URIRef]
+                LabelType | None, list[rdf.Literal | skos.Label | rdf.Iri]
             ] = {}
             for label_type, skos_lexical_label in skos_concept.lexical_labels():
                 skos_lexical_labels_by_type.setdefault(label_type, []).append(
@@ -49,7 +48,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                     for skos_lexical_label in skos_lexical_labels_by_type[
                         interchange_label.type.unwrap()
                     ]
-                    if isinstance(skos_lexical_label, Literal)
+                    if isinstance(skos_lexical_label, rdf.Literal)
                     and skos_lexical_label == interchange_label.literal_form
                 )
                 # assert any(
@@ -67,7 +66,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                     interchange_property.predicate == SKOS.notation
                     or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
                 )
-                assert isinstance(interchange_property.object, Literal)
+                assert isinstance(interchange_property.object, rdf.Literal)
 
             for interchange_relationship in interchange_node.relationships():
                 other_resource: rdf.NamedResource = (

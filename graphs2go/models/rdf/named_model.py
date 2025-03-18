@@ -5,8 +5,7 @@ from typing import TYPE_CHECKING, cast
 from graphs2go.models.rdf.model import Model
 
 if TYPE_CHECKING:
-    from rdflib import URIRef
-
+    from graphs2go.models.rdf.iri import Iri
     from graphs2go.models.rdf.named_resource import NamedResource
 
 
@@ -27,9 +26,9 @@ class NamedModel(Model):
         return cast("NamedResource", super().resource)
 
     @property
-    def identifier(self) -> URIRef:
+    def identifier(self) -> Iri:
         return self.resource.iri
 
     @property
-    def iri(self) -> URIRef:
+    def iri(self) -> Iri:
         return self.resource.iri

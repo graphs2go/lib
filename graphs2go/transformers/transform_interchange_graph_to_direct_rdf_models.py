@@ -1,9 +1,9 @@
 from collections.abc import Iterable
 
-from rdflib import RDF, RDFS
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, rdf
+from graphs2go.namespaces import RDF, RDFS
 from graphs2go.transformers.transform_interchange_graph import (
     transform_interchange_graph,
 )

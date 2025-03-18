@@ -1,6 +1,7 @@
-from rdflib import RDF, SKOS, Graph
+from rdflib import Graph
 
 from graphs2go.models import interchange, rdf
+from graphs2go.namespaces import RDF, SKOS
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_graph_to_direct_rdf_models import (
     transform_interchange_graph_to_direct_rdf_models,

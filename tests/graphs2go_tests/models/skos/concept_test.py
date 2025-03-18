@@ -1,8 +1,7 @@
 import pytest
-from rdflib import SKOS, Literal
 
-from graphs2go.models import skos
-from graphs2go.models.label_type import LabelType
+from graphs2go.models import skos, LabelType, rdf
+from graphs2go.namespaces import SKOS
 
 
 def test_lexical_labels(skos_concept: skos.Concept) -> None:
@@ -21,7 +20,7 @@ def test_lexical_labels(skos_concept: skos.Concept) -> None:
             sum(
                 1
                 for label_type_, lexical_label in lexical_labels
-                if label_type == label_type_ and isinstance(lexical_label, Literal)
+                if label_type == label_type_ and isinstance(lexical_label, rdf.Literal)
             )
             == 1
         )
@@ -45,7 +44,7 @@ def test_notes(skos_concept: skos.Concept) -> None:
     assert len(notes) == 1
     predicate, object_ = notes[0]
     assert predicate == SKOS.note
-    assert isinstance(object_, Literal)
+    assert isinstance(object_, rdf.Literal)
 
 
 def test_semantic_relations(skos_graph: skos.Graph) -> None:

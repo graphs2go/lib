@@ -1,8 +1,7 @@
 from enum import Enum
 
-from rdflib import SKOS, URIRef
-
-from graphs2go.namespaces.skosxl import SKOSXL
+from graphs2go.models import rdf
+from graphs2go.namespaces import SKOS, SKOSXL
 
 
 class LabelType(Enum):
@@ -10,7 +9,7 @@ class LabelType(Enum):
     HIDDEN = SKOS.hiddenLabel, SKOSXL.hiddenLabel
     PREFERRED = SKOS.prefLabel, SKOSXL.prefLabel
 
-    def __init__(self, skos_predicate: URIRef, skosxl_predicate: URIRef):
+    def __init__(self, skos_predicate: rdf.Iri, skosxl_predicate: rdf.Iri):
         self.skos_predicate = skos_predicate
         self.skosxl_predicate = skosxl_predicate
 

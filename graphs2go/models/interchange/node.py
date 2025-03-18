@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self, TypeVar
 
-from rdflib import RDF, URIRef
-
 from graphs2go.models import rdf
+from graphs2go.namespaces import RDF
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.property import Property
@@ -23,7 +22,7 @@ class Node(Model):
     """
 
     class Builder(Model.Builder):
-        def add_type(self, type_: URIRef) -> Self:
+        def add_type(self, type_: rdf.Iri) -> Self:
             self._resource_builder.add(INTERCHANGE.nodeType, type_)
             return self
 
@@ -31,13 +30,13 @@ class Node(Model):
             return Node(self._resource_builder.build())
 
     @classmethod
-    def builder(cls, iri: URIRef) -> Node.Builder:
+    def builder(cls, iri: rdf.Iri) -> Node.Builder:
         return cls.Builder(
             rdf.NamedResource.builder(iri=iri).add(RDF.type, INTERCHANGE.Node)
         )
 
     def __dependent_models(
-        self, model_class: type[_ModelT], predicate: URIRef
+        self, model_class: type[_ModelT], predicate: rdf.Iri
     ) -> Iterable[_ModelT]:
         resource: rdf.NamedResource
         for resource in self.resource.values(
@@ -55,7 +54,7 @@ class Node(Model):
         return self.__dependent_models(Relationship, INTERCHANGE.relationship)
 
     @property
-    def types(self) -> tuple[URIRef, ...]:
+    def types(self) -> tuple[rdf.Iri, ...]:
         return tuple(
             self.resource.values(INTERCHANGE.nodeType, rdf.Resource.ValueMappers.iri)
         )

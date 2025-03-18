@@ -1,7 +1,7 @@
 import pytest
-from rdflib import SKOS
 
 from graphs2go.models import interchange
+from graphs2go.namespaces import SKOS
 
 
 def test_builder(interchange_node: interchange.Node) -> None:

@@ -1,8 +1,9 @@
 from pathlib import Path
 
 import brotli
-from rdflib import Graph, URIRef
+from rdflib import Graph
 
+from graphs2go.models import rdf
 from graphs2go.utils.brotli_file import BrotliFile
 
 
@@ -10,9 +11,9 @@ def test_rdflib_serialize(tmp_path: Path) -> None:
     graph = Graph()
     graph.add(
         (
-            URIRef("http://example.com/subject"),
-            URIRef("http://example.com/predicate"),
-            URIRef("http://example.com/object"),
+            rdf.Iri("http://example.com/subject"),
+            rdf.Iri("http://example.com/predicate"),
+            rdf.Iri("http://example.com/object"),
         )
     )
     graph_ttl = graph.serialize(format="ttl")

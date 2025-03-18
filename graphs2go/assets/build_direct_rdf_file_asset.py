@@ -1,7 +1,6 @@
 from collections.abc import Callable
 
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
-from rdflib import URIRef
 from returns.maybe import Maybe, Nothing
 
 from graphs2go.assets.rdf_file_asset_defaults import RDF_FILE_FORMATS_DEFAULT
@@ -16,7 +15,7 @@ def build_direct_rdf_file_asset(
     *,
     partitions_def: Maybe[PartitionsDefinition] = Nothing,
     rdf_file_formats: tuple[rdf.FileFormat, ...] = RDF_FILE_FORMATS_DEFAULT,
-    rdf_graph_identifier_to_file_stem: Maybe[Callable[[URIRef], str]] = Nothing,
+    rdf_graph_identifier_to_file_stem: Maybe[Callable[[rdf.Iri], str]] = Nothing,
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def direct_rdf_file(
