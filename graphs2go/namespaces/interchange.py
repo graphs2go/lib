@@ -1,20 +1,17 @@
-from rdflib.namespace import DefinedNamespace, Namespace
 from graphs2go.models import rdf
 
 
-class INTERCHANGE(DefinedNamespace):
-    _NS = Namespace("http://www.graphs2go.com/schema/interchange#")
-
-    _fail = True
+class INTERCHANGE:
+    _BASE_IRI = "http://www.graphs2go.com/schema/interchange#"
 
     # Classes
-    Label: rdf.Iri
-    Node: rdf.Iri
-    Property: rdf.Iri
-    Relationship: rdf.Iri
+    Label = rdf.Iri(_BASE_IRI + "Label")
+    Node = rdf.Iri(_BASE_IRI + "Node")
+    Property = rdf.Iri(_BASE_IRI + "Property")
+    Relationship = rdf.Iri(_BASE_IRI + "Relationship")
 
     # Properties
-    label: rdf.Iri  # Node->Label
-    nodeType: rdf.Iri
-    property: rdf.Iri  # Node -> Property
-    relationship: rdf.Iri  # Node -> Relationship
+    label = rdf.Iri(_BASE_IRI + "label")  # Node->Label
+    nodeType = rdf.Iri(_BASE_IRI + "nodeType")
+    property = rdf.Iri(_BASE_IRI + "property")  # Node -> Property
+    relationship = rdf.Iri(_BASE_IRI + "relationship")  # Node -> Relationship

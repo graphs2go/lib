@@ -1,18 +1,15 @@
-from rdflib.namespace import DefinedNamespace, Namespace
-from rdflib.term import URIRef
+from graphs2go.models import rdf
 
 
-class SKOSXL(DefinedNamespace):
-    _NS = Namespace("http://www.w3.org/2008/05/skos-xl#")
-
-    _fail = True
+class SKOSXL:
+    _BASE_IRI = "http://www.w3.org/2008/05/skos-xl#"
 
     # Classes
-    Label: URIRef
+    Label = rdf.Iri(_BASE_IRI + "Label")
 
     # Properties
-    altLabel: URIRef
-    hiddenLabel: URIRef
-    labelRelation: URIRef
-    literalForm: URIRef
-    prefLabel: URIRef
+    altLabel = rdf.Iri(_BASE_IRI + "altLabel")
+    hiddenLabel = rdf.Iri(_BASE_IRI + "hiddenLabel")
+    labelRelation = rdf.Iri(_BASE_IRI + "labelRelation")
+    literalForm = rdf.Iri(_BASE_IRI + "literalForm")
+    prefLabel = rdf.Iri(_BASE_IRI + "prefLabel")

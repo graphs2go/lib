@@ -1,17 +1,13 @@
-from rdflib.namespace import DefinedNamespace, Namespace
-from rdflib.term import URIRef
+from graphs2go.models import rdf
 
 
-class DASH(DefinedNamespace):
-    _NS = Namespace("http://datashapes.org/dash#")
-
-    _fail = True
+class DASH:
+    _BASE_IRI = "http://datashapes.org/dash#"
 
     # Properties
-
-    abstract: URIRef
-    reifiableBy: URIRef
-    viewer: URIRef
+    abstract = rdf.Iri(_BASE_IRI + "abstract")
+    reifiableBy = rdf.Iri(_BASE_IRI + "reifiableBy")
+    viewer = rdf.Iri(_BASE_IRI + "viewer")
 
     # Resources
-    DetailsViewer: URIRef
+    DetailsViewer = rdf.Iri(_BASE_IRI + "DetailsViewer")
