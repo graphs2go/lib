@@ -2,16 +2,17 @@ from graphs2go.models import rdf
 
 
 class INTERCHANGE:
-    _BASE_IRI = "http://www.graphs2go.com/schema/interchange#"
+    BASE_IRI = rdf.Iri("http://www.graphs2go.com/schema/interchange#")
+    PREFIX = "interchange"
 
     # Classes
-    Label = rdf.Iri(_BASE_IRI + "Label")
-    Node = rdf.Iri(_BASE_IRI + "Node")
-    Property = rdf.Iri(_BASE_IRI + "Property")
-    Relationship = rdf.Iri(_BASE_IRI + "Relationship")
+    Label = rdf.Iri(BASE_IRI + "Label")
+    Node = rdf.Iri(BASE_IRI + "Node")
+    Property = rdf.Iri(BASE_IRI + "Property")
+    Relationship = rdf.Iri(BASE_IRI + "Relationship")
 
     # Properties
-    label = rdf.Iri(_BASE_IRI + "label")  # Node->Label
-    nodeType = rdf.Iri(_BASE_IRI + "nodeType")
-    property = rdf.Iri(_BASE_IRI + "property")  # Node -> Property
-    relationship = rdf.Iri(_BASE_IRI + "relationship")  # Node -> Relationship
+    label = rdf.Iri(BASE_IRI + "label")  # Node->Label
+    nodeType = rdf.Iri(BASE_IRI + "nodeType")
+    property = rdf.Iri(BASE_IRI + "property")  # Node -> Property
+    relationship = rdf.Iri(BASE_IRI + "relationship")  # Node -> Relationship

@@ -1,2 +1,6 @@
+from graphs2go.models import rdf
+
+
 class SDO:
-    _BASE_IRI = "http://schema.org/"
+    BASE_IRI = rdf.Iri("http://schema.org/")
+    PREFIX = "schema"
