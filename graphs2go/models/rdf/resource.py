@@ -1,26 +1,23 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Self, TypeVar
+from typing import TYPE_CHECKING, Self
 
 import rdflib.collection
 from rdflib import Graph
-from graphs2go.models.rdf.blank_node import BlankNode
-from graphs2go.models.rdf.literal import Literal
-from graphs2go.models.rdf.iri import Iri
-from rdflib.term import Node
 from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
 
+from graphs2go.models.rdf.quad import Quad, Quad_Object, Quad_Predicate
+from graphs2go.models.rdf.blank_node import BlankNode
+from graphs2go.models.rdf.iri import Iri
+from graphs2go.models.rdf.literal import Literal
+from graphs2go.stores.rdf.quad_store import QuadStore
+
 if TYPE_CHECKING:
     from graphs2go.models.rdf.named_resource import NamedResource
-
-
-_PyValueT = TypeVar("_PyValueT")
-_ValueT = TypeVar("_ValueT")
-_ValueMapper = Callable[[Node, Node, Node, Graph], Maybe[_ValueT]]
 
 
 class Resource:
@@ -31,26 +28,24 @@ class Resource:
     Identifier = BlankNode | Iri
 
     class Builder:
-        def __init__(self, *, graph: Graph, identifier: Resource.Identifier) -> None:
-            self.__graph = graph
+        def __init__(
+            self, *, identifier: Resource.Identifier, store: QuadStore
+        ) -> None:
             self.__identifier = identifier
+            self.__store = store
 
-        def add(self, predicate: Iri, object_: Node) -> Self:
-            self.__graph.add((self.__identifier, predicate, object_))
+        def add(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
+            self.__store.add(Quad(self.__identifier, predicate, object_))
             return self
 
         def build(self) -> Resource:
             return Resource(graph=self.__graph, identifier=self.__identifier)
 
         @property
-        def graph(self) -> Graph:
-            return self.__graph
-
-        @property
-        def identifier(self) -> BlankNode | Iri:
+        def identifier(self) -> Resource.Identifier:
             return self.__identifier
 
-        def set(self, predicate: Iri, object_: Node) -> Self:
+        def set(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
             self.__graph.set((self.__identifier, predicate, object_))
             return self
 

@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-class Store(ABC):
+class QuadStore(ABC):
     @dataclass(frozen=True)
     class Descriptor:
         """
@@ -28,22 +28,26 @@ class Store(ABC):
     def add(self, quad: rdf.Quad) -> None:
         raise NotImplementedError
 
+    def clear(self) -> None:
+        for quad in self.match():
+            self.remove(quad)
+
     @abstractmethod
-    def close(self) -> Self:
+    def close(self) -> None:
         raise NotImplementedError()
 
     @staticmethod
-    def create(*, config: RdfStoreConfig) -> Store:
+    def create(*, config: RdfStoreConfig) -> QuadStore:
         config_parsed = config.parse()
 
-        from .oxigraph_store import OxigraphStore
+        from .oxigraph_quad_store import OxigraphQuadStore
 
         if not is_successful(config_parsed.directory_path):
-            return OxigraphStore(directory_path=Maybe.empty)
+            return OxigraphQuadStore(directory_path=Maybe.empty)
 
         oxigraph_directory_path = config_parsed.directory_path.unwrap()
         oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
-        return OxigraphStore(
+        return OxigraphQuadStore(
             directory_path=oxigraph_directory_path,
             read_only=False,
             transactional=config_parsed.transactional,
@@ -137,10 +141,14 @@ class Store(ABC):
         raise NotImplementedError
 
     @classmethod
-    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Store:
-        from .oxigraph_store import OxigraphStore
+    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:
+        from .oxigraph_quad_store import OxigraphQuadStore
 
-        if isinstance(descriptor, OxigraphStore.Descriptor):
-            return OxigraphStore.open(descriptor, read_only=read_only)
+        if isinstance(descriptor, OxigraphQuadStore.Descriptor):
+            return OxigraphQuadStore.open(descriptor, read_only=read_only)
 
         raise TypeError(type(descriptor))
+
+    @abstractmethod
+    def remove(self, quad: rdf.Quad) -> None:
+        raise NotImplementedError()

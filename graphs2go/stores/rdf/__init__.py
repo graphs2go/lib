@@ -1,1 +1,1 @@
-from .store import Store
+from .quad_store import QuadStore as QuadStore

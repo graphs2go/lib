@@ -8,7 +8,7 @@ import pyoxigraph
 import pyoxigraph as ox
 
 from graphs2go.models import rdf
-from .store import Store
+from .quad_store import QuadStore
 from returns.maybe import Maybe
 
 if TYPE_CHECKING:
@@ -122,7 +122,7 @@ def _quad_to_ox(quad: rdf.Quad) -> ox.Quad:
     )
 
 
-class OxigraphStore(Store):
+class OxigraphQuadStore(QuadStore):
     """
     A store backed by Oxigraph, either in-memory or on disk.
 
@@ -130,7 +130,7 @@ class OxigraphStore(Store):
     """
 
     @dataclass(frozen=True)
-    class Descriptor(Store.Descriptor):
+    class Descriptor(QuadStore.Descriptor):
         directory_path: Path | None
         transactional: bool
 
@@ -213,8 +213,8 @@ class OxigraphStore(Store):
             yield _quad_from_ox(quad)
 
     @classmethod
-    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Store:
-        return OxigraphStore(
+    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:
+        return OxigraphQuadStore(
             directory_path=Maybe.from_optional(descriptor.directory_path),
             read_only=read_only,
             transactional=descriptor.transactional,
