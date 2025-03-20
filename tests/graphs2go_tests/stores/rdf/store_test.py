@@ -10,11 +10,11 @@ from graphs2go.stores.rdf import Store
 class StoreTest:
     class _TestData:
         BLANK_NODE_SUBJECT = rdf.BlankNode()
-        IRI_SUBJECT = rdf.Iri("http://example.org/subject")
+        IRI_SUBJECT = rdf.Iri("http://example.com/subject")
         BLANK_NODE_OBJECT = rdf.BlankNode()
-        IRI_OBJECT = rdf.Iri("http://example.org/object")
+        IRI_OBJECT = rdf.Iri("http://example.com/object")
         LITERAL_OBJECT = rdf.Literal("object")
-        PREDICATE = rdf.Iri("http://example.org/predicate")
+        PREDICATE = rdf.Iri("http://example.com/predicate")
         QUAD = rdf.Quad(
             IRI_SUBJECT,
             PREDICATE,
@@ -60,12 +60,22 @@ class StoreTest:
     def test_descriptor(self, store: Store) -> None:
         assert isinstance(store.descriptor, Store.Descriptor)
 
+    def test_dump_prefixes(self, store: Store) -> None:
+        store.add(self._TestData.QUAD)
+        output = store.dump(
+            format_=rdf.Format.TURTLE, prefixes={"ex": rdf.Iri("http://example.com/")}
+        ).decode("utf-8")
+        assert (
+            output
+            == "@prefix ex: <http://example.com/> .\nex:subject ex:predicate ex:object .\n"
+        )
+
     def test_dump_to_bytes(self, store: Store) -> None:
         store.add(self._TestData.QUAD)
         output = store.dump(format_=rdf.Format.NQUADS).decode("utf-8")
         assert (
             output
-            == "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .\n"
+            == "<http://example.com/subject> <http://example.com/predicate> <http://example.com/object> .\n"
         )
 
     def test_dump_to_file(self, store: Store, tmp_path: Path) -> None:
@@ -77,7 +87,7 @@ class StoreTest:
         with output_file_path.open() as output_file:
             assert (
                 output_file.read()
-                == "<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .\n"
+                == "<http://example.com/subject> <http://example.com/predicate> <http://example.com/object> .\n"
             )
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")

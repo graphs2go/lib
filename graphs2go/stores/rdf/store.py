@@ -55,22 +55,34 @@ class Store(ABC):
         pass
 
     def dump(
-        self, *, format_: rdf.Format, output: IO[bytes] | Path | None = None
+        self,
+        *,
+        format_: rdf.Format,
+        output: IO[bytes] | Path | None = None,
+        prefixes: dict[str, rdf.Iri] | None = None,
     ) -> bytes | None:
         if isinstance(output, Path):
             with output.open("wb") as file_output:
-                self._dump(format_=format_, output=file_output)
+                self._dump(format_=format_, output=file_output, prefixes=prefixes or {})
                 return None
         elif output is None:
             with BytesIO() as bytes_output:
-                self._dump(format_=format_, output=bytes_output)
+                self._dump(
+                    format_=format_, output=bytes_output, prefixes=prefixes or {}
+                )
                 return bytes_output.getvalue()
         else:
-            self._dump(format_=format_, output=output)
+            self._dump(format_=format_, output=output, prefixes=prefixes or {})
             return None
 
     @abstractmethod
-    def _dump(self, *, format_: rdf.Format, output: IO[bytes]) -> None:
+    def _dump(
+        self,
+        *,
+        format_: rdf.Format,
+        output: IO[bytes],
+        prefixes: dict[str, rdf.Iri],
+    ) -> None:
         raise NotImplementedError
 
     def __enter__(self):

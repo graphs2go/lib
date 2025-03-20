@@ -156,7 +156,7 @@ class OxigraphStore(Store):
     def add(self, quad: rdf.Quad) -> None:
         self.__delegate.add(_quad_to_ox(quad))
 
-    def close(self, commit_pending_transaction: bool = False) -> None:  # noqa: ARG002
+    def close(self) -> None:  # noqa: ARG002
         # There's no explicit close on the pyoxigraph Store.
         # Delete all references to the pyoxigraph Store so it gets garbage collected and releases its lock.
         with contextlib.suppress(AttributeError):
@@ -169,9 +169,13 @@ class OxigraphStore(Store):
             transactional=self.__transactional,
         )
 
-    def _dump(self, *, format_: rdf.Format, output: IO[bytes]) -> None:
+    def _dump(
+        self, *, format_: rdf.Format, output: IO[bytes], prefixes: dict[str, rdf.Iri]
+    ) -> None:
         self.__delegate.dump(
             format=pyoxigraph.RdfFormat.from_extension(format_.file_extension),
+            from_graph=None if format_.supports_quads else ox.DefaultGraph(),
+            prefixes={prefix: str(namespace) for prefix, namespace in prefixes.items()},
             output=output,
         )
 
