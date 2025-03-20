@@ -156,24 +156,6 @@ class OxigraphStore(Store):
     def add(self, quad: rdf.Quad) -> None:
         self.__delegate.add(_quad_to_ox(quad))
 
-    # def add(
-    #     self,
-    #     triple: _TripleType,
-    #     context: Graph,
-    #     quoted: bool = False,
-    # ) -> None:
-    #     self.__delegate.add(_triple_to_ox(triple, context))
-    #     super().add(triple, context, quoted)
-
-    # def add_graph(self, graph: Graph) -> None:
-    #     self.__delegate.add_graph(_graph_identifier_to_ox(graph.identifier))
-    #
-    # def addN(self, quads: Iterable[_QuadType]) -> None:  # noqa: N802
-    #     if self.__transactional:
-    #         self.__delegate.extend(_quad_to_ox(q) for q in quads)  # type: ignore
-    #     else:
-    #         self.__delegate.bulk_extend(_quad_to_ox(q) for q in quads)  # type: ignore
-
     def close(self, commit_pending_transaction: bool = False) -> None:  # noqa: ARG002
         # There's no explicit close on the pyoxigraph Store.
         # Delete all references to the pyoxigraph Store so it gets garbage collected and releases its lock.
@@ -192,6 +174,12 @@ class OxigraphStore(Store):
             format=pyoxigraph.RdfFormat.from_extension(format_.file_extension),
             output=output,
         )
+
+    def extend(self, quads: Iterable[rdf.Quad]) -> None:
+        if self.__transactional:
+            self.__delegate.extend(_quad_to_ox(quad) for quad in quads)  # type: ignore
+        else:
+            self.__delegate.bulk_extend(_quad_to_ox(quad) for quad in quads)  # type: ignore
 
     def _load(self, *, format_: rdf.Format, input_: IO[bytes] | IO[str]) -> None:
         if self.__transactional:

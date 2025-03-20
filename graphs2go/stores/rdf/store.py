@@ -79,11 +79,21 @@ class Store(ABC):
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
         self.close()
 
+    def extend(self, quads: Iterable[rdf.Quad]) -> None:
+        for quad in quads:
+            self.add(quad)
+
     @property
     def is_empty(self) -> bool:
         for _ in self.match():
             return False
         return True
+
+    def __len__(self) -> int:
+        count = 0
+        for _ in self.match():
+            count += 1
+        return count
 
     def load(
         self, *, format_: rdf.Format, input_: bytes | IO[bytes] | IO[str] | Path | str

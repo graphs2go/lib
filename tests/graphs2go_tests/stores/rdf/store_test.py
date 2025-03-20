@@ -26,6 +26,40 @@ class StoreTest:
     def store(self, tmp_path: Path) -> Iterable[Store]:
         raise NotImplementedError
 
+    # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
+    def test_add(self, store: Store) -> None:  # noqa: N802
+        assert store.is_empty
+        store.add(self._TestData.QUAD)
+        assert not store.is_empty
+
+    def test_extend(self, store: Store) -> None:  # noqa: N802
+        store.extend(
+            (
+                rdf.Quad(
+                    self._TestData.IRI_SUBJECT,
+                    self._TestData.PREDICATE,
+                    self._TestData.IRI_OBJECT,
+                ),
+                rdf.Quad(
+                    self._TestData.BLANK_NODE_SUBJECT,
+                    self._TestData.PREDICATE,
+                    self._TestData.BLANK_NODE_OBJECT,
+                ),
+                rdf.Quad(
+                    self._TestData.IRI_SUBJECT,
+                    self._TestData.PREDICATE,
+                    self._TestData.LITERAL_OBJECT,
+                ),
+            )
+        )
+        assert len(store) == 3
+
+    def test_close(self, store: Store) -> None:
+        store.close()
+
+    def test_descriptor(self, store: Store) -> None:
+        assert isinstance(store.descriptor, Store.Descriptor)
+
     def test_dump_to_bytes(self, store: Store) -> None:
         store.add(self._TestData.QUAD)
         output = store.dump(format_=rdf.Format.NQUADS).decode("utf-8")
@@ -47,10 +81,15 @@ class StoreTest:
             )
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
-    def test_add(self, store: Store) -> None:  # noqa: N802
+    def test_is_empty(self, store: Store) -> None:
         assert store.is_empty
+
+    def test_len(self, store: Store) -> None:
+        assert len(store) == 0
         store.add(self._TestData.QUAD)
-        assert not store.is_empty
+        assert len(store) == 1
+        store.add(self._TestData.QUAD)
+        assert len(store) == 1
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
     def test_load_from_file(self, store: Store) -> None:
@@ -60,9 +99,37 @@ class StoreTest:
         )
         assert not store.is_empty
 
-    # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
-    def test_is_empty(self, store: Store) -> None:
-        assert store.is_empty
+    def test_match_empty(self, store: Store) -> None:
+        assert len(tuple(store.match())) == 0
+
+    def test_match_exact(self, store: Store) -> None:
+        store.add(self._TestData.QUAD)
+        matches = tuple(store.match(*self._TestData.QUAD))
+        assert len(matches) == 1
+        assert matches[0] == self._TestData.QUAD
+
+    def test_match_mismatch(self, store: Store) -> None:
+        store.add(self._TestData.QUAD)
+        assert (
+            len(
+                tuple(
+                    store.match(
+                        self._TestData.QUAD.subject,
+                        self._TestData.QUAD.predicate,
+                        self._TestData.BLANK_NODE_OBJECT,
+                    )
+                )
+            )
+            == 0
+        )
+
+    def test_match_wildcard(self, store: Store) -> None:
+        store.add(self._TestData.QUAD)
+        matches = tuple(
+            store.match(self._TestData.QUAD.subject, self._TestData.QUAD.predicate)
+        )
+        assert len(matches) == 1
+        assert matches[0] == self._TestData.QUAD
 
     def __test_open(self, *, store: Store, read_only: bool) -> None:
         assert store.is_empty
