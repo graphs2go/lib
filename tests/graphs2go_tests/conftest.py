@@ -6,8 +6,6 @@ from returns.maybe import Nothing, Some
 
 from graphs2go.models import interchange, rdf, skos, LabelType
 from graphs2go.namespaces import SKOS
-from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
-from graphs2go.rdf_stores.oxigraph_rdf_store import OxigraphRdfStore
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.utils.uuid_urn import uuid_urn
 
@@ -27,7 +25,7 @@ def interchange_graph_descriptor() -> interchange.Graph.Descriptor:
     interchange_graph_identifier = uuid_urn()
     with interchange.Graph(
         identifier=interchange_graph_identifier,
-        rdf_store=OxigraphRdfStore.create_(
+        rdf_store=OxigraphQuadStore.create_(
             identifier=interchange_graph_identifier,
             rdf_store_config=RdfStoreConfig.default(directory_path_default=Nothing),
         ),

@@ -6,24 +6,24 @@ from typing import TYPE_CHECKING, Generic, Self, TypeVar
 import rdflib
 from rdflib.graph import DATASET_DEFAULT_GRAPH_ID
 
-from graphs2go.models.rdf.model import Model
-from graphs2go.models.rdf.named_resource import NamedResource
+from graphs2go.models import rdf
+from graphs2go.stores.rdf import QuadStore
 
-# from graphs2go.rdf_stores.rdf_store import RdfStore
+# from graphs2go.quad_stores.quad_store import RdfStore
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
     from rdflib.graph import _QuadType
 
-    from graphs2go.resources.rdf_store_config import RdfStoreConfig
+    from graphs2go.resources.quad_store_config import RdfStoreConfig
 
 
-_ModelT = TypeVar("_ModelT", bound=Model)
+_ModelT = TypeVar("_ModelT", bound=rdf.Model)
 _DEFAULT_GRAPH = rdflib.Graph(identifier=DATASET_DEFAULT_GRAPH_ID)
 
 
-def _model_to_quads(model: Model) -> Iterable[_QuadType]:
+def _model_to_quads(model: rdf.Model) -> Iterable[_QuadType]:
     for s, p, o in model.resource.graph:
         yield (
             s,
@@ -37,40 +37,37 @@ def _model_to_quads(model: Model) -> Iterable[_QuadType]:
         )
 
 
-ModelT = TypeVar("ModelT", bound=Model)
+ModelT = TypeVar("ModelT", bound=rdf.Model)
 
 
-class Graph(Generic[ModelT]):
+class ModelStore[ModelT]:
     """
-    Non-picklable RDF graph backed by RDF store.
+    Non-picklable RDF model store backed by an RDF quad store.
     """
 
     @dataclass(frozen=True)
     class Descriptor:
         """
-        A picklable dataclass identifying an RDF graph.
+        A picklable dataclass identifying an RDF model store.
         """
 
-        identifier: rdflib.URIRef
-        rdf_store_descriptor: RdfStore.Descriptor
+        identifier: rdf.Iri
+        quad_store_descriptor: QuadStore.Descriptor
 
-    def __init__(self, *, identifier: rdflib.URIRef, rdf_store: RdfStore):
+    def __init__(self, *, identifier: rdf.Iri, quad_store: QuadStore):
         self.__identifier = identifier
-        self.__rdflib_graph = rdflib.ConjunctiveGraph(
-            identifier=identifier, store=rdf_store
-        )
-        self.__rdf_store = rdf_store
+        self.__quad_store = quad_store
 
     def add(self, model: ModelT) -> Self:
-        self.__rdf_store.addN(_model_to_quads(model))
+        self.__quad_store.extend(_model_to_quads(model))
         return self
 
-    def add_all(self, models: Iterable[ModelT]) -> Self:
+    def extend(self, models: Iterable[ModelT]) -> Self:
         def models_to_quads() -> Iterable[_QuadType]:
             for model in models:
                 yield from _model_to_quads(model)
 
-        self.__rdf_store.addN(models_to_quads())
+        self.__quad_store.addN(models_to_quads())
         return self
 
     def add_all_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
@@ -80,16 +77,16 @@ class Graph(Generic[ModelT]):
 
     def close(self) -> None:
         self.__rdflib_graph.close()
-        self.__rdf_store.close()
+        self.__quad_store.close()
 
     @classmethod
     def create(
-        cls, *, identifier: rdflib.URIRef, rdf_store_config: RdfStoreConfig
+        cls, *, identifier: rdflib.URIRef, quad_store_config: RdfStoreConfig
     ) -> Self:
         return cls(
             identifier=identifier,
-            rdf_store=RdfStore.create_(
-                identifier=identifier, rdf_store_config=rdf_store_config
+            quad_store=RdfStore.create_(
+                identifier=identifier, quad_store_config=quad_store_config
             ),
         )
 
@@ -97,7 +94,7 @@ class Graph(Generic[ModelT]):
     def descriptor(self) -> Descriptor:
         return self.Descriptor(
             identifier=self.__identifier,
-            rdf_store_descriptor=self.__rdf_store.descriptor,
+            quad_store_descriptor=self.__quad_store.descriptor,
         )
 
     def __enter__(self):
@@ -112,7 +109,7 @@ class Graph(Generic[ModelT]):
 
     @property
     def is_empty(self) -> bool:
-        return self.__rdf_store.is_empty
+        return self.__quad_store.is_empty
 
     def _models_by_rdf_type(
         self, *, model_class: type[_ModelT], rdf_type: rdflib.URIRef
@@ -141,8 +138,8 @@ class Graph(Generic[ModelT]):
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
             identifier=descriptor.identifier,
-            rdf_store=RdfStore.open_(
-                descriptor.rdf_store_descriptor, read_only=read_only
+            quad_store=RdfStore.open_(
+                descriptor.quad_store_descriptor, read_only=read_only
             ),
         )
 

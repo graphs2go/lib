@@ -1,7 +1,7 @@
 from .blank_node import BlankNode as BlankNode
+from .dataset import Dataset as Dataset
 from .file_format import FileFormat as FileFormat
 from .format import Format as Format
-from .graph import Graph as Graph
 from .iri import Iri as Iri
 from .literal import Literal as Literal
 from .model import Model as Model
