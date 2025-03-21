@@ -3,34 +3,28 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from io import BytesIO, StringIO
-from typing import TYPE_CHECKING, Self, IO
+from pathlib import Path
+from typing import TYPE_CHECKING, IO
 
 from returns.maybe import Maybe
 from returns.pipeline import is_successful
 
 from graphs2go.models import rdf
-from pathlib import Path
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
-
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-class QuadStore(ABC):
+class QuadStore(rdf.Dataset):
+    """
+    An RDF quad store / persistent RDF Dataset.
+    """
+
     @dataclass(frozen=True)
     class Descriptor:
         """
         A picklable dataclass identifying an RDF store. It can be used to open an RDF store.
         """
-
-    @abstractmethod
-    def add(self, quad: rdf.Quad) -> None:
-        raise NotImplementedError
-
-    def clear(self) -> None:
-        for quad in self.match():
-            self.remove(quad)
 
     @abstractmethod
     def close(self) -> None:
@@ -95,22 +89,6 @@ class QuadStore(ABC):
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
         self.close()
 
-    def extend(self, quads: Iterable[rdf.Quad]) -> None:
-        for quad in quads:
-            self.add(quad)
-
-    @property
-    def is_empty(self) -> bool:
-        for _ in self.match():
-            return False
-        return True
-
-    def __len__(self) -> int:
-        count = 0
-        for _ in self.match():
-            count += 1
-        return count
-
     def load(
         self, *, format_: rdf.Format, input_: bytes | IO[bytes] | IO[str] | Path | str
     ) -> None:
@@ -130,16 +108,6 @@ class QuadStore(ABC):
     def _load(self, *, format_: rdf.Format, input_: IO[bytes] | IO[str]) -> None:
         raise NotImplementedError()
 
-    @abstractmethod
-    def match(
-        self,
-        subject: rdf.Quad_Subject | None = None,
-        predicate: rdf.Quad_Predicate | None = None,
-        object_: rdf.Quad_Object | None = None,
-        graph: rdf.Quad_Graph = None,
-    ) -> Iterable[rdf.Quad]:
-        raise NotImplementedError
-
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:
         from .oxigraph_quad_store import OxigraphQuadStore
@@ -148,7 +116,3 @@ class QuadStore(ABC):
             return OxigraphQuadStore.open(descriptor, read_only=read_only)
 
         raise TypeError(type(descriptor))
-
-    @abstractmethod
-    def remove(self, quad: rdf.Quad) -> None:
-        raise NotImplementedError()
