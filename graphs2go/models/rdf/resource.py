@@ -32,22 +32,22 @@ class Resource:
             self, *, dataset: Dataset, identifier: Resource.Identifier
         ) -> None:
             self.__identifier = identifier
-            self.__dataset = dataset
+            self._dataset = dataset
 
         def add(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
-            self.__dataset.add(Quad(self.__identifier, predicate, object_))
+            self._dataset.add(Quad(self.__identifier, predicate, object_))
             return self
 
         def build(self) -> Resource:
-            return Resource(dataset=self.__dataset, identifier=self.__identifier)
+            return Resource(dataset=self._dataset, identifier=self.__identifier)
 
         @property
         def identifier(self) -> Resource.Identifier:
             return self.__identifier
 
         def set(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
-            self.__dataset.remove_matches(self.__identifier, predicate)
-            self.__dataset.add(Quad(self.__identifier, predicate, object_))
+            self._dataset.remove_matches(self.__identifier, predicate)
+            self._dataset.add(Quad(self.__identifier, predicate, object_))
             return self
 
     # class ValueMappers:
@@ -187,11 +187,11 @@ class Resource:
     #     for _value in self.values(predicate, mapper=mapper):  # type: ignore
     #         return True
     #     return False
-    #
-    # @property
-    # def identifier(self) -> Identifier:
-    #     return self.__identifier
-    #
+
+    @property
+    def identifier(self) -> Identifier:
+        return self.__identifier
+
     # def optional_value(
     #     self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
     # ) -> Maybe[_ValueT]:  # type: ignore

@@ -11,21 +11,21 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-class Graph(rdf.Graph[Model]):
+class ModelSet(rdf.ModelSet[Model]):
     """
-    Non-picklable interchange graph. Used as an entry point for accessing top-level graph models.
+    Non-picklable interchange model store. Used as an entry point for accessing top-level models.
     """
 
     def node_by_iri(self, iri: rdf.Iri) -> Node:
         # For performance reasons, don't check if it's actually a Node
-        return Node(rdf.NamedResource(graph=self.rdflib_graph, iri=iri))
+        return Node(self._resource_set.named_resource(iri))
 
     def nodes(self) -> Iterable[Node]:
         return self._models_by_rdf_type(model_class=Node, rdf_type=INTERCHANGE.Node)
 
     def nodes_by_type(self, type_: rdf.Iri) -> Iterable[Node]:
         return (
-            Node(resource=rdf.NamedResource(graph=self.rdflib_graph, iri=node_iri))
+            Node(resource=self._resource_set.named_resource(node_iri))
             for node_iri in self.node_iris_by_type(type_)
         )
 

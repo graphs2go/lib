@@ -7,6 +7,10 @@ if TYPE_CHECKING:
 
 
 class Model:
+    """
+    Base class for RDF-backed models.
+    """
+
     class Builder:
         def __init__(self, resource_builder: Resource.Builder):
             self.__resource_builder = resource_builder
