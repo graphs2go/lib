@@ -27,7 +27,9 @@ def interchange_graph_descriptor() -> interchange.Graph.Descriptor:
         identifier=interchange_graph_identifier,
         rdf_store=OxigraphQuadStore.create_(
             identifier=interchange_graph_identifier,
-            rdf_store_config=RdfStoreConfig.default(directory_path_default=Nothing),
+            rdf_store_config=RdfStoreConfig.default(
+                oxigraph_directory_path_default=Nothing
+            ),
         ),
     ) as graph:
         concept_scheme = (

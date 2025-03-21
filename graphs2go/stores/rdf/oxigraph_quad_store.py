@@ -131,26 +131,21 @@ class OxigraphQuadStore(QuadStore):
 
     @dataclass(frozen=True)
     class Descriptor(QuadStore.Descriptor):
-        directory_path: Path | None
+        directory_path: Path
         transactional: bool
 
-    def __init__(
-        self, *, directory_path: Maybe[Path], read_only: bool, transactional: bool
-    ):
-        self.__directory_path = directory_path.value_or(None)
-        if self.__directory_path is not None:
-            if read_only:
-                if not self.__directory_path.is_dir():
-                    raise ValueError(
-                        "store opened read-only but directory %s does not exist or is not a directory",
-                        self.__directory_path,
-                    )
-                self.__delegate = ox.Store.read_only(str(self.__directory_path))
-            else:
-                self.__directory_path.mkdir(exist_ok=True, parents=True)
-                self.__delegate = ox.Store(self.__directory_path)
+    def __init__(self, *, directory_path: Path, read_only: bool, transactional: bool):
+        self.__directory_path = directory_path
+        if read_only:
+            if not self.__directory_path.is_dir():
+                raise ValueError(
+                    "store opened read-only but directory %s does not exist or is not a directory",
+                    self.__directory_path,
+                )
+            self.__delegate = ox.Store.read_only(str(self.__directory_path))
         else:
-            self.__delegate = ox.Store()
+            self.__directory_path.mkdir(exist_ok=True, parents=True)
+            self.__delegate = ox.Store(self.__directory_path)
         self.__transactional = transactional
 
     def add(self, quad: rdf.Quad) -> None:

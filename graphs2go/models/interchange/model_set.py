@@ -34,11 +34,9 @@ class ModelSet(rdf.ModelSet[Model]):
 
     def node_iris_by_type(self, type_: rdf.Iri) -> Iterable[rdf.Iri]:
         return (
-            node_iri
-            for node_iri in self.__rdflib_graph.subjects(
-                predicate=INTERCHANGE.nodeType,
-                object=type_,
-                unique=True,
+            quad.subject
+            for quad in self._dataset.match(
+                predicate=INTERCHANGE.nodeType, object_=type_
             )
-            if isinstance(node_iri, rdf.Iri)
+            if isinstance(quad.subject, rdf.Iri)
         )

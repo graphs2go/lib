@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Self, TypeVar
 
+from returns.maybe import Maybe, Nothing
+
 from graphs2go.models import rdf
 from graphs2go.stores.rdf import QuadStore
 
@@ -37,10 +39,14 @@ class ModelStore[ModelT](rdf.ModelSet[ModelT]):
         self.__quad_store.close()
 
     @classmethod
-    def create(cls, *, identifier: rdf.Iri, quad_store_config: RdfStoreConfig) -> Self:
+    def create(
+        cls, *, identifier: rdf.Iri, quad_store_config: Maybe[RdfStoreConfig] = Nothing
+    ) -> Self:
         return cls(
             identifier=identifier,
-            quad_store=QuadStore.create(config=quad_store_config),
+            quad_store=QuadStore.create(
+                config=quad_store_config, identifier=identifier
+            ),
         )
 
     @property

@@ -6,6 +6,7 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, IO
 
+from pathvalidate import sanitize_filename
 from returns.maybe import Maybe
 from returns.pipeline import is_successful
 
@@ -31,15 +32,18 @@ class QuadStore(rdf.Dataset):
         raise NotImplementedError()
 
     @staticmethod
-    def create(*, config: RdfStoreConfig) -> QuadStore:
+    def create(*, config: RdfStoreConfig, identifier: rdf.Iri) -> QuadStore:
         config_parsed = config.parse()
 
         from .oxigraph_quad_store import OxigraphQuadStore
 
-        if not is_successful(config_parsed.directory_path):
-            return OxigraphQuadStore(directory_path=Maybe.empty)
+        if not is_successful(config_parsed.oxigraph_directory_path):
+            raise NotImplementedError
 
-        oxigraph_directory_path = config_parsed.directory_path.unwrap()
+        oxigraph_directory_path = (
+            config_parsed.oxigraph_directory_path.unwrap()
+            / sanitize_filename(str(identifier))
+        )
         oxigraph_directory_path.mkdir(parents=True, exist_ok=True)
         return OxigraphQuadStore(
             directory_path=oxigraph_directory_path,

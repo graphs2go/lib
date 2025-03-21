@@ -22,13 +22,13 @@ class NamedModel(Model):
             return cast("NamedResource.Builder", super()._resource_builder)
 
     @property
-    def resource(self) -> NamedResource:
-        return cast("NamedResource", super().resource)
-
-    @property
     def identifier(self) -> Iri:
         return self.resource.iri
 
     @property
     def iri(self) -> Iri:
         return self.resource.iri
+
+    @property
+    def resource(self) -> NamedResource:
+        return cast("NamedResource", super().resource)

@@ -12,24 +12,26 @@ _TRANSACTIONAL_DEFAULT = False
 class RdfStoreConfig(ConfigurableResource):  # type: ignore
     @dataclass(frozen=True)
     class Parsed:
-        directory_path: Maybe[Path]
+        oxigraph_directory_path: Maybe[Path]
         transactional: bool
 
-    directory_path: str
+    oxigraph_directory_path: str
     transactional: bool
 
     @classmethod
-    def default(cls, *, directory_path_default: Maybe[Path]) -> RdfStoreConfig:
+    def default(cls, *, oxigraph_directory_path_default: Maybe[Path]) -> RdfStoreConfig:
         return RdfStoreConfig(
-            directory_path=str(directory_path_default.value_or("")),
+            oxigraph_directory_path=str(oxigraph_directory_path_default.value_or("")),
             transactional=_TRANSACTIONAL_DEFAULT,
         )
 
     @classmethod
-    def from_env_vars(cls, *, directory_path_default: Maybe[Path]) -> RdfStoreConfig:
+    def from_env_vars(
+        cls, *, oxigraph_directory_path_default: Maybe[Path]
+    ) -> RdfStoreConfig:
         return cls(
-            directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(
-                str(directory_path_default.value_or(""))
+            oxigraph_directory_path=EnvVar("OXIGRAPH_DIRECTORY_PATH").get_value(
+                str(oxigraph_directory_path_default.value_or(""))
             ),  # type: ignore
             transactional=EnvVar.int("RDF_STORE_TRANSACTIONAL").get_value(
                 1 if _TRANSACTIONAL_DEFAULT else 0
@@ -39,8 +41,10 @@ class RdfStoreConfig(ConfigurableResource):  # type: ignore
 
     def parse(self) -> Parsed:
         return RdfStoreConfig.Parsed(
-            directory_path=(
-                Some(Path(self.directory_path)) if self.directory_path else Nothing
+            oxigraph_directory_path=(
+                Some(Path(self.oxigraph_directory_path))
+                if self.oxigraph_directory_path
+                else Nothing
             ),
             transactional=self.transactional,
         )
