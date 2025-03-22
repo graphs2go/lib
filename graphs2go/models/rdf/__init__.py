@@ -5,7 +5,6 @@ from .format import Format as Format
 from .iri import Iri as Iri
 from .literal import Literal as Literal
 from .model import Model as Model
-from .model_set import ModelSet as ModelSet
 from .quad import (
     Quad as Quad,
     Quad_Graph as Quad_Graph,

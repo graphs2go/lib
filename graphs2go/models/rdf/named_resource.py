@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from returns.maybe import Maybe, Nothing
+from returns.pipeline import is_successful
 
-from graphs2go.models.rdf.dataset import Dataset
 from graphs2go.models.rdf.resource import Resource
 
 if TYPE_CHECKING:
+    from graphs2go.models.rdf.dataset import Dataset
     from graphs2go.models.rdf.iri import Iri
 
 
@@ -30,7 +31,12 @@ class NamedResource(Resource):
 
     @classmethod
     def builder(cls, *, iri: Iri, dataset: Maybe[Dataset] = Nothing) -> Builder:  # type: ignore
-        return cls.Builder(dataset=dataset.or_else_call(lambda: Dataset()), iri=iri)
+        if is_successful(dataset):
+            return cls.Builder(dataset=dataset.unwrap(), iri=iri)
+
+        from graphs2go.models.rdf.oxigraph_dataset import OxigraphDataset
+
+        return cls.Builder(dataset=OxigraphDataset(), iri=iri)
 
     @property
     def iri(self) -> Iri:

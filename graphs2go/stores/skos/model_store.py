@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from graphs2go.models import rdf
 from graphs2go.models.skos.concept import Concept
 from graphs2go.models.skos.concept_scheme import ConceptScheme
 from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces import SKOS, SKOSXL
+from graphs2go.stores.rdf.model_store import ModelStore as RdfModelStore
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-class Graph(rdf.Graph[Model]):
+class ModelStore(RdfModelStore[Model]):
     """
     Non-picklable SKOS graph. Used as an entry point for accessing top-level graph models.
     """

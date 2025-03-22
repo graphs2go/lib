@@ -173,9 +173,12 @@ class Resource:
     def builder(
         cls, *, identifier: Identifier, dataset: Maybe[Dataset] = Nothing
     ) -> Builder:
-        return cls.Builder(
-            dataset=dataset.or_else_call(lambda: Dataset()), identifier=identifier
-        )
+        if is_successful(dataset):
+            return cls.Builder(dataset=dataset.unwrap(), identifier=identifier)
+
+        from graphs2go.models.rdf.oxigraph_dataset import OxigraphDataset
+
+        return cls.Builder(dataset=OxigraphDataset(), identifier=identifier)
 
     @property
     def dataset(self) -> Dataset:

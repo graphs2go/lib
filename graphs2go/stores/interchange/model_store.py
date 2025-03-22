@@ -6,12 +6,13 @@ from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.node import Node
 from graphs2go.namespaces.interchange import INTERCHANGE
+from graphs2go.stores.rdf.model_store import ModelStore as RdfModelStore
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-class ModelSet(rdf.ModelSet[Model]):
+class ModelStore(RdfModelStore[Model]):
     """
     Non-picklable interchange model store. Used as an entry point for accessing top-level models.
     """
