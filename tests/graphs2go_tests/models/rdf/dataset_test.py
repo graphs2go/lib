@@ -116,3 +116,49 @@ class DatasetTest:
         assert not dataset.is_empty
         dataset.remove(self._TestData.QUAD)
         assert dataset.is_empty
+
+    def test_remove_matches_exact(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert not dataset.is_empty
+        dataset.remove_matches(*self._TestData.QUAD)
+        assert dataset.is_empty
+
+    def test_remove_matches_graph(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert not dataset.is_empty
+        dataset.remove_matches(graph=self._TestData.QUAD.graph)
+        assert dataset.is_empty
+
+    def test_remove_matches_mismatch(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert not dataset.is_empty
+        dataset.remove_matches(
+            self._TestData.QUAD.subject,
+            self._TestData.QUAD.predicate,
+            self._TestData.BLANK_NODE_OBJECT,
+        )
+        assert not dataset.is_empty
+
+    def test_remove_matches_object(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert not dataset.is_empty
+        dataset.remove_matches(
+            object_=self._TestData.QUAD.object_,
+        )
+        assert dataset.is_empty
+
+    def test_remove_matches_predicate(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert not dataset.is_empty
+        dataset.remove_matches(
+            predicate=self._TestData.QUAD.predicate,
+        )
+        assert dataset.is_empty
+
+    def test_remove_matches_subject(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert not dataset.is_empty
+        dataset.remove_matches(
+            subject=self._TestData.QUAD.subject,
+        )
+        assert dataset.is_empty

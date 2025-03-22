@@ -51,7 +51,7 @@ class OxigraphDataset(Dataset):
             else None
         )
         object_ox = (
-            OxigraphAdapters.Quad.Object.to_ox(object) if object is not None else None
+            OxigraphAdapters.Quad.Object.to_ox(object_) if object_ is not None else None
         )
         graph_ox = (
             OxigraphAdapters.Quad.Graph.to_ox(graph) if graph is not None else None
@@ -102,4 +102,4 @@ class OxigraphDataset(Dataset):
             yield OxigraphAdapters.Quad.from_ox(quad_ox)
 
     def remove(self, quad: Quad) -> None:
-        self.__delegate.discard(quad)
+        self.__delegate.discard(OxigraphAdapters.Quad.to_ox(quad))

@@ -28,8 +28,8 @@ def test_relationships(interchange_graph: interchange.Graph) -> None:
             continue
         for relationship in relationships:
             assert relationship.subject == node.iri
-            assert relationship.object != node.iri
-            assert relationship.object in all_node_iris
+            assert relationship.object_ != node.iri
+            assert relationship.object_ in all_node_iris
         return
     pytest.fail("didn't find node with relationships")
 

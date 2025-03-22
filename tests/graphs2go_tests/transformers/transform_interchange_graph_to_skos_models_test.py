@@ -66,7 +66,7 @@ def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -
                     interchange_property.predicate == SKOS.notation
                     or interchange_property.predicate in skos.Concept.NOTE_PREDICATES
                 )
-                assert isinstance(interchange_property.object, rdf.Literal)
+                assert isinstance(interchange_property.object_, rdf.Literal)
 
             for interchange_relationship in interchange_node.relationships():
                 other_resource: rdf.NamedResource = (

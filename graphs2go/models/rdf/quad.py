@@ -14,5 +14,5 @@ Quad_Subject = BlankNode | Iri
 class Quad(NamedTuple):
     subject: Quad_Subject
     predicate: Quad_Predicate
-    object: Quad_Object
+    object_: Quad_Object
     graph: Quad_Graph = None
