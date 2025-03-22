@@ -18,7 +18,8 @@ def build_interchange_file_asset(
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def interchange_file(
-        output_config: OutputConfig, interchange_graph: interchange.Graph.Descriptor
+        output_config: OutputConfig,
+        interchange_model_store: InterchangeModelStore.Descriptor,
     ) -> None:
         logger = get_dagster_logger()
         output_directory_path = output_config.parse().directory_path / "interchange"
@@ -33,11 +34,11 @@ def build_interchange_file_asset(
                     directory_path=output_directory_path,
                     rdf_file_format=rdf_file_format,
                 ) as loader,
-                interchange.Graph.open(
-                    interchange_graph, read_only=True
-                ) as open_interchange_graph,
+                InterchangeModelStore.open(
+                    interchange_model_store, read_only=True
+                ) as open_interchange_model_store,
             ):
-                rdflib_graph = open_interchange_graph.rdflib_graph
+                rdflib_graph = open_interchange_model_store.rdflib_graph
                 for namespace_prefix, namespace in namespaces.items():
                     rdflib_graph.bind(namespace_prefix, namespace)
                 loader.load(rdflib_graph)

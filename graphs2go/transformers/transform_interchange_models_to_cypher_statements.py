@@ -8,9 +8,10 @@ from returns.pipeline import is_successful
 
 from graphs2go.models import cypher, interchange, rdf
 from graphs2go.models.cypher.node_pattern import NodePattern
-from graphs2go.transformers.transform_interchange_graph import (
-    transform_interchange_graph,
+from graphs2go.transformers.transform_interchange_models import (
+    transform_interchange_models,
 )
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -149,15 +150,15 @@ def _transform_interchange_node(
     )
 
 
-def transform_interchange_graph_to_cypher_statements(
-    interchange_graph_descriptor: interchange.Graph.Descriptor,
+def transform_interchange_models_to_cypher_statements(
+    interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
 ) -> Iterable[cypher.Statement]:
     interchange_node_iris: set[rdf.Iri] = set()
     interchange_relationship_objects: set[rdf.Iri] = set()
 
     output_model: _OutputModel
-    for output_model in transform_interchange_graph(
-        interchange_graph_descriptor=interchange_graph_descriptor,
+    for output_model in transform_interchange_models(
+        interchange_model_store_descriptor=interchange_model_store_descriptor,
         transform_interchange_node=_transform_interchange_node,
         # in_process=True,
     ):
@@ -170,11 +171,11 @@ def transform_interchange_graph_to_cypher_statements(
         yield from output_model.cypher_statements  # type: ignore
 
     # Interchange relationship objects that don't refer to interchange nodes should also be represented in the graph.
-    with interchange.Graph.open(
-        interchange_graph_descriptor, read_only=True
-    ) as interchange_graph:
+    with InterchangeModelStore.open(
+        interchange_model_store_descriptor, read_only=True
+    ) as interchange_model_store:
         iri_transformer = _UriTransformer(
-            namespace_manager=interchange_graph.rdflib_graph.namespace_manager
+            namespace_manager=interchange_model_store.rdflib_graph.namespace_manager
         )
 
         for external_interchange_relation_object in (

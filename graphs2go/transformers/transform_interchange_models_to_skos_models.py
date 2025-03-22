@@ -5,9 +5,10 @@ from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, skos
 from graphs2go.namespaces import SKOS
-from graphs2go.transformers.transform_interchange_graph import (
-    transform_interchange_graph,
+from graphs2go.transformers.transform_interchange_models import (
+    transform_interchange_models,
 )
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def _transform_interchange_labels_to_skos_labels(
@@ -102,18 +103,18 @@ def _transform_skos_concept_scheme_interchange_node_to_skos_models(
     yield skos_concept_scheme_builder.build()
 
 
-def transform_interchange_graph_to_skos_models(
-    interchange_graph_descriptor: interchange.Graph.Descriptor,
+def transform_interchange_models_to_skos_models(
+    interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
 ) -> Iterable[skos.Model]:
-    yield from transform_interchange_graph(
+    yield from transform_interchange_models(
         in_process=True,
-        interchange_graph_descriptor=interchange_graph_descriptor,
+        interchange_model_store_descriptor=interchange_model_store_descriptor,
         interchange_node_type=Some(SKOS.ConceptScheme),
         transform_interchange_node=_transform_skos_concept_scheme_interchange_node_to_skos_models,
     )
 
-    yield from transform_interchange_graph(
-        interchange_graph_descriptor=interchange_graph_descriptor,
+    yield from transform_interchange_models(
+        interchange_model_store_descriptor=interchange_model_store_descriptor,
         interchange_node_type=Some(SKOS.Concept),
         transform_interchange_node=_transform_skos_concept_interchange_node_to_skos_models,
     )

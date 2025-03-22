@@ -3,35 +3,41 @@ from typing import TYPE_CHECKING
 from graphs2go.models import interchange, rdf, skos
 from graphs2go.namespaces import SKOS
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
-from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
-    transform_interchange_graph_to_skos_models,
+from graphs2go.transformers.transform_interchange_models_to_skos_models import (
+    transform_interchange_models_to_skos_models,
 )
+from graphs2go.stores.skos import ModelStore as SkosModelStore
 
 if TYPE_CHECKING:
     from graphs2go.models.label_type import LabelType
 
 
-def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -> None:
-    skos_graph = skos.Graph(
-        identifier=interchange_graph_descriptor.identifier, rdf_store=MemoryRdfStore()
+def test_transform(
+    interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
+) -> None:
+    skos_model_store = SkosModelStore(
+        identifier=interchange_model_store_descriptor.identifier,
+        rdf_store=MemoryRdfStore(),
     )
-    skos_graph.add_all(
-        transform_interchange_graph_to_skos_models(interchange_graph_descriptor)
+    skos_model_store.add_all(
+        transform_interchange_models_to_skos_models(interchange_model_store_descriptor)
     )
 
     skos_concept_schemes_by_iri = {
         concept_scheme.iri: concept_scheme
-        for concept_scheme in skos_graph.concept_schemes()
+        for concept_scheme in skos_model_store.concept_schemes()
     }
     assert len(skos_concept_schemes_by_iri) == 1
     concept_scheme = next(iter(skos_concept_schemes_by_iri.values()))
 
-    skos_concepts_by_iri = {concept.iri: concept for concept in skos_graph.concepts()}
+    skos_concepts_by_iri = {
+        concept.iri: concept for concept in skos_model_store.concepts()
+    }
 
-    with interchange.Graph.open(
-        interchange_graph_descriptor, read_only=True
-    ) as interchange_graph:
-        for interchange_node in interchange_graph.nodes_by_type(SKOS.Concept):
+    with InterchangeModelStore.open(
+        interchange_model_store_descriptor, read_only=True
+    ) as interchange_model_store:
+        for interchange_node in interchange_model_store.nodes_by_type(SKOS.Concept):
             skos_concept = skos_concepts_by_iri[interchange_node.iri]
 
             skos_lexical_labels_by_type: dict[

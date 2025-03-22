@@ -8,12 +8,12 @@ def test_builder(
 
 
 def test_object(
-    interchange_graph: interchange.Graph,
+    interchange_model_store: InterchangeModelStore,
     interchange_relationship: interchange.Relationship,
 ) -> None:
     assert isinstance(interchange_relationship.object, rdf.Iri)
     assert interchange_relationship.subject in {
-        node.iri for node in interchange_graph.nodes()
+        node.iri for node in interchange_model_store.nodes()
     }
 
 
@@ -22,10 +22,10 @@ def test_predicate(interchange_relationship: interchange.Relationship) -> None:
 
 
 def test_subject(
-    interchange_graph: interchange.Graph,
+    interchange_model_store: InterchangeModelStore,
     interchange_relationship: interchange.Relationship,
 ) -> None:
     assert isinstance(interchange_relationship.subject, rdf.Iri)
     assert interchange_relationship.subject in {
-        node.iri for node in interchange_graph.nodes()
+        node.iri for node in interchange_model_store.nodes()
     }

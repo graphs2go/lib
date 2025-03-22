@@ -4,9 +4,10 @@ from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, rdf
 from graphs2go.namespaces import RDF, RDFS
-from graphs2go.transformers.transform_interchange_graph import (
-    transform_interchange_graph,
+from graphs2go.transformers.transform_interchange_models import (
+    transform_interchange_models,
 )
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def _transform_interchange_node_to_direct_rdf_models(
@@ -39,8 +40,8 @@ def _transform_interchange_node_to_direct_rdf_models(
     yield rdf.NamedModel(rdf_resource_builder.build())
 
 
-def transform_interchange_graph_to_direct_rdf_models(
-    interchange_graph_descriptor: interchange.Graph.Descriptor,
+def transform_interchange_models_to_direct_rdf_models(
+    interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
 ) -> Iterable[rdf.NamedModel]:
     """
     Transform the interchange graph into a "direct" RDF representation, one with only as much reification as it
@@ -50,8 +51,8 @@ def transform_interchange_graph_to_direct_rdf_models(
     https://lists.wikimedia.org/hyperkitty/list/wikidata@lists.wikimedia.org/message/5YFA5QB7FCT2KIONGZX6GOTT4URHQRVJ/
     """
 
-    yield from transform_interchange_graph(
+    yield from transform_interchange_models(
         in_process=True,
-        interchange_graph_descriptor=interchange_graph_descriptor,
+        interchange_model_store_descriptor=interchange_model_store_descriptor,
         transform_interchange_node=_transform_interchange_node_to_direct_rdf_models,
     )

@@ -18,7 +18,7 @@ def build_skos_file_asset(
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def skos_file(
-        output_config: OutputConfig, skos_graph: skos.Graph.Descriptor
+        output_config: OutputConfig, skos_model_store: SkosModelStore.Descriptor
     ) -> None:
         logger = get_dagster_logger()
         output_directory_path = output_config.parse().directory_path / "skos"
@@ -34,9 +34,11 @@ def build_skos_file_asset(
                     rdf_file_format=rdf_file_format,
                     rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
                 ) as loader,
-                skos.Graph.open(skos_graph, read_only=True) as open_skos_graph,
+                SkosModelStore.open(
+                    skos_model_store, read_only=True
+                ) as open_skos_model_store,
             ):
-                rdflib_graph = open_skos_graph.rdflib_graph
+                rdflib_graph = open_skos_model_store.rdflib_graph
                 rdflib_graph.bind("skosxl", SKOSXL)
                 loader.load(rdflib_graph)
             logger.info(

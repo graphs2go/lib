@@ -6,28 +6,30 @@ from tqdm import tqdm
 
 from graphs2go.models import interchange, skos, rdf
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
-from graphs2go.transformers.transform_interchange_graph_to_skos_models import (
-    transform_interchange_graph_to_skos_models,
+from graphs2go.transformers.transform_interchange_models_to_skos_models import (
+    transform_interchange_models_to_skos_models,
 )
 
 
-def build_skos_graph_asset(
+def build_skos_model_store_asset(
     *, partitions_def: Maybe[PartitionsDefinition] = Nothing
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
-    def skos_graph(
-        interchange_graph: interchange.Graph.Descriptor,
+    def skos_model_store(
+        interchange_model_store: InterchangeModelStore.Descriptor,
         rdf_store_config: RdfStoreConfig,
-    ) -> skos.Graph.Descriptor:
-        with skos.Graph.create(
-            identifier=rdf.Iri(f"urn:skos:{quote(interchange_graph.identifier)}"),
+    ) -> SkosModelStore.Descriptor:
+        with SkosModelStore.create(
+            identifier=rdf.Iri(f"urn:skos:{quote(interchange_model_store.identifier)}"),
             rdf_store_config=rdf_store_config,
-        ) as open_skos_graph:
-            return open_skos_graph.add_all_if_empty(
+        ) as open_skos_model_store:
+            return open_skos_model_store.add_all_if_empty(
                 lambda: tqdm(
-                    transform_interchange_graph_to_skos_models(interchange_graph),
+                    transform_interchange_models_to_skos_models(
+                        interchange_model_store
+                    ),
                     desc="SKOS graph models",
                 )
             ).descriptor
 
-    return skos_graph
+    return skos_model_store

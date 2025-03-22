@@ -3,17 +3,22 @@ from rdflib import Graph
 from graphs2go.models import interchange, rdf
 from graphs2go.namespaces import RDF, SKOS
 from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
-from graphs2go.transformers.transform_interchange_graph_to_direct_rdf_models import (
-    transform_interchange_graph_to_direct_rdf_models,
+from graphs2go.transformers.transform_interchange_models_to_direct_rdf_models import (
+    transform_interchange_models_to_direct_rdf_models,
 )
 
 
-def test_transform(interchange_graph_descriptor: interchange.Graph.Descriptor) -> None:
+def test_transform(
+    interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
+) -> None:
     rdf_graph: rdf.Graph[rdf.NamedModel] = rdf.Graph(
-        identifier=interchange_graph_descriptor.identifier, rdf_store=MemoryRdfStore()
+        identifier=interchange_model_store_descriptor.identifier,
+        rdf_store=MemoryRdfStore(),
     )
     rdf_graph.add_all(
-        transform_interchange_graph_to_direct_rdf_models(interchange_graph_descriptor)
+        transform_interchange_models_to_direct_rdf_models(
+            interchange_model_store_descriptor
+        )
     )
 
     rdflib_graph: Graph = rdf_graph.rdflib_graph

@@ -2,6 +2,7 @@ import pytest
 
 from graphs2go.models import skos, LabelType, rdf
 from graphs2go.namespaces import SKOS
+from graphs2go.stores.skos import ModelStore as SkosModelStore
 
 
 def test_lexical_labels(skos_concept: skos.Concept) -> None:
@@ -47,13 +48,13 @@ def test_notes(skos_concept: skos.Concept) -> None:
     assert isinstance(object_, rdf.Literal)
 
 
-def test_semantic_relations(skos_graph: skos.Graph) -> None:
-    for concept in skos_graph.concepts():
+def test_semantic_relations(skos_model_store: SkosModelStore) -> None:
+    for concept in skos_model_store.concepts():
         for predicate, related_concept in concept.semantic_relations():
             assert predicate in skos.Concept.SEMANTIC_RELATION_PREDICATES
             assert isinstance(related_concept, skos.Concept)
             assert related_concept.iri in {
-                concept.iri for concept in skos_graph.concepts()
+                concept.iri for concept in skos_model_store.concepts()
             }
             return
     pytest.fail("no semantic relations")

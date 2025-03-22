@@ -16,9 +16,10 @@ def test_predicate(interchange_property: interchange.Property) -> None:
 
 
 def test_subject(
-    interchange_graph: interchange.Graph, interchange_property: interchange.Property
+    interchange_model_store: InterchangeModelStore,
+    interchange_property: interchange.Property,
 ) -> None:
     assert isinstance(interchange_property.subject, rdf.Iri)
     assert interchange_property.subject in {
-        node.iri for node in interchange_graph.nodes()
+        node.iri for node in interchange_model_store.nodes()
     }
