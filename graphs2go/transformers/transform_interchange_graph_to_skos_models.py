@@ -12,7 +12,7 @@ from graphs2go.transformers.transform_interchange_graph import (
 
 def _transform_interchange_labels_to_skos_labels(
     interchange_labels: Iterable[interchange.Label],
-    subject_skos_model_builder: skos.LabeledModel.Builder,
+    subject_skos_model_builder: skos.Resource.Builder,
 ) -> Iterable[skos.Label]:
     for interchange_label in interchange_labels:
         if not is_successful(interchange_label.type):

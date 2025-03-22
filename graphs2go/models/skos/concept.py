@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING, ClassVar, Self
 from graphs2go.models import rdf
 from graphs2go.namespaces import RDF, SKOS
 from graphs2go.models.skos.concept_scheme import ConceptScheme
-from graphs2go.models.skos.labeled_model import LabeledModel
+from graphs2go.models.skos.resource import Resource
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-class Concept(LabeledModel):
+class Concept(Resource):
     _CONCEPT_SCHEME_CLASS = ConceptScheme
 
     # https://www.w3.org/TR/skos-reference/#notes
@@ -44,7 +44,7 @@ class Concept(LabeledModel):
         )
     )
 
-    class Builder(LabeledModel.Builder):
+    class Builder(Resource.Builder):
         def add_in_scheme(self, in_scheme: rdf.Iri) -> Self:
             self._resource_builder.add(SKOS.inScheme, in_scheme)
             return self

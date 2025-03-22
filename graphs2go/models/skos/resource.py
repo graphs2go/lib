@@ -8,7 +8,11 @@ from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.model import Model
 
 
-class LabeledModel(Model, ABC):
+class Resource(Model, ABC):
+    """
+    Abstract base class of SKOS Concept and ConceptScheme.
+    """
+
     class Builder(Model.Builder, ABC):
         def add_lexical_label(
             self, *, label: Label | rdf.Literal | rdf.Iri, type_: LabelType

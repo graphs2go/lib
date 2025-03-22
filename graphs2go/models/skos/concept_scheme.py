@@ -4,11 +4,11 @@ from typing import Self
 
 from graphs2go.models import rdf
 from graphs2go.namespaces import RDF, SKOS
-from graphs2go.models.skos.labeled_model import LabeledModel
+from graphs2go.models.skos.resource import Resource
 
 
-class ConceptScheme(LabeledModel):
-    class Builder(LabeledModel.Builder):
+class ConceptScheme(Resource):
+    class Builder(Resource.Builder):
         def add_top_concept(self, top_concept: rdf.Iri) -> Self:
             self._resource_builder.add(SKOS.hasTopConcept, top_concept)
             return self
