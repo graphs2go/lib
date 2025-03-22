@@ -1,23 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-from datetime import date, datetime
-from decimal import Decimal
 from typing import TYPE_CHECKING, Self
 
-import rdflib.collection
-from rdflib import Dataset
-from returns.maybe import Maybe, Nothing, Some
+from returns.maybe import Maybe, Nothing
 from returns.pipeline import is_successful
 
-from graphs2go.models.rdf.dataset import Dataset
-from graphs2go.models.rdf.quad import Quad, Quad_Object, Quad_Predicate
 from graphs2go.models.rdf.blank_node import BlankNode
 from graphs2go.models.rdf.iri import Iri
-from graphs2go.models.rdf.literal import Literal
+from graphs2go.models.rdf.quad import Quad, Quad_Object, Quad_Predicate
 
 if TYPE_CHECKING:
-    from graphs2go.models.rdf.named_resource import NamedResource
+    from graphs2go.models.rdf.dataset import Dataset
 
 
 class Resource:
