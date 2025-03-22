@@ -19,7 +19,7 @@ class NamedResource(Resource):
             self.__iri = iri
 
         def build(self) -> NamedResource:
-            return NamedResource(dataset=self._dataset, iri=self.__iri)
+            return NamedResource(dataset=self.__dataset, iri=self.__iri)
 
         @property
         def iri(self) -> Iri:

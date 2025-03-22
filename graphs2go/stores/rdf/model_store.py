@@ -42,7 +42,7 @@ class ModelStore[ModelT]:
         self._resource_set = ResourceSet(dataset=quad_store)
 
     def add(self, model: ModelT) -> Self:
-        self._dataset.extend(_model_to_quads(model))
+        self._quad_store.extend(_model_to_quads(model))
         return self
 
     def add_all_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
@@ -113,6 +113,6 @@ class ModelStore[ModelT]:
     def _model_iris_by_rdf_type(self, rdf_type: rdf.Iri) -> Iterable[rdf.Iri]:
         return (
             quad.subject
-            for quad in self._dataset.match(predicate=RDF.type, object_=rdf_type)
+            for quad in self._quad_store.match(predicate=RDF.type, object_=rdf_type)
             if isinstance(quad.subject, rdf.Iri)
         )

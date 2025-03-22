@@ -119,8 +119,8 @@ class OxigraphAdapters:
         @staticmethod
         def to_ox(quad: Quad) -> ox.Quad:
             return ox.Quad(
-                OxigraphAdapters.Quad.Subject.to_ox(quad[0]),
-                OxigraphAdapters.Quad.Predicate.to_ox(quad[1]),
-                OxigraphAdapters.Quad.Object.to_ox(quad[2]),
-                OxigraphAdapters.Quad.Graph.to_ox(quad[3]),
+                OxigraphAdapters.Quad.Subject.to_ox(quad.subject),
+                OxigraphAdapters.Quad.Predicate.to_ox(quad.predicate),
+                OxigraphAdapters.Quad.Object.to_ox(quad.object_),
+                OxigraphAdapters.Quad.Graph.to_ox(quad.graph),
             )

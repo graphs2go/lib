@@ -1,3 +1,4 @@
+from graphs2go.models.rdf.iri import Iri
 from graphs2go.models.rdf.named_resource import NamedResource
 from graphs2go.models.rdf.resource import Resource
 from graphs2go.models.rdf.dataset import Dataset
@@ -11,8 +12,8 @@ class ResourceSet:
     def dataset(self) -> Dataset:
         return self.__dataset
 
-    def named_resource(self, identifier: NamedResource.Identifier) -> NamedResource:
-        return NamedResource(dataset=self.__dataset, identifier=identifier)
+    def named_resource(self, iri: Iri) -> NamedResource:
+        return NamedResource(dataset=self.__dataset, iri=iri)
 
     def resource(self, identifier: Resource.Identifier) -> Resource:
         return Resource(dataset=self.__dataset, identifier=identifier)

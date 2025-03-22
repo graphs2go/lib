@@ -49,8 +49,8 @@ class Label(Model):
         resource_builder.add(SKOSXL.literalForm, literal_form)
 
         # Add direct statements for ease of querying
-        resource_builder.graph.add(
-            (subject_iri, INTERCHANGE.label, resource_builder.identifier)
+        resource_builder.dataset.add(
+            rdf.Quad(subject_iri, INTERCHANGE.label, resource_builder.identifier)
         )
         # if type_ is not None:
         #     resource.graph.add(

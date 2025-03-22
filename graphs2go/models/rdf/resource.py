@@ -24,23 +24,27 @@ class Resource:
         def __init__(
             self, *, dataset: Dataset, identifier: Resource.Identifier
         ) -> None:
+            self.__dataset = dataset
             self.__identifier = identifier
-            self._dataset = dataset
 
         def add(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
-            self._dataset.add(Quad(self.__identifier, predicate, object_))
+            self.__dataset.add(Quad(self.__identifier, predicate, object_))
             return self
 
         def build(self) -> Resource:
-            return Resource(dataset=self._dataset, identifier=self.__identifier)
+            return Resource(dataset=self.__dataset, identifier=self.__identifier)
+
+        @property
+        def dataset(self) -> Dataset:
+            return self.__dataset
 
         @property
         def identifier(self) -> Resource.Identifier:
             return self.__identifier
 
         def set(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
-            self._dataset.remove_matches(self.__identifier, predicate)
-            self._dataset.add(Quad(self.__identifier, predicate, object_))
+            self.__dataset.remove_matches(self.__identifier, predicate)
+            self.__dataset.add(Quad(self.__identifier, predicate, object_))
             return self
 
     # class ValueMappers:

@@ -40,8 +40,8 @@ class Property(Model):
         # (s, p, o)
         # resource.graph.add((subject_iri, predicate, object_))
         # Node -> Property instance
-        resource_builder.graph.add(
-            (subject_iri, INTERCHANGE.property, resource_builder.identifier)
+        resource_builder.dataset.add(
+            rdf.Quad(subject_iri, INTERCHANGE.property, resource_builder.identifier)
         )
 
         return cls.Builder(resource_builder)

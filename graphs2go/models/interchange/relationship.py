@@ -41,8 +41,8 @@ class Relationship(Model):
         # (s, p, o)
         # resource.graph.add((subject_iri, predicate, object_iri))
         # Node -> Relationship instances
-        resource_builder.graph.add(
-            (subject_iri, INTERCHANGE.relationship, resource_builder.identifier)
+        resource_builder.dataset.add(
+            rdf.Quad(subject_iri, INTERCHANGE.relationship, resource_builder.identifier)
         )
 
         return cls.Builder(resource_builder)

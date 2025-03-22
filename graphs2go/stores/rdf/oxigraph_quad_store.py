@@ -7,13 +7,14 @@ from typing import TYPE_CHECKING, IO
 import pyoxigraph
 import pyoxigraph as ox
 
-from graphs2go.models import rdf
-from .quad_store import QuadStore
+from graphs2go.models.rdf import Quad
+from graphs2go.stores.rdf.quad_store import QuadStore
 from returns.maybe import Maybe
 
-from ...models.rdf.oxigraph_adapters import OxigraphAdapters
+from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
 
 if TYPE_CHECKING:
+    from graphs2go.models import rdf
     from collections.abc import Iterable
     from pathlib import Path
 
@@ -118,7 +119,10 @@ class OxigraphQuadStore(QuadStore):
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:
         return OxigraphQuadStore(
-            directory_path=Maybe.from_optional(descriptor.directory_path),
+            directory_path=descriptor.directory_path,
             read_only=read_only,
             transactional=descriptor.transactional,
         )
+
+    def remove(self, quad: Quad) -> None:
+        self.__delegate.remove(OxigraphAdapters.Quad.to_ox(quad))
