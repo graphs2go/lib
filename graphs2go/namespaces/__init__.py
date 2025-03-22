@@ -1,4 +1,4 @@
-from rdflib import DCTERMS, RDF, RDFS, SKOS  # noqa: F401
+from rdflib import DCTERMS, RDF, RDFS, SKOS, XSD  # noqa: F401
 from .dash import DASH as DASH
 from .interchange import INTERCHANGE as INTERCHANGE
 from .sdo import SDO as SDO
@@ -14,4 +14,5 @@ PREFIXES: dict[str, rdf.Iri] = {
     SDO.PREFIX: SDO.BASE_IRI,
     "skos": rdf.Iri(SKOS._NS),
     SKOSXL.PREFIX: SKOSXL.BASE_IRI,
+    "xsd": rdf.Iri(XSD._NS),
 }

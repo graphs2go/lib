@@ -1,15 +1,23 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+import base64
+from datetime import date, datetime
+from decimal import Decimal
+from typing import TYPE_CHECKING, Self, Any
 
-from returns.maybe import Maybe, Nothing
+from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
+from returns.result import Result, Success, Failure
 
 from graphs2go.models.rdf.blank_node import BlankNode
 from graphs2go.models.rdf.iri import Iri
+from graphs2go.models.rdf.literal import Literal
 from graphs2go.models.rdf.quad import Quad, Quad_Object, Quad_Predicate
+from graphs2go.namespaces import XSD, RDF
 
 if TYPE_CHECKING:
+    from graphs2go.models.rdf import NamedResource
+    from collections.abc import Iterable
     from graphs2go.models.rdf.dataset import Dataset
 
 
@@ -21,14 +29,18 @@ class Resource:
     Identifier = BlankNode | Iri
 
     class Builder:
+        _AddableValue = Quad_Object | bool | bytes | date | datetime | float | int | str
+
         def __init__(
             self, *, dataset: Dataset, identifier: Resource.Identifier
         ) -> None:
             self.__dataset = dataset
             self.__identifier = identifier
 
-        def add(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
-            self.__dataset.add(Quad(self.__identifier, predicate, object_))
+        def add(self, predicate: Quad_Predicate, value: _AddableValue) -> Self:
+            self.__dataset.add(
+                Quad(self.__identifier, predicate, self.__value_to_quad_object(value))
+            )
             return self
 
         def build(self) -> Resource:
@@ -42,125 +54,151 @@ class Resource:
         def identifier(self) -> Resource.Identifier:
             return self.__identifier
 
-        def set(self, predicate: Quad_Predicate, object_: Quad_Object) -> Self:
+        def set(self, predicate: Quad_Predicate, value: _AddableValue) -> Self:
             self.__dataset.remove_matches(self.__identifier, predicate)
-            self.__dataset.add(Quad(self.__identifier, predicate, object_))
+            self.__dataset.add(
+                Quad(self.__identifier, predicate, self.__value_to_quad_object(value))
+            )
             return self
 
-    # class ValueMappers:
-    #     @staticmethod
-    #     def bool(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[bool]:
-    #         return Resource.ValueMappers.__py_value(object_, bool)
-    #
-    #     @staticmethod
-    #     def bytes(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[bytes]:
-    #         return Resource.ValueMappers.__py_value(object_, bytes)
-    #
-    #     @staticmethod
-    #     def collection(
-    #         _subject: Node, _predicate: Node, object_: Node, dataset: Dataset
-    #     ) -> Maybe[tuple[Node, ...]]:
-    #         if not isinstance(object_, BlankNode | Iri):
-    #             return Nothing
-    #         return Some(tuple(rdflib.collection.Collection(dataset, object_)))
-    #
-    #     @staticmethod
-    #     def date_or_datetime(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[date | datetime]:
-    #         if not isinstance(object_, Literal):
-    #             return Nothing
-    #         value_py = object_.toPython()
-    #         if isinstance(value_py, date | datetime):
-    #             return Some(value_py)
-    #         return Nothing
-    #
-    #     @staticmethod
-    #     def datetime(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[datetime]:
-    #         return Resource.ValueMappers.__py_value(object_, datetime)
-    #
-    #     @staticmethod
-    #     def float(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[float]:
-    #         if not isinstance(object_, Literal):
-    #             return Nothing
-    #         value_py = object_.toPython()
-    #         if isinstance(value_py, Decimal | float | int):
-    #             return Some(float(value_py))
-    #         return Nothing
-    #
-    #     @staticmethod
-    #     def identifier(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[Resource.Identifier]:
-    #         return Some(object_) if isinstance(object_, BlankNode | Iri) else Nothing
-    #
-    #     @staticmethod
-    #     def identity(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[Node]:
-    #         return Some(object_)
-    #
-    #     @staticmethod
-    #     def int(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[int]:
-    #         if not isinstance(object_, Literal):
-    #             return Nothing
-    #         value_py = object_.toPython()
-    #         if isinstance(value_py, Decimal | float | int):
-    #             return Some(int(value_py))
-    #         return Nothing
-    #
-    #     @staticmethod
-    #     def iri(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[Iri]:
-    #         return Some(object_) if isinstance(object_, Iri) else Nothing
-    #
-    #     @staticmethod
-    #     def literal(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[Literal]:
-    #         return Some(object_) if isinstance(object_, Literal) else Nothing
-    #
-    #     @staticmethod
-    #     def named_resource(
-    #         subject: Node, predicate: Node, object_: Node, dataset: Dataset
-    #     ) -> Maybe[NamedResource]:
-    #         from .named_resource import NamedResource
-    #
-    #         return Resource.ValueMappers.iri(subject, predicate, object_, dataset).map(
-    #             lambda iri: NamedResource(dataset=dataset, iri=iri)
-    #         )
-    #
-    #     @staticmethod
-    #     def __py_value(object_: Node, py_type: type[_PyValueT]) -> Maybe[_PyValueT]:
-    #         if not isinstance(object_, Literal):
-    #             return Nothing
-    #         py_value = object_.toPython()
-    #         return Some(py_value) if isinstance(py_value, py_type) else Nothing
-    #
-    #     @staticmethod
-    #     def resource(
-    #         subject: Node, predicate: Node, object_: Node, dataset: Dataset
-    #     ) -> Maybe[Resource]:
-    #         return Resource.ValueMappers.identifier(
-    #             subject, predicate, object_, dataset
-    #         ).map(lambda identifier: Resource(dataset=dataset, identifier=identifier))
-    #
-    #     @staticmethod
-    #     def str(
-    #         _subject: Node, _predicate: Node, object_: Node, _graph: Dataset
-    #     ) -> Maybe[str]:
-    #         return Resource.ValueMappers.__py_value(object_, str)
+        @staticmethod
+        def __value_to_quad_object(value: _AddableValue) -> Quad_Object:
+            if isinstance(value, BlankNode):
+                return value
+            if isinstance(value, bytes):
+                return Literal(base64.encodebytes(value), datatype=XSD.base64Binary)
+            if isinstance(value, date):
+                return Literal(value)
+            if isinstance(value, datetime):
+                return Literal(value)
+            if isinstance(value, Decimal):
+                return Literal(value)
+            if isinstance(value, float):
+                return Literal(value)
+            if isinstance(value, int):
+                return Literal(value)
+            if isinstance(value, Iri):
+                return value
+            if isinstance(value, Literal):
+                return value
+            if isinstance(value, str):
+                return Literal(value)
+            raise TypeError(type(value))
+
+    class Value:
+        def __init__(
+            self, *, object_: Quad_Object, predicate: Quad_Predicate, subject: Resource
+        ):
+            self.__object = object_
+            self.__predicate = predicate
+            self.__subject = subject
+
+        def __cast[T](
+            self, value: Any, type_: type[T]  # noqa: ANN401
+        ) -> Result[T, ValueError]:
+            if isinstance(value, type_):
+                return Success(value)
+            return Failure(
+                ValueError(
+                    f"{self.__subject.identifier} {self.__predicate} is not a {type_} but a {type(value)}"
+                )
+            )
+
+        def to_blank_node(self) -> Result[BlankNode, ValueError]:
+            return self.__cast(self.__object, BlankNode)
+
+        def to_bool(self) -> Result[bool, ValueError]:
+            return self.__to_python().bind(lambda py: self.__cast(py, bool))
+
+        def to_bytes(self) -> Result[bytes, ValueError]:
+            return self.__to_python().bind(lambda py: self.__cast(py, bytes))
+
+        def to_collection(self) -> Result[tuple[Resource.Value, ...], ValueError]:
+            def __to_collection(
+                resource: Resource,
+            ) -> Result[tuple[Resource.Value, ...], ValueError]:
+                if resource.identifier == RDF.nil:
+                    return Success(())
+                first = resource.value(RDF.first)
+                if not is_successful(first):
+                    return Failure(
+                        ValueError(f"{resource.identifier} has no rdf:first")
+                    )
+                rest = resource.value(RDF.rest)
+                if not is_successful(rest):
+                    return Failure(ValueError(f"{resource.identifier} has no rdf:rest"))
+                rest_collection = rest.to_collection()
+                if not is_successful(rest_collection):
+                    return rest_collection
+                return Success((first, *rest_collection.unwrap()))
+
+            return self.to_resource().bind(__to_collection)
+
+        def to_date(self) -> Result[date, ValueError]:
+            return self.__to_python().bind(lambda py: self.__cast(py, date))
+
+        def to_date_or_date_time(self) -> Result[date | datetime, ValueError]:
+            return self.__to_python().bind(lambda py: self.__cast(py, date | datetime))
+
+        def to_datetime(self) -> Result[datetime, ValueError]:
+            return self.__to_python().bind(lambda py: self.__cast(py, datetime))
+
+        def to_decimal(self) -> Result[Decimal, ValueError]:
+            return (
+                self.__to_python()
+                .bind(lambda py: self.__cast(py, Decimal | float | int))
+                .map(lambda number: Decimal(number))
+            )
+
+        def to_float(self) -> Result[float, ValueError]:
+            return (
+                self.__to_python()
+                .bind(lambda py: self.__cast(py, Decimal | float | int))
+                .map(lambda number: float(number))
+            )
+
+        def to_identifier(self) -> Result[Resource.Identifier, ValueError]:
+            return self.__cast(self.__object, Resource.Identifier)
+
+        def to_int(self) -> Result[int, ValueError]:
+            return (
+                self.__to_python()
+                .bind(lambda py: self.__cast(py, Decimal | float | int))
+                .map(lambda number: int(number))
+            )
+
+        def to_iri(self) -> Result[Iri, ValueError]:
+            return self.__cast(self.__object, Iri)
+
+        def to_literal(self) -> Result[Literal, ValueError]:
+            return self.__cast(self.__object, Literal)
+
+        def to_named_resource(self) -> Result["NamedResource", ValueError]:
+            from graphs2go.models.rdf.named_resource import NamedResource
+
+            return self.to_iri().map(
+                lambda iri: NamedResource(dataset=self.__subject.dataset, iri=iri)
+            )
+
+        def __to_python(
+            self,
+        ) -> Result[
+            bool | bytes | date | datetime | Decimal | float | int | str, ValueError
+        ]:
+            return self.to_literal().map(lambda literal: literal.toPython())
+
+        def to_resource(self) -> Result[Resource, ValueError]:
+            return self.to_identifier().map(
+                lambda identifier: Resource(
+                    dataset=self.__subject.dataset, identifier=identifier
+                )
+            )
+
+        def to_str(self) -> Result[int, ValueError]:
+            return self.__to_python().bind(lambda py: self.__cast(py, str))
+
+        def to_term(self) -> Quad_Object:
+            return self.__object
 
     def __init__(self, *, dataset: Dataset, identifier: BlankNode | Iri):
         self.__dataset = dataset
@@ -181,51 +219,15 @@ class Resource:
     def dataset(self) -> Dataset:
         return self.__dataset
 
-    # def has_value(
-    #     self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
-    # ) -> bool:
-    #     for _value in self.values(predicate, mapper=mapper):  # type: ignore
-    #         return True
-    #     return False
-
     @property
     def identifier(self) -> Identifier:
         return self.__identifier
 
-    # def optional_value(
-    #     self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
-    # ) -> Maybe[_ValueT]:  # type: ignore
-    #     for value in self.values(predicate, mapper=mapper):  # type: ignore
-    #         return Some(value)
-    #     return Nothing
-    #
-    # def optional_value_with_default(
-    #     self,
-    #     predicate: Iri,
-    #     default: _ValueT,
-    #     mapper: _ValueMapper = ValueMappers.identity,
-    # ) -> _ValueT:  # type: ignore
-    #     for value in self.values(predicate, mapper=mapper):  # type: ignore
-    #         return value
-    #     return default
-    #
-    # def required_value(
-    #     self, predicate: Iri, mapper: _ValueMapper = ValueMappers.identity
-    # ) -> _ValueT:  # type: ignore
-    #     value: Maybe[_ValueT] = self.optional_value(predicate, mapper=mapper)
-    #     if not is_successful(value):
-    #         raise KeyError("missing required value for " + str(predicate))
-    #     return value.unwrap()
-    #
-    # def values(
-    #     self,
-    #     predicate: Iri,
-    #     mapper: _ValueMapper = ValueMappers.identity,
-    #     unique: bool = False,
-    # ) -> Iterable[_ValueT]:  # type: ignore
-    #     for value in self.__dataset.objects(
-    #         subject=self.identifier, predicate=predicate, unique=unique
-    #     ):
-    #         mapped_value = mapper(self.identifier, predicate, value, self.__dataset)
-    #         if is_successful(mapped_value):
-    #             yield mapped_value.unwrap()
+    def value(self, predicate: Iri) -> Maybe[Value]:
+        for value in self.values(predicate):
+            return Some(value)
+        return Nothing
+
+    def values(self, predicate: Iri) -> Iterable[Value]:
+        for quad in self.__dataset.match(self.__identifier, predicate):
+            yield self.Value(object_=quad.object_, predicate=predicate, subject=self)
