@@ -22,6 +22,4 @@ class Label(Model):
 
     @property
     def literal_form(self) -> rdf.Literal:
-        return self.resource.required_value(
-            SKOSXL.literalForm, rdf.Resource.ValueMappers.literal
-        )
+        return self.resource.value(SKOSXL.literalForm).unwrap().to_literal().unwrap()

@@ -6,6 +6,7 @@ from graphs2go.models import rdf
 from graphs2go.models.label_type import LabelType
 from graphs2go.models.skos.label import Label
 from graphs2go.models.skos.model import Model
+from graphs2go.utils import success_values
 
 
 class Resource(Model, ABC):
@@ -31,14 +32,14 @@ class Resource(Model, ABC):
 
     def lexical_labels(self) -> Iterable[tuple[LabelType, Label | rdf.Literal]]:
         for label_type in LabelType:
-            literal: rdf.Literal
-            for literal in self.resource.values(
-                label_type.skos_predicate, rdf.Resource.ValueMappers.literal
+            for literal in success_values(
+                value.to_literal()
+                for value in self.resource.values(label_type.skos_predicate)
             ):
                 yield label_type, literal
 
-            resource: rdf.NamedResource
-            for resource in self.resource.values(
-                label_type.skosxl_predicate, rdf.Resource.ValueMappers.named_resource
-            ):  # type: ignore
+            for resource in success_values(
+                value.to_named_resource()
+                for value in self.resource.values(label_type.skosxl_predicate)
+            ):
                 yield label_type, self._LABEL_CLASS(resource)

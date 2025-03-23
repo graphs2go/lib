@@ -28,8 +28,8 @@ class Model(rdf.NamedModel, ABC):
 
     @property
     def created(self) -> Maybe[datetime]:
-        return self.resource.optional_value(
-            DCTERMS.created, rdf.Resource.ValueMappers.datetime
+        return self.resource.value(DCTERMS.created).bind(
+            lambda value: value.to_datetime()
         )
 
     @property
@@ -38,6 +38,6 @@ class Model(rdf.NamedModel, ABC):
 
     @property
     def modified(self) -> Maybe[datetime]:
-        return self.resource.optional_value(
-            DCTERMS.modified, rdf.Resource.ValueMappers.datetime
+        return self.resource.value(DCTERMS.modified).bind(
+            lambda value: value.to_datetime()
         )

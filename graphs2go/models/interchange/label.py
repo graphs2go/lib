@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 from returns.maybe import Maybe, Nothing
 
@@ -61,16 +61,12 @@ class Label(Model):
 
     @property
     def literal_form(self) -> rdf.Literal:
-        return self.resource.required_value(
-            SKOSXL.literalForm, rdf.Resource.ValueMappers.literal
-        )
+        return self.resource.value(SKOSXL.literalForm).unwrap().to_literal().unwrap()
 
     @property
     def type(self) -> Maybe[LabelType]:
         return Maybe.from_optional(
             self.__PREDICATE_TO_TYPE_MAP[
-                self.resource.required_value(
-                    RDF.predicate, rdf.Resource.ValueMappers.iri
-                )
+                self.resource.value(RDF.predicate).unwrap().to_iri().unwrap()
             ]
         )

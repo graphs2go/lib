@@ -1,7 +1,8 @@
-from graphs2go.models import cypher, interchange
+from graphs2go.models import cypher
 from graphs2go.transformers.transform_interchange_models_to_cypher_statements import (
     transform_interchange_models_to_cypher_statements,
 )
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def test_transform(

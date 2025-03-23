@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self, TypeVar
 
+from returns.converters import flatten
+
 from graphs2go.models import rdf
 from graphs2go.namespaces import RDF
 from graphs2go.models.interchange.label import Label
@@ -39,9 +41,7 @@ class Node(Model):
         self, model_class: type[_ModelT], predicate: rdf.Iri
     ) -> Iterable[_ModelT]:
         resource: rdf.NamedResource
-        for resource in self.resource.values(
-            predicate, rdf.Resource.ValueMappers.named_resource, unique=True
-        ):
+        for resource in self.resource.values(predicate):
             yield model_class(resource)
 
     def labels(self) -> Iterable[Label]:
@@ -56,5 +56,6 @@ class Node(Model):
     @property
     def types(self) -> tuple[rdf.Iri, ...]:
         return tuple(
-            self.resource.values(INTERCHANGE.nodeType, rdf.Resource.ValueMappers.iri)
+            value.to_iri().unwrap()
+            for value in self.resource.values(INTERCHANGE.nodeType)
         )

@@ -2,11 +2,11 @@ from typing import TYPE_CHECKING
 
 from graphs2go.models import interchange, rdf, skos
 from graphs2go.namespaces import SKOS
-from graphs2go.rdf_stores.memory_rdf_store import MemoryRdfStore
 from graphs2go.transformers.transform_interchange_models_to_skos_models import (
     transform_interchange_models_to_skos_models,
 )
 from graphs2go.stores.skos import ModelStore as SkosModelStore
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 if TYPE_CHECKING:
     from graphs2go.models.label_type import LabelType
@@ -76,10 +76,10 @@ def test_transform(
 
             for interchange_relationship in interchange_node.relationships():
                 other_resource: rdf.NamedResource = (
-                    skos_concept.resource.required_value(
-                        interchange_relationship.predicate,
-                        rdf.Resource.ValueMappers.named_resource,
-                    )
+                    skos_concept.resource.value(interchange_relationship.predicate)
+                    .unwrap()
+                    .to_named_resource()
+                    .unwrap()
                 )
                 other_iri = other_resource.iri
                 if interchange_relationship.predicate == SKOS.inScheme:

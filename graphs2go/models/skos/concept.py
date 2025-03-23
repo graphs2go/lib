@@ -6,6 +6,7 @@ from graphs2go.models import rdf
 from graphs2go.namespaces import RDF, SKOS
 from graphs2go.models.skos.concept_scheme import ConceptScheme
 from graphs2go.models.skos.resource import Resource
+from graphs2go.utils import success_values
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -81,29 +82,26 @@ class Concept(Resource):
         )
 
     def in_schemes(self) -> Iterable[ConceptScheme]:
-        resource: rdf.NamedResource
-        for resource in self.resource.values(
-            SKOS.inScheme, rdf.Resource.ValueMappers.named_resource
-        ):
-            yield self._CONCEPT_SCHEME_CLASS(resource)
+        yield from success_values(
+            value.to_named_resource().map(self._CONCEPT_SCHEME_CLASS)
+            for value in self.resource.values(SKOS.inScheme)
+        )
 
     def notations(self) -> Iterable[rdf.Literal]:
-        yield from self.resource.values(
-            SKOS.notation, rdf.Resource.ValueMappers.literal
+        yield from success_values(
+            value.to_literal() for value in self.resource.values(SKOS.notation)
         )
 
     def notes(self) -> Iterable[tuple[rdf.Iri, rdf.Literal]]:
         for predicate in self.NOTE_PREDICATES:
-            value: rdf.Literal
-            for value in self.resource.values(
-                predicate, rdf.Resource.ValueMappers.literal
+            for literal in success_values(
+                value.to_literal() for value in self.resource.values(predicate)
             ):
-                yield predicate, value
+                yield predicate, literal
 
     def semantic_relations(self) -> Iterable[tuple[rdf.Iri, Concept]]:
         for predicate in self.SEMANTIC_RELATION_PREDICATES:
-            resource: rdf.NamedResource
-            for resource in self.resource.values(
-                predicate, rdf.Resource.ValueMappers.named_resource
+            for resource in success_values(
+                value.to_named_resource() for value in self.resource.values(predicate)
             ):
                 yield predicate, self.__class__(resource)

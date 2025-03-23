@@ -48,16 +48,12 @@ class Property(Model):
 
     @property
     def object(self) -> rdf.Literal:
-        return self.resource.required_value(
-            RDF.object, rdf.Resource.ValueMappers.literal
-        )
+        return self.resource.value(RDF.object).unwrap().to_literal().unwrap()
 
     @property
     def predicate(self) -> rdf.Iri:
-        return self.resource.required_value(
-            RDF.predicate, rdf.Resource.ValueMappers.iri
-        )
+        return self.resource.value(RDF.predicate).unwrap().to_iri().unwrap()
 
     @property
     def subject(self) -> rdf.Iri:
-        return self.resource.required_value(RDF.subject, rdf.Resource.ValueMappers.iri)
+        return self.resource.value(RDF.subject).unwrap().to_iri().unwrap()
