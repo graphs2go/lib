@@ -94,9 +94,9 @@ class ModelStore[ModelT: rdf.Model]:
             ),
         )
 
-    def _models_by_rdf_type(
-        self, *, model_class: type[ModelT], rdf_type: rdf.Iri
-    ) -> Iterable[ModelT]:
+    def _models_by_rdf_type[NarrowerModelT: rdf.Model](
+        self, *, model_class: type[NarrowerModelT], rdf_type: rdf.Iri
+    ) -> Iterable[NarrowerModelT]:
         return (
             model_class(self._resource_set.named_resource(model_iri))
             for model_iri in self._model_iris_by_rdf_type(rdf_type)
