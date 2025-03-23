@@ -49,12 +49,10 @@ class ModelStore[ModelT]:
 
     @classmethod
     def create(
-        cls, *, identifier: rdf.Iri, quad_store_config: Maybe[RdfStoreConfig] = Nothing
+        cls, *, identifier: rdf.Iri, rdf_store_config: Maybe[RdfStoreConfig] = Nothing
     ) -> Self:
         return cls(
-            quad_store=QuadStore.create(
-                config=quad_store_config, identifier=identifier
-            ),
+            quad_store=QuadStore.create(config=rdf_store_config, identifier=identifier),
         )
 
     @property

@@ -9,6 +9,7 @@ from graphs2go.models.interchange.property import Property
 from graphs2go.models.interchange.relationship import Relationship
 from graphs2go.namespaces import RDF
 from graphs2go.namespaces.interchange import INTERCHANGE
+from graphs2go.utils import success_values
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -38,9 +39,10 @@ class Node(Model):
     def __dependent_models(
         self, model_class: type[_ModelT], predicate: rdf.Iri
     ) -> Iterable[_ModelT]:
-        resource: rdf.NamedResource
-        for resource in self.resource.values(predicate):
-            yield model_class(resource)
+        yield from success_values(
+            value.to_named_resource().map(model_class)
+            for value in self.resource.values(predicate)
+        )
 
     def labels(self) -> Iterable[Label]:
         return self.__dependent_models(Label, INTERCHANGE.label)

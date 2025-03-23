@@ -3,7 +3,7 @@ from __future__ import annotations
 import base64
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Self, cast
 
 from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
@@ -97,13 +97,13 @@ class Resource:
         def __cast[T](
             self,
             value: Any,  # noqa: ANN401
-            type_: type[T],
+            types: type[T] | tuple[type[T], ...],
         ) -> Result[T, ValueError]:
-            if isinstance(value, type_):
+            if isinstance(value, types):
                 return Success(value)
             return Failure(
                 ValueError(
-                    f"{self.__subject.identifier} {self.__predicate} is not a {type_} but a {type(value)}"
+                    f"{self.__subject.identifier} {self.__predicate} is not a {types} but a {type(value)}"
                 )
             )
 
@@ -130,10 +130,10 @@ class Resource:
                 rest = resource.value(RDF.rest)
                 if not is_successful(rest):
                     return Failure(ValueError(f"{resource.identifier} has no rdf:rest"))
-                rest_collection = rest.to_collection()
+                rest_collection = rest.unwrap().to_collection()
                 if not is_successful(rest_collection):
                     return rest_collection
-                return Success((first, *rest_collection.unwrap()))
+                return Success((first.unwrap(), *rest_collection.unwrap()))
 
             return self.to_resource().bind(__to_collection)
 
@@ -141,7 +141,7 @@ class Resource:
             return self.__to_python().bind(lambda py: self.__cast(py, date))
 
         def to_date_or_date_time(self) -> Result[date | datetime, ValueError]:
-            return self.__to_python().bind(lambda py: self.__cast(py, date | datetime))
+            return self.__to_python().bind(lambda py: self.__cast(py, (date, datetime)))
 
         def to_datetime(self) -> Result[datetime, ValueError]:
             return self.__to_python().bind(lambda py: self.__cast(py, datetime))
@@ -149,25 +149,27 @@ class Resource:
         def to_decimal(self) -> Result[Decimal, ValueError]:
             return (
                 self.__to_python()
-                .bind(lambda py: self.__cast(py, Decimal | float | int))
-                .map(lambda number: Decimal(number))
+                .bind(lambda py: self.__cast(py, (Decimal, float, int, str)))
+                .map(
+                    lambda number: Decimal(cast("Decimal | float | int | str", number))
+                )
             )
 
         def to_float(self) -> Result[float, ValueError]:
             return (
                 self.__to_python()
-                .bind(lambda py: self.__cast(py, Decimal | float | int))
-                .map(lambda number: float(number))
+                .bind(lambda py: self.__cast(py, (Decimal, float, int, str)))
+                .map(lambda number: float(cast("Decimal | float | int | str", number)))
             )
 
         def to_identifier(self) -> Result[Resource.Identifier, ValueError]:
-            return self.__cast(self.__object, Resource.Identifier)
+            return self.__cast(self.__object, (BlankNode, Iri))
 
         def to_int(self) -> Result[int, ValueError]:
             return (
                 self.__to_python()
-                .bind(lambda py: self.__cast(py, Decimal | float | int))
-                .map(lambda number: int(number))
+                .bind(lambda py: self.__cast(py, (Decimal, float, int, str)))
+                .map(lambda number: int(cast("Decimal | float | int | str", number)))
             )
 
         def to_iri(self) -> Result[Iri, ValueError]:
@@ -197,7 +199,7 @@ class Resource:
                 )
             )
 
-        def to_str(self) -> Result[int, ValueError]:
+        def to_str(self) -> Result[str, ValueError]:
             return self.__to_python().bind(lambda py: self.__cast(py, str))
 
         def to_term(self) -> Quad_Object:

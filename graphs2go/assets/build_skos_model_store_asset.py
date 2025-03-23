@@ -23,7 +23,7 @@ def build_skos_model_store_asset(
     ) -> SkosModelStore.Descriptor:
         with SkosModelStore.create(
             identifier=rdf.Iri(f"urn:skos:{quote(interchange_model_store.identifier)}"),
-            quad_store_config=rdf_store_config,
+            rdf_store_config=rdf_store_config,
         ) as open_skos_model_store:
             return open_skos_model_store.extend_if_empty(
                 lambda: tqdm(

@@ -2,6 +2,7 @@ from abc import ABC
 from datetime import date, datetime
 from typing import Self
 
+from returns.converters import result_to_maybe
 from returns.maybe import Maybe
 from returns.pipeline import is_successful
 
@@ -29,7 +30,7 @@ class Model(rdf.NamedModel, ABC):
     @property
     def created(self) -> Maybe[datetime]:
         return self.resource.value(DCTERMS.created).bind(
-            lambda value: value.to_datetime()
+            lambda value: result_to_maybe(value.to_datetime())
         )
 
     @property
@@ -39,5 +40,5 @@ class Model(rdf.NamedModel, ABC):
     @property
     def modified(self) -> Maybe[datetime]:
         return self.resource.value(DCTERMS.modified).bind(
-            lambda value: value.to_datetime()
+            lambda value: result_to_maybe(value.to_datetime())
         )

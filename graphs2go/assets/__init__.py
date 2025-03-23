@@ -4,7 +4,7 @@ from .build_cypher_files_asset import (
 from .build_direct_rdf_file_asset import (
     build_direct_rdf_file_asset as build_direct_rdf_file_asset,
 )
-from .build_direct_rdf_graph_asset import (
+from .build_direct_rdf_model_store_asset import (
     build_direct_rdf_graph_asset as build_direct_rdf_graph_asset,
 )
 from .build_interchange_file_asset import (

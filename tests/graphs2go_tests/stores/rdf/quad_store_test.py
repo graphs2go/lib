@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -27,8 +28,12 @@ class QuadStoreTest(DatasetTest):
 
     def test_dump_prefixes(self, quad_store: QuadStore) -> None:
         quad_store.add(self._TestData.QUAD)
-        output = quad_store.dump(
-            format_=rdf.Format.TURTLE, prefixes={"ex": rdf.Iri("http://example.com/")}
+        output = cast(
+            "bytes",
+            quad_store.dump(
+                format_=rdf.Format.TURTLE,
+                prefixes={"ex": rdf.Iri("http://example.com/")},
+            ),
         ).decode("utf-8")
         assert (
             output
@@ -37,7 +42,9 @@ class QuadStoreTest(DatasetTest):
 
     def test_dump_to_bytes(self, quad_store: QuadStore) -> None:
         quad_store.add(self._TestData.QUAD)
-        output = quad_store.dump(format_=rdf.Format.NQUADS).decode("utf-8")
+        output = cast("bytes", quad_store.dump(format_=rdf.Format.NQUADS)).decode(
+            "utf-8"
+        )
         assert (
             output
             == "<http://example.com/subject> <http://example.com/predicate> <http://example.com/object> .\n"
@@ -77,8 +84,8 @@ class QuadStoreTest(DatasetTest):
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
     def test_open_read_only(self, quad_store: QuadStore) -> None:
-        self.__test_open(store=quad_store, read_only=True)
+        self.__test_open(quad_store=quad_store, read_only=True)
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
     def test_open_read_write(self, quad_store: QuadStore) -> None:
-        self.__test_open(store=quad_store, read_only=False)
+        self.__test_open(quad_store=quad_store, read_only=False)
