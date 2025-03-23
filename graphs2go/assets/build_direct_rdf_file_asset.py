@@ -9,6 +9,7 @@ from graphs2go.models import rdf
 from graphs2go.namespaces import SDO
 from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.resources.output_config import OutputConfig
+from graphs2go.stores.rdf import ModelStore as RdfModelStore
 
 
 def build_direct_rdf_file_asset(
@@ -19,7 +20,7 @@ def build_direct_rdf_file_asset(
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
     def direct_rdf_file(
-        output_config: OutputConfig, direct_rdf_graph: rdf.Graph.Descriptor
+        output_config: OutputConfig, direct_rdf_model_store: RdfModelStore.Descriptor
     ) -> None:
         logger = get_dagster_logger()
         output_directory_path = output_config.parse().directory_path / "direct_rdf"
@@ -35,7 +36,9 @@ def build_direct_rdf_file_asset(
                     rdf_file_format=rdf_file_format,
                     rdf_graph_identifier_to_file_stem=rdf_graph_identifier_to_file_stem,
                 ) as loader,
-                rdf.Graph.open(direct_rdf_graph, read_only=True) as open_rdf_graph,
+                RdfModelStore.open(
+                    direct_rdf_model_store, read_only=True
+                ) as open_rdf_graph,
             ):
                 rdflib_graph = open_rdf_graph.rdflib_graph
                 rdflib_graph.bind("schema", SDO)

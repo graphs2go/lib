@@ -1,12 +1,9 @@
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
-from rdflib import Namespace
-from rdflib.namespace import DefinedNamespace
 from returns.maybe import Maybe, Nothing
 
 from graphs2go.assets.rdf_file_asset_defaults import RDF_FILE_FORMATS_DEFAULT
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
 from graphs2go.models import rdf
-from graphs2go.namespaces import NAMESPACES
 from graphs2go.resources.output_config import OutputConfig
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
@@ -14,7 +11,6 @@ from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 def build_interchange_file_asset(
     *,
     partitions_def: Maybe[PartitionsDefinition] = Nothing,
-    namespaces: dict[str, type[DefinedNamespace] | Namespace] = NAMESPACES,
     rdf_file_formats: tuple[rdf.FileFormat, ...] = RDF_FILE_FORMATS_DEFAULT,
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
@@ -40,8 +36,6 @@ def build_interchange_file_asset(
                 ) as open_interchange_model_store,
             ):
                 rdflib_graph = open_interchange_model_store.rdflib_graph
-                for namespace_prefix, namespace in namespaces.items():
-                    rdflib_graph.bind(namespace_prefix, namespace)
                 loader.load(rdflib_graph)
             logger.info(
                 "loaded interchange graph to %s files in %s",

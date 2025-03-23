@@ -11,11 +11,11 @@ from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.stores.rdf import ModelStore as RdfModelStore
 
 
-def build_direct_rdf_graph_asset(
+def build_direct_rdf_model_store_asset(
     *, partitions_def: Maybe[PartitionsDefinition] = Nothing
 ) -> AssetsDefinition:
     @asset(code_version="1", partitions_def=partitions_def.value_or(None))
-    def direct_rdf_graph(
+    def direct_rdf_model_store(
         interchange_model_store: InterchangeModelStore.Descriptor,
         rdf_store_config: RdfStoreConfig,
     ) -> RdfModelStore.Descriptor:
@@ -34,4 +34,4 @@ def build_direct_rdf_graph_asset(
                 )
             ).descriptor
 
-    return direct_rdf_graph
+    return direct_rdf_model_store

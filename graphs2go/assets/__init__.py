@@ -5,7 +5,7 @@ from .build_direct_rdf_file_asset import (
     build_direct_rdf_file_asset as build_direct_rdf_file_asset,
 )
 from .build_direct_rdf_model_store_asset import (
-    build_direct_rdf_graph_asset as build_direct_rdf_graph_asset,
+    build_direct_rdf_model_store_asset as build_direct_rdf_model_store_asset,
 )
 from .build_interchange_file_asset import (
     build_interchange_file_asset as build_interchange_file_asset,
