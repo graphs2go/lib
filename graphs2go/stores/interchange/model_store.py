@@ -36,7 +36,7 @@ class ModelStore(RdfModelStore[Model]):
     def node_iris_by_type(self, type_: rdf.Iri) -> Iterable[rdf.Iri]:
         return (
             quad.subject
-            for quad in self._dataset.match(
+            for quad in self._quad_store.match(
                 predicate=INTERCHANGE.nodeType, object_=type_
             )
             if isinstance(quad.subject, rdf.Iri)

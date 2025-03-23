@@ -26,15 +26,10 @@ def interchange_model_store(
 
 @pytest.fixture()
 def interchange_model_store_descriptor(
-    rdf_store_config: RdfStoreConfig,
+    quad_store: QuadStore,
 ) -> InterchangeModelStore.Descriptor:
-    interchange_model_store_identifier = uuid_urn()
     with InterchangeModelStore(
-        identifier=interchange_model_store_identifier,
-        quad_store=QuadStore.create(
-            config=rdf_store_config,
-            identifier=interchange_model_store_identifier,
-        ),
+        quad_store=quad_store,
     ) as store:
         concept_scheme = (
             interchange.Node.builder(iri=uuid_urn())
@@ -125,6 +120,11 @@ def interchange_relationship(
     pytest.fail("no relationships")
 
 
+@pytest.fixture()
+def quad_store(rdf_store_config: RdfStoreConfig) -> QuadStore:
+    return QuadStore.create(config=rdf_store_config, identifier=uuid_urn())
+
+
 @pytest.fixture
 def rdf_store_config(tmp_path: Path) -> RdfStoreConfig:
     return RdfStoreConfig.default(oxigraph_directory_path_default=Some(tmp_path))
@@ -145,13 +145,9 @@ def skos_concept_scheme(skos_model_store: SkosModelStore) -> skos.ConceptScheme:
 
 
 @pytest.fixture()
-def skos_model_store(rdf_store_config: RdfStoreConfig) -> SkosModelStore:
-    store_identifier = uuid_urn()
+def skos_model_store(quad_store: QuadStore) -> SkosModelStore:
     store = SkosModelStore(
-        identifier=store_identifier,
-        quad_store=QuadStore.create(
-            config=rdf_store_config, identifier=store_identifier
-        ),
+        quad_store=quad_store,
     )
 
     concept_scheme = skos.ConceptScheme.builder(iri=uuid_urn()).build()

@@ -34,11 +34,9 @@ class ModelStore[ModelT]:
         A picklable dataclass identifying an RDF model store.
         """
 
-        identifier: rdf.Iri
         quad_store_descriptor: QuadStore.Descriptor
 
-    def __init__(self, *, identifier: rdf.Iri, quad_store: QuadStore):
-        self.__identifier = identifier
+    def __init__(self, *, quad_store: QuadStore):
         self._quad_store = quad_store
         self._resource_set = ResourceSet(dataset=quad_store)
 
@@ -59,7 +57,6 @@ class ModelStore[ModelT]:
         cls, *, identifier: rdf.Iri, quad_store_config: Maybe[RdfStoreConfig] = Nothing
     ) -> Self:
         return cls(
-            identifier=identifier,
             quad_store=QuadStore.create(
                 config=quad_store_config, identifier=identifier
             ),
@@ -68,7 +65,7 @@ class ModelStore[ModelT]:
     @property
     def descriptor(self) -> Descriptor:
         return self.Descriptor(
-            identifier=self.__identifier,
+            # identifier=self.__identifier,
             quad_store_descriptor=self._quad_store.descriptor,
         )
 
@@ -86,9 +83,9 @@ class ModelStore[ModelT]:
         self._quad_store.extend(models_to_quads())
         return self
 
-    @property
-    def identifier(self) -> rdf.Iri:
-        return self.__identifier
+    # @property
+    # def identifier(self) -> rdf.Iri:
+    #     return self.__identifier
 
     @property
     def is_empty(self) -> bool:
@@ -97,7 +94,6 @@ class ModelStore[ModelT]:
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
-            identifier=descriptor.identifier,
             quad_store=QuadStore.open(
                 descriptor.quad_store_descriptor, read_only=read_only
             ),
