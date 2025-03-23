@@ -10,7 +10,7 @@ def test_transform(
 ) -> None:
     cypher_statements = tuple(
         transform_interchange_models_to_cypher_statements(
-            interchange_model_store_descriptor
+            interchange_model_store_descriptor, in_process=True
         )
     )
 

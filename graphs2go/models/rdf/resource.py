@@ -96,8 +96,8 @@ class Resource:
 
         def __cast[T](
             self,
-            value: Any,
-            type_: type[T],  # noqa: ANN401
+            value: Any,  # noqa: ANN401
+            type_: type[T],
         ) -> Result[T, ValueError]:
             if isinstance(value, type_):
                 return Success(value)
@@ -176,7 +176,7 @@ class Resource:
         def to_literal(self) -> Result[Literal, ValueError]:
             return self.__cast(self.__object, Literal)
 
-        def to_named_resource(self) -> Result["NamedResource", ValueError]:
+        def to_named_resource(self) -> Result[NamedResource, ValueError]:
             from graphs2go.models.rdf.named_resource import NamedResource
 
             return self.to_iri().map(

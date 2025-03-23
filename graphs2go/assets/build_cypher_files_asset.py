@@ -3,11 +3,11 @@ from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
 from graphs2go.loaders.cypher_directory_loader import CypherDirectoryLoader
-from graphs2go.models import interchange
 from graphs2go.resources.output_config import OutputConfig
 from graphs2go.transformers.transform_interchange_models_to_cypher_statements import (
     transform_interchange_models_to_cypher_statements,
 )
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def build_cypher_files_asset(

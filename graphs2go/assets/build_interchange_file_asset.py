@@ -5,9 +5,10 @@ from returns.maybe import Maybe, Nothing
 
 from graphs2go.assets.rdf_file_asset_defaults import RDF_FILE_FORMATS_DEFAULT
 from graphs2go.loaders.rdf_directory_loader import RdfDirectoryLoader
-from graphs2go.models import interchange, rdf
+from graphs2go.models import rdf
 from graphs2go.namespaces import NAMESPACES
 from graphs2go.resources.output_config import OutputConfig
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def build_interchange_file_asset(

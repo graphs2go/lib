@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import IO, TYPE_CHECKING
 
 from pathvalidate import sanitize_filename
-from returns.maybe import Maybe
 from returns.pipeline import is_successful
 
 from graphs2go.models import rdf
@@ -29,7 +28,7 @@ class QuadStore(rdf.Dataset):
 
     @abstractmethod
     def close(self) -> None:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @staticmethod
     def create(*, config: RdfStoreConfig, identifier: rdf.Iri) -> QuadStore:
@@ -110,7 +109,7 @@ class QuadStore(rdf.Dataset):
 
     @abstractmethod
     def _load(self, *, format_: rdf.Format, input_: IO[bytes] | IO[str]) -> None:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:

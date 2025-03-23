@@ -25,12 +25,12 @@ class DatasetTest:
         raise NotImplementedError
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
-    def test_add(self, dataset: rdf.Dataset) -> None:  # noqa: N802
+    def test_add(self, dataset: rdf.Dataset) -> None:
         assert dataset.is_empty
         dataset.add(self._TestData.QUAD)
         assert not dataset.is_empty
 
-    def test_extend(self, dataset: rdf.Dataset) -> None:  # noqa: N802
+    def test_extend(self, dataset: rdf.Dataset) -> None:
         dataset.extend(
             (
                 rdf.Quad(
@@ -58,6 +58,32 @@ class DatasetTest:
         assert not dataset.is_empty
         dataset.clear()
         assert dataset.is_empty
+
+    def test_count_matches_all(self, dataset: rdf.Dataset) -> None:
+        assert dataset.count_matches() == 0
+        dataset.add(self._TestData.QUAD)
+        assert dataset.count_matches() == 1
+
+    def test_count_matches_exact(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert dataset.count_matches(*self._TestData.QUAD) == 1
+
+    def test_count_matches_partial(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        assert (
+            dataset.count_matches(
+                self._TestData.QUAD.subject, self._TestData.QUAD.predicate
+            )
+            == 1
+        )
+        assert (
+            dataset.count_matches(
+                self._TestData.QUAD.subject,
+                self._TestData.QUAD.predicate,
+                self._TestData.BLANK_NODE_OBJECT,
+            )
+            == 0
+        )
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
     def test_is_empty(self, dataset: rdf.Dataset) -> None:

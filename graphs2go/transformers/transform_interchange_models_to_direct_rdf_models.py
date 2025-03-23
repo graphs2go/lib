@@ -42,6 +42,7 @@ def _transform_interchange_node_to_direct_rdf_models(
 
 def transform_interchange_models_to_direct_rdf_models(
     interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
+    in_process: bool = False,
 ) -> Iterable[rdf.NamedModel]:
     """
     Transform the interchange graph into a "direct" RDF representation, one with only as much reification as it
@@ -52,7 +53,7 @@ def transform_interchange_models_to_direct_rdf_models(
     """
 
     yield from transform_interchange_models(
-        in_process=True,
+        in_process=in_process,
         interchange_model_store_descriptor=interchange_model_store_descriptor,
         transform_interchange_node=_transform_interchange_node_to_direct_rdf_models,
     )

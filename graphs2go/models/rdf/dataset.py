@@ -35,6 +35,24 @@ class Dataset(ABC):
         for quad in self.match():
             self.remove(quad)
 
+    def count_matches(
+        self,
+        subject: Quad_Subject | None = None,
+        predicate: Quad_Predicate | None = None,
+        object_: Quad_Object | None = None,
+        graph: Quad_Graph = None,
+    ) -> int:
+        """
+        Count all matching quads from the Dataset.
+
+        The parameters have the same semantics as match.
+        """
+
+        count = 0
+        for _ in self.match(subject, predicate, object_, graph):
+            count += 1
+        return count
+
     def extend(self, quads: Iterable[Quad]) -> None:
         """
         Add zero or more quads to the Dataset.
@@ -88,7 +106,7 @@ class Dataset(ABC):
         Remove a quad from the Dataset.
         """
 
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def remove_matches(
         self,

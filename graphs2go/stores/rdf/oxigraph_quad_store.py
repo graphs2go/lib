@@ -6,9 +6,7 @@ from typing import IO, TYPE_CHECKING
 
 import pyoxigraph
 import pyoxigraph as ox
-from returns.maybe import Maybe
 
-from graphs2go.models.rdf import Quad
 from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
 from graphs2go.stores.rdf.quad_store import QuadStore
 
@@ -48,7 +46,7 @@ class OxigraphQuadStore(QuadStore):
     def add(self, quad: rdf.Quad) -> None:
         self.__delegate.add(OxigraphAdapters.Quad.to_ox(quad))
 
-    def close(self) -> None:  # noqa: ARG002
+    def close(self) -> None:
         # There's no explicit close on the pyoxigraph Store.
         # Delete all references to the pyoxigraph Store so it gets garbage collected and releases its lock.
         with contextlib.suppress(AttributeError):
@@ -126,5 +124,5 @@ class OxigraphQuadStore(QuadStore):
             transactional=descriptor.transactional,
         )
 
-    def remove(self, quad: Quad) -> None:
+    def remove(self, quad: rdf.Quad) -> None:
         self.__delegate.remove(OxigraphAdapters.Quad.to_ox(quad))

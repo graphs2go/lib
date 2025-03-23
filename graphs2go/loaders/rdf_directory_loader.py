@@ -21,8 +21,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-    from graphs2go.models import rdf
-
 
 metrics = markus.get_metrics(__name__)
 

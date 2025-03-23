@@ -1,4 +1,4 @@
-from rdflib import DCTERMS, RDF, RDFS, SKOS, XSD  # noqa: F401
+from rdflib import DCTERMS, RDF, RDFS, SKOS, XSD
 
 from graphs2go.models import rdf
 

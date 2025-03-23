@@ -1,8 +1,6 @@
-from rdflib import Graph
-
-from graphs2go.models import interchange, rdf
 from graphs2go.namespaces import RDF, SKOS
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
+from graphs2go.stores.rdf import ModelStore as RdfModelStore, QuadStore
 from graphs2go.transformers.transform_interchange_models_to_direct_rdf_models import (
     transform_interchange_models_to_direct_rdf_models,
 )
@@ -10,22 +8,24 @@ from graphs2go.transformers.transform_interchange_models_to_direct_rdf_models im
 
 def test_transform(
     interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
+    quad_store: QuadStore,
 ) -> None:
-    rdf_graph: rdf.Graph[rdf.NamedModel] = rdf.Graph(
-        identifier=interchange_model_store_descriptor.identifier,
-        rdf_store=MemoryRdfStore(),
-    )
-    rdf_graph.add_all(
-        transform_interchange_models_to_direct_rdf_models(
-            interchange_model_store_descriptor
+    with RdfModelStore(quad_store=quad_store) as rdf_model_store:
+        rdf_model_store.extend(
+            transform_interchange_models_to_direct_rdf_models(
+                interchange_model_store_descriptor, in_process=True
+            )
         )
-    )
 
-    rdflib_graph: Graph = rdf_graph.rdflib_graph
-    assert (
-        len(tuple(rdflib_graph.subjects(predicate=RDF.type, object=SKOS.ConceptScheme)))
-        == 1
-    )
-    assert (
-        len(tuple(rdflib_graph.subjects(predicate=RDF.type, object=SKOS.Concept))) == 2
-    )
+        assert (
+            rdf_model_store.quad_store.count_matches(
+                predicate=RDF.type, object_=SKOS.ConceptScheme
+            )
+            == 1
+        )
+        assert (
+            rdf_model_store.quad_store.count_matches(
+                predicate=RDF.type, object_=SKOS.Concept
+            )
+            == 2
+        )

@@ -10,5 +10,5 @@ from tests.graphs2go_tests.models.rdf.dataset_test import DatasetTest
 
 class TestOxigraphDataset(DatasetTest):
     @pytest.fixture()
-    def dataset(self, tmp_path: Path) -> Iterable[rdf.Dataset]:
-        yield OxigraphDataset()
+    def dataset(self, tmp_path: Path) -> Iterable[rdf.Dataset]:  # noqa: ARG002
+        yield OxigraphDataset()  # noqa: PT022

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self, TypeVar
 
-from returns.converters import flatten
-
 from graphs2go.models import rdf
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model

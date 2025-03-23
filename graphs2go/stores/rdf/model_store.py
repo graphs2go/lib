@@ -44,11 +44,6 @@ class ModelStore[ModelT]:
         self._quad_store.extend(_model_to_quads(model))
         return self
 
-    def add_all_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
-        if self.is_empty:
-            self.extend(lazy_models())
-        return self
-
     def close(self) -> None:
         self._quad_store.close()
 
@@ -83,6 +78,11 @@ class ModelStore[ModelT]:
         self._quad_store.extend(models_to_quads())
         return self
 
+    def extend_if_empty(self, lazy_models: Callable[[], Iterable[ModelT]]) -> Self:
+        if self.is_empty:
+            self.extend(lazy_models())
+        return self
+
     # @property
     # def identifier(self) -> rdf.Iri:
     #     return self.__identifier
@@ -113,3 +113,7 @@ class ModelStore[ModelT]:
             for quad in self._quad_store.match(predicate=RDF.type, object_=rdf_type)
             if isinstance(quad.subject, rdf.Iri)
         )
+
+    @property
+    def quad_store(self) -> QuadStore:
+        return self._quad_store

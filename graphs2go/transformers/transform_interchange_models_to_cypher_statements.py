@@ -152,6 +152,7 @@ def _transform_interchange_node(
 
 def transform_interchange_models_to_cypher_statements(
     interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
+    in_process: bool = False,
 ) -> Iterable[cypher.Statement]:
     interchange_node_iris: set[rdf.Iri] = set()
     interchange_relationship_objects: set[rdf.Iri] = set()
@@ -160,7 +161,7 @@ def transform_interchange_models_to_cypher_statements(
     for output_model in transform_interchange_models(
         interchange_model_store_descriptor=interchange_model_store_descriptor,
         transform_interchange_node=_transform_interchange_node,
-        # in_process=True,
+        in_process=in_process,
     ):
         interchange_node_iris.add(output_model.interchange_node_iri)  # type: ignore
         for (

@@ -136,7 +136,7 @@ def test_value_to_date_or_datetime(
 def test_value_to_datetime(
     builder: rdf.Resource.Builder, predicate: rdf.Quad_Predicate
 ) -> None:
-    value = datetime(2025, 3, 22, 5, 6, 7)
+    value = datetime(2025, 3, 22, 5, 6, 7)  # noqa: DTZ001
     assert (
         builder.add(predicate, value)
         .build()
@@ -189,7 +189,7 @@ def test_value_to_int(
     builder: rdf.Resource.Builder, predicate: rdf.Quad_Predicate
 ) -> None:
     assert (
-        builder.add(predicate, Decimal(1.0))
+        builder.add(predicate, Decimal("1.0"))
         .build()
         .value(predicate)
         .unwrap()
@@ -241,9 +241,7 @@ def test_value_to_resource(
         .unwrap()
         .to_resource()
         .unwrap()
-        .identifier
-        == value
-    )
+    ).identifier == value
 
 
 def test_value_to_str(

@@ -4,9 +4,10 @@ from dagster import AssetsDefinition, PartitionsDefinition, asset
 from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
-from graphs2go.models import interchange, rdf
+from graphs2go.models import rdf
 from graphs2go.resources import RdfStoreConfig
 from graphs2go.transformers import transform_interchange_models_to_direct_rdf_models
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def build_direct_rdf_graph_asset(
@@ -23,7 +24,7 @@ def build_direct_rdf_graph_asset(
             ),
             rdf_store_config=rdf_store_config,
         ) as open_rdf_graph:
-            return open_rdf_graph.add_all_if_empty(
+            return open_rdf_graph.extend_if_empty(
                 lambda: tqdm(
                     transform_interchange_models_to_direct_rdf_models(
                         interchange_model_store

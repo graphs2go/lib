@@ -105,6 +105,7 @@ def _transform_skos_concept_scheme_interchange_node_to_skos_models(
 
 def transform_interchange_models_to_skos_models(
     interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
+    in_process: bool = False,
 ) -> Iterable[skos.Model]:
     yield from transform_interchange_models(
         in_process=True,
@@ -114,6 +115,7 @@ def transform_interchange_models_to_skos_models(
     )
 
     yield from transform_interchange_models(
+        in_process=in_process,
         interchange_model_store_descriptor=interchange_model_store_descriptor,
         interchange_node_type=Some(SKOS.Concept),
         transform_interchange_node=_transform_skos_concept_interchange_node_to_skos_models,

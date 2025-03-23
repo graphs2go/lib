@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from graphs2go.models import interchange, rdf, skos
+from graphs2go.models import rdf, skos
 from graphs2go.namespaces import SKOS
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.stores.rdf import QuadStore
@@ -20,9 +20,9 @@ def test_transform(
     with SkosModelStore(
         quad_store=quad_store,
     ) as skos_model_store:
-        skos_model_store.add_all(
+        skos_model_store.extend(
             transform_interchange_models_to_skos_models(
-                interchange_model_store_descriptor
+                interchange_model_store_descriptor, in_process=True
             )
         )
 
