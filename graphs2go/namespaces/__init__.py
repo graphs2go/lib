@@ -1,9 +1,11 @@
 from rdflib import DCTERMS, RDF, RDFS, SKOS, XSD  # noqa: F401
+
+from graphs2go.models import rdf
+
 from .dash import DASH as DASH
 from .interchange import INTERCHANGE as INTERCHANGE
 from .sdo import SDO as SDO
 from .skosxl import SKOSXL as SKOSXL
-from graphs2go.models import rdf
 
 PREFIXES: dict[str, rdf.Iri] = {
     DASH.PREFIX: DASH.BASE_IRI,

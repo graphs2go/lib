@@ -1,7 +1,7 @@
+from graphs2go.models.rdf.dataset import Dataset
 from graphs2go.models.rdf.iri import Iri
 from graphs2go.models.rdf.named_resource import NamedResource
 from graphs2go.models.rdf.resource import Resource
-from graphs2go.models.rdf.dataset import Dataset
 
 
 class ResourceSet:

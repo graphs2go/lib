@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import TYPE_CHECKING, IO
+from typing import IO, TYPE_CHECKING
 
 from pathvalidate import sanitize_filename
 from returns.maybe import Maybe

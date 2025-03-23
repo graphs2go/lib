@@ -2,8 +2,8 @@ from typing import override
 
 from rdflib import ConjunctiveGraph, Graph
 
-from graphs2go.models import rdf
 from graphs2go.loaders.rdf_loader import RdfLoader
+from graphs2go.models import rdf
 
 
 class BufferingRdfLoader(RdfLoader):

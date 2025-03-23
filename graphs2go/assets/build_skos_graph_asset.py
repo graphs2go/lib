@@ -4,7 +4,7 @@ from dagster import AssetsDefinition, PartitionsDefinition, asset
 from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
-from graphs2go.models import interchange, skos, rdf
+from graphs2go.models import interchange, rdf, skos
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.transformers.transform_interchange_models_to_skos_models import (
     transform_interchange_models_to_skos_models,

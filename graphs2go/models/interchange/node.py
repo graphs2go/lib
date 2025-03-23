@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING, Self, TypeVar
 from returns.converters import flatten
 
 from graphs2go.models import rdf
-from graphs2go.namespaces import RDF
 from graphs2go.models.interchange.label import Label
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.interchange.property import Property
 from graphs2go.models.interchange.relationship import Relationship
+from graphs2go.namespaces import RDF
 from graphs2go.namespaces.interchange import INTERCHANGE
 
 if TYPE_CHECKING:

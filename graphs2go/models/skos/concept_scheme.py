@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Self
 
 from graphs2go.models import rdf
-from graphs2go.namespaces import RDF, SKOS
 from graphs2go.models.skos.resource import Resource
+from graphs2go.namespaces import RDF, SKOS
 
 
 class ConceptScheme(Resource):

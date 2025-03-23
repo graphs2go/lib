@@ -8,10 +8,10 @@ from returns.pipeline import is_successful
 
 from graphs2go.models import cypher, interchange, rdf
 from graphs2go.models.cypher.node_pattern import NodePattern
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.transformers.transform_interchange_models import (
     transform_interchange_models,
 )
-from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 if TYPE_CHECKING:
     from datetime import datetime

@@ -4,7 +4,6 @@ from .blank_node import BlankNode
 from .iri import Iri
 from .literal import Literal
 
-
 Quad_Graph = BlankNode | Iri | None
 Quad_Object = BlankNode | Iri | Literal
 Quad_Predicate = Iri

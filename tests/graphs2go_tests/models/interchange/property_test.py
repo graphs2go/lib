@@ -1,4 +1,5 @@
 from graphs2go.models import interchange, rdf
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def test_builder(

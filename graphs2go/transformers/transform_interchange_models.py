@@ -6,8 +6,8 @@ from returns.maybe import Maybe, Nothing
 from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, rdf
-from graphs2go.transformers.parallel_transform import parallel_transform
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
+from graphs2go.transformers.parallel_transform import parallel_transform
 
 _INTERCHANGE_NODE_BATCH_SIZE = 100
 _OutputT = TypeVar("_OutputT")

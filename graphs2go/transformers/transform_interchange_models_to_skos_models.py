@@ -5,10 +5,10 @@ from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, skos
 from graphs2go.namespaces import SKOS
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.transformers.transform_interchange_models import (
     transform_interchange_models,
 )
-from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def _transform_interchange_labels_to_skos_labels(

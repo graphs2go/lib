@@ -2,11 +2,11 @@ from typing import TYPE_CHECKING
 
 from graphs2go.models import interchange, rdf, skos
 from graphs2go.namespaces import SKOS
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
+from graphs2go.stores.skos import ModelStore as SkosModelStore
 from graphs2go.transformers.transform_interchange_models_to_skos_models import (
     transform_interchange_models_to_skos_models,
 )
-from graphs2go.stores.skos import ModelStore as SkosModelStore
-from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 if TYPE_CHECKING:
     from graphs2go.models.label_type import LabelType

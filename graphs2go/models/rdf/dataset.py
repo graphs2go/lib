@@ -3,10 +3,10 @@ from collections.abc import Iterable
 
 from graphs2go.models.rdf.quad import (
     Quad,
-    Quad_Subject,
-    Quad_Predicate,
-    Quad_Object,
     Quad_Graph,
+    Quad_Object,
+    Quad_Predicate,
+    Quad_Subject,
 )
 
 

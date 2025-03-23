@@ -1,7 +1,8 @@
 import pytest
-from graphs2go.namespaces import RDF, RDFS, SDO
-from graphs2go.models import rdf
 from rdflib import Graph
+
+from graphs2go.models import rdf
+from graphs2go.namespaces import RDF, RDFS, SDO
 
 
 @pytest.fixture(scope="session")

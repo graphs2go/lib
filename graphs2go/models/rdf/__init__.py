@@ -5,14 +5,12 @@ from .format import Format as Format
 from .iri import Iri as Iri
 from .literal import Literal as Literal
 from .model import Model as Model
-from .quad import (
-    Quad as Quad,
-    Quad_Graph as Quad_Graph,
-    Quad_Object as Quad_Object,
-    Quad_Predicate as Quad_Predicate,
-    Quad_Subject as Quad_Subject,
-)
 from .named_model import NamedModel as NamedModel
 from .named_resource import NamedResource as NamedResource
+from .quad import Quad as Quad
+from .quad import Quad_Graph as Quad_Graph
+from .quad import Quad_Object as Quad_Object
+from .quad import Quad_Predicate as Quad_Predicate
+from .quad import Quad_Subject as Quad_Subject
 from .resource import Resource as Resource
 from .resource_set import ResourceSet as ResourceSet

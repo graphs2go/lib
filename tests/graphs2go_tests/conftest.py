@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from returns.maybe import Some
 
-from graphs2go.models import interchange, rdf, skos, LabelType
+from graphs2go.models import LabelType, interchange, rdf, skos
 from graphs2go.namespaces import SKOS
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
@@ -130,14 +130,14 @@ def rdf_store_config(tmp_path: Path) -> RdfStoreConfig:
     return RdfStoreConfig.default(oxigraph_directory_path_default=Some(tmp_path))
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def skos_concept(skos_model_store: SkosModelStore) -> skos.Concept:
     for concept in skos_model_store.concepts():
         return concept
     pytest.fail("no concepts")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def skos_concept_scheme(skos_model_store: SkosModelStore) -> skos.ConceptScheme:
     for concept_scheme in skos_model_store.concept_schemes():
         return concept_scheme
@@ -193,7 +193,7 @@ def skos_model_store(rdf_store_config: RdfStoreConfig) -> SkosModelStore:
     return store
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def skos_label(skos_model_store: SkosModelStore) -> skos.Label:
     for label in skos_model_store.labels():
         return label

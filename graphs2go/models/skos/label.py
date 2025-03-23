@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from graphs2go.models import rdf, LabelType
+from graphs2go.models import LabelType, rdf
 from graphs2go.models.skos.model import Model
 from graphs2go.namespaces import RDF, SKOSXL
 

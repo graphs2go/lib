@@ -4,8 +4,8 @@ from decimal import Decimal
 import pytest
 
 from graphs2go.models import rdf
-from graphs2go.utils import uuid_urn
 from graphs2go.namespaces import RDF
+from graphs2go.utils import uuid_urn
 
 
 @pytest.fixture()

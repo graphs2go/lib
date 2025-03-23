@@ -4,10 +4,10 @@ from returns.pipeline import is_successful
 
 from graphs2go.models import interchange, rdf
 from graphs2go.namespaces import RDF, RDFS
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.transformers.transform_interchange_models import (
     transform_interchange_models,
 )
-from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def _transform_interchange_node_to_direct_rdf_models(

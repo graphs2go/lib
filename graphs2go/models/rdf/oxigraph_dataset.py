@@ -2,19 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from graphs2go.models.rdf.dataset import Dataset
-from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
 import pyoxigraph as ox
 
+from graphs2go.models.rdf.dataset import Dataset
+from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
+
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from graphs2go.models.rdf.quad import (
         Quad,
-        Quad_Subject,
-        Quad_Predicate,
-        Quad_Object,
         Quad_Graph,
+        Quad_Object,
+        Quad_Predicate,
+        Quad_Subject,
     )
-    from collections.abc import Iterable
 
 
 class OxigraphDataset(Dataset):

@@ -7,11 +7,12 @@ from returns.maybe import Maybe, Nothing
 
 from graphs2go.models import rdf
 from graphs2go.models.rdf import ResourceSet
-from graphs2go.stores.rdf.quad_store import QuadStore
 from graphs2go.namespaces import RDF
+from graphs2go.stores.rdf.quad_store import QuadStore
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Callable
+    from collections.abc import Callable, Iterable
+
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 

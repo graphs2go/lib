@@ -2,6 +2,7 @@ import pytest
 
 from graphs2go.models import interchange
 from graphs2go.namespaces import SKOS
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def test_builder(interchange_node: interchange.Node) -> None:

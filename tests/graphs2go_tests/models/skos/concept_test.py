@@ -1,6 +1,6 @@
 import pytest
 
-from graphs2go.models import skos, LabelType, rdf
+from graphs2go.models import LabelType, rdf, skos
 from graphs2go.namespaces import SKOS
 from graphs2go.stores.skos import ModelStore as SkosModelStore
 

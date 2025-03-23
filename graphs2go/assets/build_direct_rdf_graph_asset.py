@@ -6,9 +6,7 @@ from tqdm import tqdm
 
 from graphs2go.models import interchange, rdf
 from graphs2go.resources import RdfStoreConfig
-from graphs2go.transformers import (
-    transform_interchange_models_to_direct_rdf_models,
-)
+from graphs2go.transformers import transform_interchange_models_to_direct_rdf_models
 
 
 def build_direct_rdf_graph_asset(

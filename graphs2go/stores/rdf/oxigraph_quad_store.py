@@ -2,21 +2,21 @@ from __future__ import annotations
 
 import contextlib
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, IO
+from typing import IO, TYPE_CHECKING
 
 import pyoxigraph
 import pyoxigraph as ox
-
-from graphs2go.models.rdf import Quad
-from graphs2go.stores.rdf.quad_store import QuadStore
 from returns.maybe import Maybe
 
+from graphs2go.models.rdf import Quad
 from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
+from graphs2go.stores.rdf.quad_store import QuadStore
 
 if TYPE_CHECKING:
-    from graphs2go.models import rdf
     from collections.abc import Iterable
     from pathlib import Path
+
+    from graphs2go.models import rdf
 
 
 class OxigraphQuadStore(QuadStore):
@@ -75,7 +75,9 @@ class OxigraphQuadStore(QuadStore):
         if self.__transactional:
             self.__delegate.extend(OxigraphAdapters.Quad.to_ox(quad) for quad in quads)  # type: ignore
         else:
-            self.__delegate.bulk_extend(OxigraphAdapters.Quad.to_ox(quad) for quad in quads)  # type: ignore
+            self.__delegate.bulk_extend(
+                OxigraphAdapters.Quad.to_ox(quad) for quad in quads
+            )  # type: ignore
 
     def _load(self, *, format_: rdf.Format, input_: IO[bytes] | IO[str]) -> None:
         if self.__transactional:

@@ -7,7 +7,7 @@ from returns.maybe import Maybe, Nothing
 from graphs2go.models import rdf
 from graphs2go.models.interchange.model import Model
 from graphs2go.models.label_type import LabelType
-from graphs2go.namespaces import INTERCHANGE, SKOSXL, RDF, RDFS
+from graphs2go.namespaces import INTERCHANGE, RDF, RDFS, SKOSXL
 from graphs2go.utils.uuid_urn import uuid_urn
 
 

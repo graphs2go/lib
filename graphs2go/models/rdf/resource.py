@@ -3,21 +3,22 @@ from __future__ import annotations
 import base64
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Self, Any
+from typing import TYPE_CHECKING, Any, Self
 
 from returns.maybe import Maybe, Nothing, Some
 from returns.pipeline import is_successful
-from returns.result import Result, Success, Failure
+from returns.result import Failure, Result, Success
 
 from graphs2go.models.rdf.blank_node import BlankNode
 from graphs2go.models.rdf.iri import Iri
 from graphs2go.models.rdf.literal import Literal
 from graphs2go.models.rdf.quad import Quad, Quad_Object, Quad_Predicate
-from graphs2go.namespaces import XSD, RDF
+from graphs2go.namespaces import RDF, XSD
 
 if TYPE_CHECKING:
-    from graphs2go.models.rdf import NamedResource
     from collections.abc import Iterable
+
+    from graphs2go.models.rdf import NamedResource
     from graphs2go.models.rdf.dataset import Dataset
 
 
@@ -94,7 +95,9 @@ class Resource:
             self.__subject = subject
 
         def __cast[T](
-            self, value: Any, type_: type[T]  # noqa: ANN401
+            self,
+            value: Any,
+            type_: type[T],  # noqa: ANN401
         ) -> Result[T, ValueError]:
             if isinstance(value, type_):
                 return Success(value)

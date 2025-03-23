@@ -1,5 +1,8 @@
 import pyoxigraph as ox
 
+from graphs2go.models.rdf.blank_node import BlankNode
+from graphs2go.models.rdf.iri import Iri
+from graphs2go.models.rdf.literal import Literal
 from graphs2go.models.rdf.quad import (
     Quad,
     Quad_Graph,
@@ -7,9 +10,6 @@ from graphs2go.models.rdf.quad import (
     Quad_Predicate,
     Quad_Subject,
 )
-from graphs2go.models.rdf.blank_node import BlankNode
-from graphs2go.models.rdf.iri import Iri
-from graphs2go.models.rdf.literal import Literal
 
 
 class OxigraphAdapters:
