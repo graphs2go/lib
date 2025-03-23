@@ -117,7 +117,7 @@ class OxigraphQuadStore(QuadStore):
             yield OxigraphAdapters.Quad.from_ox(quad)
 
     @classmethod
-    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:
+    def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:  # type: ignore[override]
         return OxigraphQuadStore(
             directory_path=descriptor.directory_path,
             read_only=read_only,

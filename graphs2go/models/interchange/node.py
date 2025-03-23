@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self, TypeVar
+from typing import TYPE_CHECKING, Self
 
 from graphs2go.models import rdf
 from graphs2go.models.interchange.label import Label
@@ -13,8 +13,6 @@ from graphs2go.utils import success_values
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-_ModelT = TypeVar("_ModelT", bound="Model")
 
 
 class Node(Model):
@@ -36,9 +34,9 @@ class Node(Model):
             rdf.NamedResource.builder(iri=iri).add(RDF.type, INTERCHANGE.Node)
         )
 
-    def __dependent_models(
-        self, model_class: type[_ModelT], predicate: rdf.Iri
-    ) -> Iterable[_ModelT]:
+    def __dependent_models[ModelT: rdf.Model](
+        self, model_class: type[ModelT], predicate: rdf.Iri
+    ) -> Iterable[ModelT]:
         yield from success_values(
             value.to_named_resource().map(model_class)
             for value in self.resource.values(predicate)

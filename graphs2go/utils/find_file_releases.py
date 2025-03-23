@@ -1,12 +1,9 @@
 from collections.abc import Callable
 from logging import Logger
 from pathlib import Path
-from typing import TypeVar
-
-ReleaseT = TypeVar("ReleaseT")
 
 
-def find_file_releases(
+def find_file_releases[ReleaseT](
     *,
     logger: Logger,
     release_directory_path: Path,

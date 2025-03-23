@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, TypeVar
-
-from returns.maybe import Maybe, Nothing
+from typing import TYPE_CHECKING, Self
 
 from graphs2go.models import rdf
 from graphs2go.models.rdf import ResourceSet
@@ -16,14 +14,11 @@ if TYPE_CHECKING:
     from graphs2go.resources.rdf_store_config import RdfStoreConfig
 
 
-ModelT = TypeVar("ModelT", bound=rdf.Model)
-
-
 def _model_to_quads(model: rdf.Model) -> Iterable[rdf.Quad]:
     yield from model.resource.dataset.match()
 
 
-class ModelStore[ModelT]:
+class ModelStore[ModelT: rdf.Model]:
     """
     Non-picklable RDF model store backed by an RDF quad store.
     """
@@ -34,9 +29,11 @@ class ModelStore[ModelT]:
         A picklable dataclass identifying an RDF model store.
         """
 
+        identifier: rdf.Iri
         quad_store_descriptor: QuadStore.Descriptor
 
-    def __init__(self, *, quad_store: QuadStore):
+    def __init__(self, *, identifier: rdf.Iri, quad_store: QuadStore):
+        self.__identifier = identifier
         self._quad_store = quad_store
         self._resource_set = ResourceSet(dataset=quad_store)
 
@@ -48,17 +45,16 @@ class ModelStore[ModelT]:
         self._quad_store.close()
 
     @classmethod
-    def create(
-        cls, *, identifier: rdf.Iri, rdf_store_config: Maybe[RdfStoreConfig] = Nothing
-    ) -> Self:
+    def create(cls, *, config: RdfStoreConfig, identifier: rdf.Iri) -> Self:
         return cls(
-            quad_store=QuadStore.create(config=rdf_store_config, identifier=identifier),
+            identifier=identifier,
+            quad_store=QuadStore.create(config=config, identifier=identifier),
         )
 
     @property
     def descriptor(self) -> Descriptor:
         return self.Descriptor(
-            # identifier=self.__identifier,
+            identifier=self.__identifier,
             quad_store_descriptor=self._quad_store.descriptor,
         )
 
@@ -81,9 +77,9 @@ class ModelStore[ModelT]:
             self.extend(lazy_models())
         return self
 
-    # @property
-    # def identifier(self) -> rdf.Iri:
-    #     return self.__identifier
+    @property
+    def identifier(self) -> rdf.Iri:
+        return self.__identifier
 
     @property
     def is_empty(self) -> bool:
@@ -92,6 +88,7 @@ class ModelStore[ModelT]:
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
+            identifier=descriptor.identifier,
             quad_store=QuadStore.open(
                 descriptor.quad_store_descriptor, read_only=read_only
             ),

@@ -20,10 +20,10 @@ def build_direct_rdf_graph_asset(
         rdf_store_config: RdfStoreConfig,
     ) -> RdfModelStore.Descriptor:
         with RdfModelStore.create(
+            config=rdf_store_config,
             identifier=rdf.Iri(
                 f"urn:direct_rdf:{quote(interchange_model_store.identifier)}"
             ),
-            rdf_store_config=rdf_store_config,
         ) as open_rdf_graph:
             return open_rdf_graph.extend_if_empty(
                 lambda: tqdm(
