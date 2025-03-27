@@ -1,13 +1,13 @@
 from pathlib import Path
 
-from graphs2go.loaders.cypher_directory_loader import CypherDirectoryLoader
+from graphs2go.loaders.cypher import DirectoryLoader
 from graphs2go.models import cypher
 
 
 def test_load(
     tmp_path: Path,
 ) -> None:
-    with CypherDirectoryLoader(directory_path=tmp_path) as loader:
+    with DirectoryLoader(directory_path=tmp_path) as loader:
         loader.load(cypher.CreateNodeStatement("testnode1"))
         loader.load(cypher.CreateNodeStatement("testnode2"))
         loader.load(cypher.CreateRelationshipStatement("testrel1"))
