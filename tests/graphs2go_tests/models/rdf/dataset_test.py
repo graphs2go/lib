@@ -20,7 +20,6 @@ class DatasetTest:
             PREDICATE,
             IRI_OBJECT,
         )
-        TTL_FILE_PATH = Path(__file__).parent / "example.ttl"
 
     @pytest.fixture()
     def dataset(self, tmp_path: Path) -> Iterable[rdf.Dataset]:
@@ -138,11 +137,11 @@ class DatasetTest:
         assert len(dataset) == 1
 
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
-    def test_load_from_file(self, dataset: rdf.Dataset) -> None:
+    def test_load_from_file(
+        self, dataset: rdf.Dataset, example_ttl_file_path: Path
+    ) -> None:
         assert dataset.is_empty
-        dataset.load(
-            format_=rdf.Format.TURTLE, input_=Path(__file__).parent / "example.ttl"
-        )
+        dataset.load(format_=rdf.Format.TURTLE, input_=example_ttl_file_path)
         assert not dataset.is_empty
 
     def test_match_empty(self, dataset: rdf.Dataset) -> None:

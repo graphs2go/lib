@@ -6,12 +6,25 @@ import pytest
 from returns.maybe import Some
 
 from graphs2go.models import LabelType, interchange, rdf, skos
+from graphs2go.models.rdf.oxigraph_dataset import OxigraphDataset
 from graphs2go.namespaces import SKOS
 from graphs2go.resources.rdf_store_config import RdfStoreConfig
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.stores.rdf import QuadStore
 from graphs2go.stores.skos import ModelStore as SkosModelStore
 from graphs2go.utils.uuid_urn import uuid_urn
+
+
+@pytest.fixture(scope="session")
+def example_ttl_file_path() -> Path:
+    return Path(__file__).parent / "example.ttl"
+
+
+@pytest.fixture(scope="session")
+def example_rdf_dataset(example_ttl_file_path: Path) -> rdf.Dataset:
+    dataset = OxigraphDataset()
+    dataset.load(format_=rdf.Format.TURTLE, input_=example_ttl_file_path)
+    return dataset
 
 
 @pytest.fixture()
