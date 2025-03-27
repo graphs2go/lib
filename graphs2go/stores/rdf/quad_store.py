@@ -55,61 +55,11 @@ class QuadStore(rdf.Dataset):
     def descriptor(self) -> Descriptor:
         pass
 
-    def dump(
-        self,
-        *,
-        format_: rdf.Format,
-        output: IO[bytes] | Path | None = None,
-        prefixes: dict[str, rdf.Iri] | None = None,
-    ) -> bytes | None:
-        if isinstance(output, Path):
-            with output.open("wb") as file_output:
-                self._dump(format_=format_, output=file_output, prefixes=prefixes or {})
-                return None
-        elif output is None:
-            with BytesIO() as bytes_output:
-                self._dump(
-                    format_=format_, output=bytes_output, prefixes=prefixes or {}
-                )
-                return bytes_output.getvalue()
-        else:
-            self._dump(format_=format_, output=output, prefixes=prefixes or {})
-            return None
-
-    @abstractmethod
-    def _dump(
-        self,
-        *,
-        format_: rdf.Format,
-        output: IO[bytes],
-        prefixes: dict[str, rdf.Iri],
-    ) -> None:
-        raise NotImplementedError
-
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):  # noqa: ANN001
         self.close()
-
-    def load(
-        self, *, format_: rdf.Format, input_: bytes | IO[bytes] | IO[str] | Path | str
-    ) -> None:
-        if isinstance(input_, bytes):
-            with BytesIO(input_) as bytes_input:
-                self._load(format_=format_, input_=bytes_input)
-        elif isinstance(input_, Path):
-            with input_.open("rb") as file_input:
-                self._load(format_=format_, input_=file_input)
-        elif isinstance(input_, str):
-            with StringIO(input_) as str_input:
-                self._load(format_=format_, input_=str_input)
-        else:
-            self._load(format_=format_, input_=input_)
-
-    @abstractmethod
-    def _load(self, *, format_: rdf.Format, input_: IO[bytes] | IO[str]) -> None:
-        raise NotImplementedError
 
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:

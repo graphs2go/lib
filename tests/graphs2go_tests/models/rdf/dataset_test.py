@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -19,6 +20,7 @@ class DatasetTest:
             PREDICATE,
             IRI_OBJECT,
         )
+        TTL_FILE_PATH = Path(__file__).parent / "example.ttl"
 
     @pytest.fixture()
     def dataset(self, tmp_path: Path) -> Iterable[rdf.Dataset]:
@@ -85,9 +87,48 @@ class DatasetTest:
             == 0
         )
 
+    def test_dump_prefixes(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        output = cast(
+            "bytes",
+            dataset.dump(
+                format_=rdf.Format.TURTLE,
+                prefixes={"ex": rdf.Iri("http://example.com/")},
+            ),
+        ).decode("utf-8")
+        assert (
+            output
+            == "@prefix ex: <http://example.com/> .\nex:subject ex:predicate ex:object .\n"
+        )
+
+    def test_dump_to_bytes(self, dataset: rdf.Dataset) -> None:
+        dataset.add(self._TestData.QUAD)
+        output = cast("bytes", dataset.dump(format_=rdf.Format.NQUADS)).decode("utf-8")
+        assert (
+            output
+            == "<http://example.com/subject> <http://example.com/predicate> <http://example.com/object> .\n"
+        )
+
+    def test_dump_to_file(self, dataset: rdf.Dataset, tmp_path: Path) -> None:
+        dataset.add(self._TestData.QUAD)
+        output_file_path = tmp_path / "temp.nq"
+        output = dataset.dump(format_=rdf.Format.NQUADS, output=output_file_path)
+        assert output is None
+        assert output_file_path.is_file()
+        with output_file_path.open() as output_file:
+            assert (
+                output_file.read()
+                == "<http://example.com/subject> <http://example.com/predicate> <http://example.com/object> .\n"
+            )
+
     # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
     def test_is_empty(self, dataset: rdf.Dataset) -> None:
         assert dataset.is_empty
+
+    def test_iter(self, dataset: rdf.Dataset) -> None:
+        assert len(tuple(dataset)) == 0
+        dataset.add(self._TestData.QUAD)
+        assert len(tuple(dataset)) == 1
 
     def test_len(self, dataset: rdf.Dataset) -> None:
         assert len(dataset) == 0
@@ -95,6 +136,14 @@ class DatasetTest:
         assert len(dataset) == 1
         dataset.add(self._TestData.QUAD)
         assert len(dataset) == 1
+
+    # @pytest.mark.skipif("CI" in os.environ, reason="don't run store tests in CI")
+    def test_load_from_file(self, dataset: rdf.Dataset) -> None:
+        assert dataset.is_empty
+        dataset.load(
+            format_=rdf.Format.TURTLE, input_=Path(__file__).parent / "example.ttl"
+        )
+        assert not dataset.is_empty
 
     def test_match_empty(self, dataset: rdf.Dataset) -> None:
         assert len(tuple(dataset.match())) == 0

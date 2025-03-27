@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, IO
 
 import pyoxigraph as ox
 
@@ -8,6 +8,8 @@ from graphs2go.models.rdf.dataset import Dataset
 from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
 
 if TYPE_CHECKING:
+    from graphs2go.models.rdf.iri import Iri
+    from graphs2go.models.rdf.format import Format
     from collections.abc import Iterable
 
     from graphs2go.models.rdf.quad import (
@@ -34,6 +36,23 @@ class OxigraphDataset(Dataset):
 
     def clear(self) -> None:
         self.__delegate.clear()
+
+    def _dump(
+        self, *, format_: Format, output: IO[bytes], prefixes: dict[str, Iri]
+    ) -> None:
+        ox.serialize(
+            format=ox.RdfFormat.from_extension(format_.file_extension),
+            prefixes={prefix: str(namespace) for prefix, namespace in prefixes.items()},
+            input=self.__delegate,
+            output=output,
+        )
+
+    def _load(self, *, format_: Format, input_: IO[bytes] | IO[str]) -> None:
+        for quad in ox.parse(
+            input=input_,
+            format=ox.RdfFormat.from_extension(format_.file_extension),
+        ):
+            self.__delegate.add(quad)
 
     def match(
         self,

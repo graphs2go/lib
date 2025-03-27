@@ -1,6 +1,11 @@
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
+from io import BytesIO, StringIO
+from pathlib import Path
+from typing import IO
 
+from graphs2go.models.rdf.format import Format
+from graphs2go.models.rdf.iri import Iri
 from graphs2go.models.rdf.quad import (
     Quad,
     Quad_Graph,
@@ -10,7 +15,7 @@ from graphs2go.models.rdf.quad import (
 )
 
 
-class Dataset(ABC):
+class Dataset(ABC, Iterable[Quad]):
     """
     Abstract base class/interface over an RDF dataset (https://www.w3.org/TR/rdf11-datasets/).
 
@@ -53,6 +58,37 @@ class Dataset(ABC):
             count += 1
         return count
 
+    def dump(
+        self,
+        *,
+        format_: Format,
+        output: IO[bytes] | Path | None = None,
+        prefixes: dict[str, Iri] | None = None,
+    ) -> bytes | None:
+        if isinstance(output, Path):
+            with output.open("wb") as file_output:
+                self._dump(format_=format_, output=file_output, prefixes=prefixes or {})
+                return None
+        elif output is None:
+            with BytesIO() as bytes_output:
+                self._dump(
+                    format_=format_, output=bytes_output, prefixes=prefixes or {}
+                )
+                return bytes_output.getvalue()
+        else:
+            self._dump(format_=format_, output=output, prefixes=prefixes or {})
+            return None
+
+    @abstractmethod
+    def _dump(
+        self,
+        *,
+        format_: Format,
+        output: IO[bytes],
+        prefixes: dict[str, Iri],
+    ) -> None:
+        raise NotImplementedError
+
     def extend(self, quads: Iterable[Quad]) -> None:
         """
         Add zero or more quads to the Dataset.
@@ -80,6 +116,28 @@ class Dataset(ABC):
         for _ in self.match():
             count += 1
         return count
+
+    def __iter__(self) -> Iterator[Quad]:
+        yield from self.match()
+
+    def load(
+        self, *, format_: Format, input_: bytes | IO[bytes] | IO[str] | Path | str
+    ) -> None:
+        if isinstance(input_, bytes):
+            with BytesIO(input_) as bytes_input:
+                self._load(format_=format_, input_=bytes_input)
+        elif isinstance(input_, Path):
+            with input_.open("rb") as file_input:
+                self._load(format_=format_, input_=file_input)
+        elif isinstance(input_, str):
+            with StringIO(input_) as str_input:
+                self._load(format_=format_, input_=str_input)
+        else:
+            self._load(format_=format_, input_=input_)
+
+    @abstractmethod
+    def _load(self, *, format_: Format, input_: IO[bytes] | IO[str]) -> None:
+        raise NotImplementedError
 
     @abstractmethod
     def match(
