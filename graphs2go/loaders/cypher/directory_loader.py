@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, final, override
+from typing import TYPE_CHECKING, final
 
 import stringcase
 

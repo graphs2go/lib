@@ -124,7 +124,7 @@ class _StreamingFileLoader(FileLoader):
         with metrics.timer("streaming_dataset_write"):
             dataset.dump(
                 format_=self._rdf_file_format.format_,
-                output=self.__open_file,
+                output=self.__open_file,  # type: ignore
             )
             self.__open_file.flush()
 
