@@ -2,7 +2,9 @@ from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_l
 from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
-from graphs2go.loaders.cypher_directory_loader import CypherDirectoryLoader
+from graphs2go.loaders.cypher.directory_loader import (
+    DirectoryLoader as CypherDirectoryLoader,
+)
 from graphs2go.resources.output_config import OutputConfig
 from graphs2go.transformers.transform_interchange_models_to_cypher_statements import (
     transform_interchange_models_to_cypher_statements,
