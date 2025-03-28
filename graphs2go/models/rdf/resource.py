@@ -30,7 +30,9 @@ class Resource:
     Identifier = BlankNode | Iri
 
     class Builder:
-        _AddableValue = Quad_Object | bool | bytes | date | datetime | float | int | str
+        _AddableValue = (
+            Quad_Object | bool | bytes | date | datetime | Decimal | float | int | str
+        )
 
         def __init__(
             self, *, dataset: Dataset, identifier: Resource.Identifier
