@@ -1,4 +1,3 @@
-from collections.abc import Callable
 
 from dagster import AssetsDefinition, PartitionsDefinition, asset, get_dagster_logger
 from pathvalidate import sanitize_filename
@@ -6,7 +5,6 @@ from returns.maybe import Maybe, Nothing
 
 from graphs2go.assets.rdf_file_asset_defaults import RDF_FILE_FORMATS_DEFAULT
 from graphs2go.models import rdf
-from graphs2go.namespaces.skosxl import SKOSXL
 from graphs2go.resources.output_config import OutputConfig
 from graphs2go.stores.skos import ModelStore as SkosModelStore
 from graphs2go.loaders.rdf import FileLoader as RdfFileLoader

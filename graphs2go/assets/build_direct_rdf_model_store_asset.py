@@ -1,10 +1,8 @@
-from urllib.parse import quote
 
 from dagster import AssetsDefinition, PartitionsDefinition, asset
 from returns.maybe import Maybe, Nothing
 from tqdm import tqdm
 
-from graphs2go.models import rdf
 from graphs2go.resources import RdfStoreConfig
 from graphs2go.transformers import transform_interchange_models_to_direct_rdf_models
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore

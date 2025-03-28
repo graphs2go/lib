@@ -2,7 +2,7 @@ from abc import ABC
 from dataclasses import dataclass
 
 
-class Store(ABC):
+class Store(ABC):  # noqa: B024
     @dataclass(frozen=True)
     class Identifier:
         """
