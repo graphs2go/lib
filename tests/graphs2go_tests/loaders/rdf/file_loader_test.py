@@ -28,7 +28,8 @@ def test_load(
 ) -> None:
     rdf_file_path = tmp_path / f"test.{rdf_file_format.file_extension}"
     with FileLoader.create(
-        file_path=rdf_file_path, rdf_file_format=rdf_file_format
+        file_format=rdf_file_format,
+        file_path=rdf_file_path,
     ) as loader:
         loader.load(example_rdf_dataset)
 

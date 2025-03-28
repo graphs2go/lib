@@ -21,7 +21,10 @@ class TestOxigraphQuadStoreTransactional(QuadStoreTest):
     @staticmethod
     def __quad_store(tmp_path: Path) -> Iterable[QuadStore]:
         with OxigraphQuadStore(
-            directory_path=tmp_path, read_only=False, transactional=True
+            directory_path=tmp_path,
+            identifier=QuadStore.Identifier(namespace="test", name="test"),
+            read_only=False,
+            transactional=True,
         ) as store:
             yield store
 
@@ -38,6 +41,9 @@ class TestOxigraphQuadStoreNonTransactional(QuadStoreTest):
     @staticmethod
     def __quad_store(tmp_path: Path) -> Iterable[QuadStore]:
         with OxigraphQuadStore(
-            directory_path=tmp_path, read_only=False, transactional=False
+            directory_path=tmp_path,
+            identifier=QuadStore.Identifier(namespace="test", name="test"),
+            read_only=False,
+            transactional=False,
         ) as store:
             yield store

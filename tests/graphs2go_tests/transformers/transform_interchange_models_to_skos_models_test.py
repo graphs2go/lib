@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from graphs2go.models import rdf, skos
 from graphs2go.namespaces import SKOS
+from graphs2go.resources import RdfStoreConfig
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.stores.rdf import QuadStore
 from graphs2go.stores.skos import ModelStore as SkosModelStore
@@ -15,10 +16,16 @@ if TYPE_CHECKING:
 
 def test_transform(
     interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
-    quad_store: QuadStore,
+    rdf_store_config: RdfStoreConfig,
 ) -> None:
     with SkosModelStore(
-        quad_store=quad_store,
+        quad_store=QuadStore.create(
+            config=rdf_store_config,
+            identifier=QuadStore.Identifier(
+                namespace="test",
+                name="transform_interchange_models_to_skos_models",
+            ),
+        )
     ) as skos_model_store:
         skos_model_store.extend(
             transform_interchange_models_to_skos_models(
@@ -76,7 +83,7 @@ def test_transform(
                         or interchange_property.predicate
                         in skos.Concept.NOTE_PREDICATES
                     )
-                    assert isinstance(interchange_property.object_, rdf.Literal)
+                    assert isinstance(interchange_property.object, rdf.Literal)
 
                 for interchange_relationship in interchange_node.relationships():
                     other_resource: rdf.NamedResource = (

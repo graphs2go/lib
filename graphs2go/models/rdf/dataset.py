@@ -4,7 +4,7 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from typing import IO
 
-from graphs2go.models.rdf import NamespacePrefixes
+from graphs2go.models.rdf.namespace_prefixes import NamespacePrefixes
 from graphs2go.models.rdf.format import Format
 from graphs2go.models.rdf.iri import Iri
 from graphs2go.models.rdf.quad import (
