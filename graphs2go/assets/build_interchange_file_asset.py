@@ -3,10 +3,10 @@ from pathvalidate import sanitize_filename
 from returns.maybe import Maybe, Nothing
 
 from graphs2go.assets.rdf_file_asset_defaults import RDF_FILE_FORMATS_DEFAULT
+from graphs2go.loaders.rdf import FileLoader as RdfFileLoader
 from graphs2go.models import rdf
 from graphs2go.resources.output_config import OutputConfig
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
-from graphs2go.loaders.rdf import FileLoader as RdfFileLoader
 
 
 def build_interchange_file_asset(

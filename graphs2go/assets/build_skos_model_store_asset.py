@@ -1,4 +1,3 @@
-
 from dagster import AssetsDefinition, PartitionsDefinition, asset
 from returns.maybe import Maybe, Nothing
 from tqdm import tqdm

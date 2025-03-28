@@ -6,10 +6,10 @@ from graphs2go.loaders.cypher.directory_loader import (
     DirectoryLoader as CypherDirectoryLoader,
 )
 from graphs2go.resources.output_config import OutputConfig
+from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.transformers.transform_interchange_models_to_cypher_statements import (
     transform_interchange_models_to_cypher_statements,
 )
-from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 
 
 def build_cypher_files_asset(

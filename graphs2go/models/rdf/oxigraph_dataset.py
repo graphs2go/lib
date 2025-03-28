@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, IO
+from typing import IO, TYPE_CHECKING
 
 import pyoxigraph as ox
 
@@ -8,10 +8,10 @@ from graphs2go.models.rdf.dataset import Dataset
 from graphs2go.models.rdf.oxigraph_adapters import OxigraphAdapters
 
 if TYPE_CHECKING:
-    from graphs2go.models.rdf.iri import Iri
-    from graphs2go.models.rdf.format import Format
     from collections.abc import Iterable
 
+    from graphs2go.models.rdf.format import Format
+    from graphs2go.models.rdf.iri import Iri
     from graphs2go.models.rdf.quad import (
         Quad,
         Quad_Graph,

@@ -4,6 +4,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 import stringcase
+from returns.maybe import Maybe, Nothing
 from returns.pipeline import is_successful
 
 from graphs2go.models import cypher, interchange, rdf
@@ -13,7 +14,6 @@ from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.transformers.transform_interchange_models import (
     transform_interchange_models,
 )
-from returns.maybe import Maybe, Nothing
 
 if TYPE_CHECKING:
     from datetime import datetime

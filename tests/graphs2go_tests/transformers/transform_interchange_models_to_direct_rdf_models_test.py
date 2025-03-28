@@ -1,6 +1,7 @@
 from graphs2go.namespaces import RDF, SKOS
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
-from graphs2go.stores.rdf import ModelStore as RdfModelStore, QuadStore
+from graphs2go.stores.rdf import ModelStore as RdfModelStore
+from graphs2go.stores.rdf import QuadStore
 from graphs2go.transformers.transform_interchange_models_to_direct_rdf_models import (
     transform_interchange_models_to_direct_rdf_models,
 )
