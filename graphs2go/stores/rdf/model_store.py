@@ -7,6 +7,7 @@ from graphs2go.models import rdf
 from graphs2go.models.rdf import ResourceSet
 from graphs2go.namespaces import RDF
 from graphs2go.stores.rdf.quad_store import QuadStore
+from graphs2go.stores.store import Store
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -18,7 +19,7 @@ def _model_to_quads(model: rdf.Model) -> Iterable[rdf.Quad]:
     yield from model.resource.dataset.match()
 
 
-class ModelStore[ModelT: rdf.Model]:
+class ModelStore[ModelT: rdf.Model](Store):
     """
     Non-picklable RDF model store backed by an RDF quad store.
     """
@@ -29,11 +30,13 @@ class ModelStore[ModelT: rdf.Model]:
         A picklable dataclass identifying an RDF model store.
         """
 
-        identifier: rdf.Iri
         quad_store_descriptor: QuadStore.Descriptor
 
-    def __init__(self, *, identifier: rdf.Iri, quad_store: QuadStore):
-        self.__identifier = identifier
+        @property
+        def identifier(self) -> Store.Identifier:
+            return self.quad_store_descriptor.identifier
+
+    def __init__(self, *, quad_store: QuadStore):
         self._quad_store = quad_store
         self._resource_set = ResourceSet(dataset=quad_store)
 
@@ -45,16 +48,14 @@ class ModelStore[ModelT: rdf.Model]:
         self._quad_store.close()
 
     @classmethod
-    def create(cls, *, config: RdfStoreConfig, identifier: rdf.Iri) -> Self:
+    def create(cls, *, config: RdfStoreConfig, identifier: Store.Identifier) -> Self:
         return cls(
-            identifier=identifier,
             quad_store=QuadStore.create(config=config, identifier=identifier),
         )
 
     @property
     def descriptor(self) -> Descriptor:
         return self.Descriptor(
-            identifier=self.__identifier,
             quad_store_descriptor=self._quad_store.descriptor,
         )
 
@@ -78,8 +79,8 @@ class ModelStore[ModelT: rdf.Model]:
         return self
 
     @property
-    def identifier(self) -> rdf.Iri:
-        return self.__identifier
+    def identifier(self) -> Store.Identifier:
+        return self._quad_store.identifier
 
     @property
     def is_empty(self) -> bool:
@@ -88,7 +89,6 @@ class ModelStore[ModelT: rdf.Model]:
     @classmethod
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> Self:
         return cls(
-            identifier=descriptor.identifier,
             quad_store=QuadStore.open(
                 descriptor.quad_store_descriptor, read_only=read_only
             ),

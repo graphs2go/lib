@@ -7,7 +7,7 @@ from .interchange import INTERCHANGE as INTERCHANGE
 from .sdo import SDO as SDO
 from .skosxl import SKOSXL as SKOSXL
 
-PREFIXES: dict[str, rdf.Iri] = {
+NAMESPACE_PREFIXES: rdf.NamespacePrefixes = {
     DASH.PREFIX: DASH.BASE_IRI,
     "dct": rdf.Iri(DCTERMS._NS),
     INTERCHANGE.PREFIX: INTERCHANGE.BASE_IRI,

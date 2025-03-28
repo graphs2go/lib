@@ -4,6 +4,7 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from typing import IO
 
+from graphs2go.models.rdf import NamespacePrefixes
 from graphs2go.models.rdf.format import Format
 from graphs2go.models.rdf.iri import Iri
 from graphs2go.models.rdf.quad import (
@@ -62,21 +63,31 @@ class Dataset(ABC, Iterable[Quad]):
         self,
         *,
         format_: Format,
+        namespace_prefixes: NamespacePrefixes | None = None,
         output: IO[bytes] | Path | None = None,
-        prefixes: dict[str, Iri] | None = None,
     ) -> bytes | None:
         if isinstance(output, Path):
             with output.open("wb") as file_output:
-                self._dump(format_=format_, output=file_output, prefixes=prefixes or {})
+                self._dump(
+                    format_=format_,
+                    namespace_prefixes=namespace_prefixes or {},
+                    output=file_output,
+                )
                 return None
         elif output is None:
             with BytesIO() as bytes_output:
                 self._dump(
-                    format_=format_, output=bytes_output, prefixes=prefixes or {}
+                    format_=format_,
+                    namespace_prefixes=namespace_prefixes or {},
+                    output=bytes_output,
                 )
                 return bytes_output.getvalue()
         else:
-            self._dump(format_=format_, output=output, prefixes=prefixes or {})
+            self._dump(
+                format_=format_,
+                output=output,
+                namespace_prefixes=namespace_prefixes or {},
+            )
             return None
 
     @abstractmethod
@@ -85,7 +96,7 @@ class Dataset(ABC, Iterable[Quad]):
         *,
         format_: Format,
         output: IO[bytes],
-        prefixes: dict[str, Iri],
+        namespace_prefixes: dict[str, Iri],
     ) -> None:
         raise NotImplementedError
 

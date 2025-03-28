@@ -38,11 +38,14 @@ class OxigraphDataset(Dataset):
         self.__delegate.clear()
 
     def _dump(
-        self, *, format_: Format, output: IO[bytes], prefixes: dict[str, Iri]
+        self, *, format_: Format, output: IO[bytes], namespace_prefixes: dict[str, Iri]
     ) -> None:
         ox.serialize(
             format=ox.RdfFormat.from_extension(format_.file_extension),
-            prefixes={prefix: str(namespace) for prefix, namespace in prefixes.items()},
+            prefixes={
+                prefix: str(namespace)
+                for prefix, namespace in namespace_prefixes.items()
+            },
             input=self.__delegate,
             output=output,
         )

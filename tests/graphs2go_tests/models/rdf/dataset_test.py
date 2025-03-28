@@ -92,7 +92,7 @@ class DatasetTest:
             "bytes",
             dataset.dump(
                 format_=rdf.Format.TURTLE,
-                prefixes={"ex": rdf.Iri("http://example.com/")},
+                namespace_prefixes={"ex": rdf.Iri("http://example.com/")},
             ),
         ).decode("utf-8")
         assert (

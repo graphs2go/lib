@@ -1,22 +1,23 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
+from functools import partial
 from typing import TYPE_CHECKING
 
 import stringcase
-from rdflib.namespace import NamespaceManager
 from returns.pipeline import is_successful
 
 from graphs2go.models import cypher, interchange, rdf
 from graphs2go.models.cypher.node_pattern import NodePattern
+from graphs2go.namespaces import NAMESPACE_PREFIXES
 from graphs2go.stores.interchange import ModelStore as InterchangeModelStore
 from graphs2go.transformers.transform_interchange_models import (
     transform_interchange_models,
 )
+from returns.maybe import Maybe, Nothing
 
 if TYPE_CHECKING:
     from datetime import datetime
 
-    from returns.maybe import Maybe
 
 _PRIMARY_NODE_LABEL = "Node"
 
@@ -28,9 +29,14 @@ class _OutputModel:
     interchange_relationship_objects: frozenset[rdf.Iri]
 
 
-class _UriTransformer:
-    def __init__(self, namespace_manager: NamespaceManager):
-        self.__namespace_manager = namespace_manager
+class _IriTransformer:
+    def __init__(self, rdf_namespace_prefixes: rdf.NamespacePrefixes):
+        from rdflib import Graph
+        from rdflib.namespace import Namespace, NamespaceManager
+
+        self.__namespace_manager = NamespaceManager(graph=Graph())
+        for prefix, namespace in rdf_namespace_prefixes.items():
+            self.__namespace_manager.bind(prefix, Namespace(namespace))
 
     def iri_to_curie(self, iri: rdf.Iri) -> tuple[str, str]:
         curie_parts = self.__namespace_manager.curie(iri).split(":", 1)
@@ -54,12 +60,10 @@ class _UriTransformer:
 
 
 def _transform_interchange_node(
-    interchange_node: interchange.Node,
+    rdf_namespace_prefixes: rdf.NamespacePrefixes, interchange_node: interchange.Node
 ) -> Iterable[_OutputModel]:
     cypher_statements: list[cypher.Statement] = []
-    iri_transformer = _UriTransformer(
-        namespace_manager=interchange_node.resource.graph.namespace_manager
-    )
+    iri_transformer = _IriTransformer(rdf_namespace_prefixes=rdf_namespace_prefixes)
 
     node_labels: list[str] = [_PRIMARY_NODE_LABEL]
 
@@ -153,6 +157,7 @@ def _transform_interchange_node(
 def transform_interchange_models_to_cypher_statements(
     interchange_model_store_descriptor: InterchangeModelStore.Descriptor,
     in_process: bool = False,
+    rdf_namespace_prefixes: Maybe[rdf.NamespacePrefixes] = Nothing,
 ) -> Iterable[cypher.Statement]:
     interchange_node_iris: set[rdf.Iri] = set()
     interchange_relationship_objects: set[rdf.Iri] = set()
@@ -160,7 +165,10 @@ def transform_interchange_models_to_cypher_statements(
     output_model: _OutputModel
     for output_model in transform_interchange_models(
         interchange_model_store_descriptor=interchange_model_store_descriptor,
-        transform_interchange_node=_transform_interchange_node,
+        transform_interchange_node=partial(
+            _transform_interchange_node,
+            rdf_namespace_prefixes.value_or(NAMESPACE_PREFIXES),
+        ),
         in_process=in_process,
     ):
         interchange_node_iris.add(output_model.interchange_node_iri)  # type: ignore
@@ -172,19 +180,14 @@ def transform_interchange_models_to_cypher_statements(
         yield from output_model.cypher_statements  # type: ignore
 
     # Interchange relationship objects that don't refer to interchange nodes should also be represented in the graph.
-    with InterchangeModelStore.open(
-        interchange_model_store_descriptor, read_only=True
-    ) as interchange_model_store:
-        iri_transformer = _UriTransformer(
-            namespace_manager=interchange_model_store.rdflib_graph.namespace_manager
-        )
+    iri_transformer = _IriTransformer(
+        rdf_namespace_prefixes=rdf_namespace_prefixes.value_or(NAMESPACE_PREFIXES)
+    )
 
-        for external_interchange_relation_object in (
-            interchange_relationship_objects - interchange_node_iris
-        ):
-            yield cypher.CreateNodeStatement.builder(
-                id_=iri_transformer.iri_to_node_id(
-                    external_interchange_relation_object
-                ),
-                label=_PRIMARY_NODE_LABEL,
-            ).build()
+    for external_interchange_relation_object in (
+        interchange_relationship_objects - interchange_node_iris
+    ):
+        yield cypher.CreateNodeStatement.builder(
+            id_=iri_transformer.iri_to_node_id(external_interchange_relation_object),
+            label=_PRIMARY_NODE_LABEL,
+        ).build()

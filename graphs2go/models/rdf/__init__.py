@@ -7,6 +7,7 @@ from .literal import Literal as Literal
 from .model import Model as Model
 from .named_model import NamedModel as NamedModel
 from .named_resource import NamedResource as NamedResource
+from .namespace_prefixes import NamespacePrefixes as NamespacePrefixes
 from .quad import Quad as Quad
 from .quad import Quad_Graph as Quad_Graph
 from .quad import Quad_Object as Quad_Object

@@ -21,8 +21,9 @@ def build_direct_rdf_model_store_asset(
     ) -> RdfModelStore.Descriptor:
         with RdfModelStore.create(
             config=rdf_store_config,
-            identifier=rdf.Iri(
-                f"urn:direct_rdf:{quote(interchange_model_store.identifier)}"
+            identifier=RdfModelStore.Identifier(
+                name=interchange_model_store.identifier.name,
+                namespace="direct_rdf",
             ),
         ) as open_rdf_graph:
             return open_rdf_graph.extend_if_empty(

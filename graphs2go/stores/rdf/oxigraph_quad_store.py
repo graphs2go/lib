@@ -29,7 +29,15 @@ class OxigraphQuadStore(QuadStore):
         directory_path: Path
         transactional: bool
 
-    def __init__(self, *, directory_path: Path, read_only: bool, transactional: bool):
+    def __init__(
+        self,
+        *,
+        directory_path: Path,
+        identifier: QuadStore.Identifier,
+        read_only: bool,
+        transactional: bool,
+    ):
+        QuadStore.__init__(self, identifier=identifier)
         self.__directory_path = directory_path
         if read_only:
             if not self.__directory_path.is_dir():
@@ -56,16 +64,24 @@ class OxigraphQuadStore(QuadStore):
     def descriptor(self) -> Descriptor:
         return self.Descriptor(
             directory_path=self.__directory_path,
+            identifier=self.identifier,
             transactional=self.__transactional,
         )
 
     def _dump(
-        self, *, format_: rdf.Format, output: IO[bytes], prefixes: dict[str, rdf.Iri]
+        self,
+        *,
+        format_: rdf.Format,
+        output: IO[bytes],
+        namespace_prefixes: dict[str, rdf.Iri],
     ) -> None:
         self.__delegate.dump(
             format=pyoxigraph.RdfFormat.from_extension(format_.file_extension),
             from_graph=None if format_.supports_quads else ox.DefaultGraph(),
-            prefixes={prefix: str(namespace) for prefix, namespace in prefixes.items()},
+            prefixes={
+                prefix: str(namespace)
+                for prefix, namespace in namespace_prefixes.items()
+            },
             output=output,
         )
 
@@ -120,6 +136,7 @@ class OxigraphQuadStore(QuadStore):
     def open(cls, descriptor: Descriptor, *, read_only: bool = False) -> QuadStore:  # type: ignore[override]
         return OxigraphQuadStore(
             directory_path=descriptor.directory_path,
+            identifier=descriptor.identifier,
             read_only=read_only,
             transactional=descriptor.transactional,
         )
